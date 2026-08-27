@@ -1,6 +1,7 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -23,11 +24,21 @@ import {
   Flame,
   Trophy,
   Swords,
+  Bell,
+  BellOff,
 } from "lucide-react";
 import {
   ACHIEVEMENTS,
   ACCESSORIES,
 } from "@/lib/quiz-data";
+import {
+  isPushSupported,
+  getPermissionState,
+  subscribeToPush,
+  unsubscribeFromPush,
+  registerServiceWorker,
+  showStreakReminder,
+} from "@/lib/notifications";
 
 const COLOR_THEMES: Record<string, string> = {
   Sunset: "#fb923c",
@@ -89,10 +100,67 @@ export default function Dashboard() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const character = useQuery(api.characters.getCharacter);
+  const subStatus = useQuery(api.notifications.getSubscriptionStatus);
+  const subscribe = useMutation(api.notifications.subscribe);
+  const unsubscribe = useMutation(api.notifications.unsubscribe);
+  const recordActivity = useMutation(api.notifications.recordDailyActivity);
+
+  const [notifSupported, setNotifSupported] = useState(false);
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>("default");
+  const [showStreakBanner, setShowStreakBanner] = useState(false);
+  const [notifLoading, setNotifLoading] = useState(false);
+
+  // Register service worker + check notification state
+  useEffect(() => {
+    const supported = isPushSupported();
+    setNotifSupported(supported);
+    setNotifPermission(getPermissionState());
+    if (supported) {
+      registerServiceWorker();
+    }
+  }, []);
+
+  // Record daily activity and check streak reminder
+  useEffect(() => {
+    if (character && character.streak && character.streak > 0) {
+      const today = new Date().toISOString().split("T")[0];
+      if (character.lastActiveDate !== today) {
+        setShowStreakBanner(true);
+        // Show browser notification if permission granted
+        if (Notification.permission === "granted") {
+          showStreakReminder(character.name, character.streak);
+        }
+      }
+    }
+    // Record today's activity
+    if (character) {
+      recordActivity();
+    }
+  }, [character, recordActivity]);
 
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
+  };
+
+  const toggleNotifications = async () => {
+    if (!notifSupported) return;
+    setNotifLoading(true);
+    try {
+      if (subStatus?.subscribed) {
+        await unsubscribeFromPush();
+        await unsubscribe();
+      } else {
+        const pushSub = await subscribeToPush();
+        if (pushSub) {
+          await subscribe(pushSub);
+        }
+        setNotifPermission(getPermissionState());
+      }
+    } catch (err) {
+      console.error("Notification toggle failed:", err);
+    }
+    setNotifLoading(false);
   };
 
   const themeColor = character
@@ -121,16 +189,71 @@ export default function Dashboard() {
               Brainly<span className="text-purple-400"> Weird</span>
             </span>
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleSignOut}
-            className="clay-btn gap-2 rounded-xl border-white/5 bg-white/[0.03] text-sm text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
-          >
-            <LogOut className="h-4 w-4" />
-            Sign out
-          </Button>
+          <div className="flex items-center gap-2">
+            {notifSupported && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={toggleNotifications}
+                disabled={notifLoading}
+                className="clay-btn gap-2 rounded-xl border-white/5 bg-white/[0.03] text-sm text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+                title={subStatus?.subscribed ? "Disable notifications" : "Enable streak reminders"}
+              >
+                {subStatus?.subscribed ? (
+                  <Bell className="h-4 w-4 text-purple-400" />
+                ) : (
+                  <BellOff className="h-4 w-4" />
+                )}
+                <span className="hidden sm:inline">
+                  {subStatus?.subscribed ? "Notifications On" : "Remind Me"}
+                </span>
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleSignOut}
+              className="clay-btn gap-2 rounded-xl border-white/5 bg-white/[0.03] text-sm text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </Button>
+          </div>
         </header>
+
+        {/* Streak reminder banner */}
+        {showStreakBanner && character && character.streak && character.streak > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            className="mb-6 clay-card flex items-center gap-4 rounded-2xl border border-orange-500/20 bg-orange-500/10 p-4"
+          >
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-orange-500/20">
+              <Flame className="h-5 w-5 text-orange-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground">
+                🔥 Don't lose your streak!
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {character.name} misses you! You've got a {character.streak}-day streak going — keep it alive with a quick lesson!
+              </p>
+            </div>
+            <Button
+              onClick={() => navigate("/lesson")}
+              size="sm"
+              className="clay-btn shrink-0 rounded-xl bg-orange-500/20 text-xs font-medium text-orange-300 hover:bg-orange-500/30"
+            >
+              Start Lesson
+            </Button>
+            <button
+              onClick={() => setShowStreakBanner(false)}
+              className="text-muted-foreground/50 hover:text-muted-foreground text-xs"
+            >
+              ✕
+            </button>
+          </motion.div>
+        )}
 
         {/* Welcome */}
         <motion.div

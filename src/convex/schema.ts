@@ -68,6 +68,15 @@ const schema = defineSchema(
       createdAt: v.number(),
     }).index("by_code", ["roomCode"]),
 
+    pushSubscriptions: defineTable({
+      userId: v.string(),
+      endpoint: v.string(),
+      p256dh: v.string(),
+      auth: v.string(),
+      enabled: v.boolean(),
+      createdAt: v.number(),
+    }).index("by_user", ["userId"]),
+
     lessons: defineTable({
       userId: v.string(),
       grade: v.string(),
