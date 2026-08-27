@@ -49,7 +49,6 @@ export default function Onboarding() {
   const [isSaving, setIsSaving] = useState(false);
   const [step, setStep] = useState(0);
 
-  // Reset topic when subject changes
   useEffect(() => {
     setTopic("");
   }, [subject]);
@@ -128,12 +127,12 @@ export default function Onboarding() {
         />
       </div>
 
-      <div className="relative mx-auto max-w-lg px-6 py-6">
+      <div className="relative mx-auto max-w-lg px-6 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-10">
           <button
             onClick={() => (step > 0 ? setStep(step - 1) : navigate("/create-character"))}
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-all duration-250"
           >
             <ArrowLeft className="h-4 w-4" />
             {step > 0 ? "Back" : "Character"}
@@ -147,7 +146,7 @@ export default function Onboarding() {
         </div>
 
         {/* Progress dots */}
-        <div className="mb-8 flex justify-center gap-2">
+        <div className="mb-10 flex justify-center gap-2">
           {steps.map((_, i) => (
             <div
               key={i}
@@ -194,26 +193,25 @@ export default function Onboarding() {
                 value={currentStep.value}
                 onValueChange={currentStep.onChange}
               >
-                <SelectTrigger className="clay-input h-12 text-base">
+                <SelectTrigger className="clay-input h-12 rounded-2xl text-base">
                   <SelectValue placeholder={currentStep.placeholder} />
                 </SelectTrigger>
-                <SelectContent className="bg-card border-white/10">
+                <SelectContent className="bg-card border-white/10 rounded-2xl">
                   {currentStep.options.map((opt) => (
-                    <SelectItem key={opt} value={opt} className="text-sm">
+                    <SelectItem key={opt} value={opt} className="text-sm rounded-xl">
                       {opt}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
 
-              {/* Show selected summary */}
               {currentStep.value && (
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="clay-card rounded-xl p-3 text-center"
+                  className="clay-card rounded-2xl p-3.5 text-center"
                 >
-                  <p className="text-sm text-muted-foreground">Selected:</p>
+                  <p className="text-xs text-muted-foreground">Selected:</p>
                   <p className="text-sm font-semibold text-foreground">
                     {currentStep.value}
                   </p>
@@ -224,12 +222,12 @@ export default function Onboarding() {
         </motion.div>
 
         {/* Navigation */}
-        <div className="mt-6 flex justify-center">
+        <div className="mt-8 flex justify-center">
           {step < 3 ? (
             <Button
               onClick={() => setStep(step + 1)}
               disabled={!canProceed}
-              className="clay-btn rounded-xl bg-purple-500 px-8 py-2.5 font-semibold text-white hover:bg-purple-400 disabled:opacity-30"
+              className="clay-primary rounded-2xl px-8 py-2.5 font-semibold disabled:opacity-30"
             >
               Next
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -238,7 +236,7 @@ export default function Onboarding() {
             <Button
               onClick={handleSave}
               disabled={!canProceed || isSaving}
-              className="clay-glow rounded-xl bg-purple-500 px-8 py-2.5 font-semibold text-white hover:bg-purple-400 disabled:opacity-30"
+              className="clay-glow rounded-2xl px-8 py-2.5 font-semibold bg-purple-500 text-white hover:bg-purple-400 disabled:opacity-30"
             >
               {isSaving ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

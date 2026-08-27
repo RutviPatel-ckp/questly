@@ -57,14 +57,10 @@ export default function Lesson() {
   const [mascotReaction, setMascotReaction] = useState<MascotReaction>("idle");
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // Use refs to avoid stale closures in speak/pause callbacks
   const isPausedRef = useRef(false);
   const lessonTextRef = useRef("");
-  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
-    null
-  );
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Keep refs in sync
   useEffect(() => {
     isPausedRef.current = isPaused;
   }, [isPaused]);
@@ -76,14 +72,12 @@ export default function Lesson() {
     ? COLOR_THEMES[character.colorTheme] || "#c084fc"
     : "#c084fc";
 
-  // Redirect to onboarding if no profile
   useEffect(() => {
     if (character && character !== null && !character.grade) {
       navigate("/onboarding");
     }
   }, [character, navigate]);
 
-  // Generate or load lesson
   const loadLesson = useCallback(
     async (forceRegenerate = false) => {
       if (
@@ -111,7 +105,6 @@ export default function Lesson() {
 
         setLessonText(result.content);
         setLessonState("ready");
-        // Celebrate!
         setShowConfetti(true);
         setMascotReaction("happy");
         playCheer();
@@ -134,14 +127,12 @@ export default function Lesson() {
     [character, generateLesson]
   );
 
-  // Auto-load on mount
   useEffect(() => {
     if (character?.grade) {
       loadLesson();
     }
   }, [character?.grade, loadLesson]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       window.speechSynthesis.cancel();
@@ -167,7 +158,6 @@ export default function Lesson() {
     const text = lessonTextRef.current;
     if (!text) return;
 
-    // Resume from pause
     if (isPausedRef.current) {
       window.speechSynthesis.resume();
       isPausedRef.current = false;
@@ -188,7 +178,6 @@ export default function Lesson() {
       return;
     }
 
-    // Fresh start
     setProgress(0);
     window.speechSynthesis.cancel();
 
@@ -272,7 +261,6 @@ export default function Lesson() {
     }
   }, [isPlaying, isPaused, speak, pauseSpeaking]);
 
-  // Loading / null guard
   if (character === undefined || character === null || !character.grade) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-grid">
@@ -294,7 +282,7 @@ export default function Lesson() {
 
       <Confetti trigger={showConfetti} color={themeColor} type="sparkles" />
 
-      <div className="relative mx-auto max-w-2xl px-6 py-6">
+      <div className="relative mx-auto max-w-2xl px-6 py-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <button
@@ -302,12 +290,12 @@ export default function Lesson() {
               stopSpeaking();
               navigate("/dashboard");
             }}
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-all duration-250"
           >
             <ArrowLeft className="h-4 w-4" />
             Dashboard
           </button>
-          <div className="clay-card flex items-center gap-2 rounded-xl px-3 py-1.5">
+          <div className="clay-card flex items-center gap-2 rounded-2xl px-3.5 py-1.5">
             <MascotCharacter color={themeColor} size={24} />
             <span className="text-sm font-medium text-foreground">
               {character.name}
@@ -315,7 +303,7 @@ export default function Lesson() {
           </div>
         </div>
 
-        {/* Character — no Framer Motion wrapper, mascot handles its own animation */}
+        {/* Character */}
         <div className="mb-8 flex flex-col items-center">
           <div
             className="clay-card-lg flex items-center justify-center rounded-full p-1.5"
@@ -358,7 +346,7 @@ export default function Lesson() {
                 </p>
               </div>
               <div
-                className="clay-card flex h-10 w-10 items-center justify-center rounded-xl"
+                className="clay-card flex h-10 w-10 items-center justify-center rounded-2xl"
                 style={{ backgroundColor: `${themeColor}15` }}
               >
                 {isTalking ? (
@@ -389,7 +377,7 @@ export default function Lesson() {
 
             {/* Error banner with retry */}
             {lessonState === "error" && (
-              <div className="clay-card rounded-xl p-4 flex items-start gap-3">
+              <div className="clay-card rounded-2xl p-4 flex items-start gap-3">
                 <AlertTriangle className="h-5 w-5 text-amber-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground">
@@ -405,7 +393,7 @@ export default function Lesson() {
                   onClick={() => loadLesson(true)}
                   variant="outline"
                   size="sm"
-                  className="clay-btn shrink-0 border-white/5 bg-white/[0.03] text-xs"
+                  className="clay-btn shrink-0 rounded-2xl border-white/5 bg-white/[0.03] text-xs"
                 >
                   <RefreshCw className="mr-1 h-3 w-3" />
                   Try again
@@ -480,7 +468,7 @@ export default function Lesson() {
           </CardContent>
         </Card>
 
-        {/* Study tip — only when lesson is loaded */}
+        {/* Study tip */}
         {lessonState === "ready" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}

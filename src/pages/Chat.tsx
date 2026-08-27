@@ -81,7 +81,7 @@ function ScoreDisplay({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-lg bg-purple-500/15 px-2 py-0.5 text-xs font-semibold text-purple-300 ${className}`}
+      className={`inline-flex items-center gap-1 rounded-2xl bg-purple-500/15 px-2.5 py-0.5 text-xs font-semibold text-purple-300 ${className}`}
     >
       <Star className="h-3 w-3" />
       {points}
@@ -103,12 +103,10 @@ export default function Chat() {
     ? COLOR_THEMES[character.colorTheme] || "#c084fc"
     : "#c084fc";
 
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Start a new session
   const startSession = useCallback(() => {
     const newSession = createSession(5);
     setSession(newSession);
@@ -128,7 +126,6 @@ export default function Chat() {
     ]);
   }, []);
 
-  // Auto-start on mount
   useEffect(() => {
     if (!session) {
       startSession();
@@ -154,7 +151,6 @@ export default function Chat() {
     setInput("");
     setIsGenerating(true);
 
-    // Simulate thinking delay
     await new Promise((r) => setTimeout(r, 600 + Math.random() * 800));
 
     const result = getTutorResponse(
@@ -163,7 +159,6 @@ export default function Chat() {
       currentQuestion.hintLevel
     );
 
-    // Update session state
     const updatedSession = { ...session };
     const sq = { ...updatedSession.sessionQuestions[updatedSession.currentIndex] };
 
@@ -185,7 +180,6 @@ export default function Chat() {
       };
       setMessages((prev) => [...prev, tutorMsg]);
 
-      // Move to next question after a delay
       setTimeout(() => {
         const nextIndex = updatedSession.currentIndex + 1;
         if (nextIndex < updatedSession.questions.length) {
@@ -203,7 +197,6 @@ export default function Chat() {
             },
           ]);
         } else {
-          // Session complete
           updatedSession.currentIndex = nextIndex;
           setSession({ ...updatedSession });
 
@@ -285,7 +278,7 @@ export default function Chat() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/dashboard")}
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-all duration-250"
           >
             <ArrowLeft className="h-4 w-4" />
             <span className="hidden sm:inline">Dashboard</span>
@@ -319,7 +312,7 @@ export default function Chat() {
               setMessages([]);
               startSession();
             }}
-            className="clay-btn rounded-lg bg-white/[0.03] p-2 text-muted-foreground hover:text-foreground"
+            className="clay-btn rounded-2xl bg-white/[0.03] p-2 text-muted-foreground hover:text-foreground"
             title="New session"
           >
             <RotateCcw className="h-4 w-4" />
@@ -346,7 +339,6 @@ export default function Chat() {
                       : "clay-card text-foreground"
                   }`}
                 >
-                  {/* Render markdown-like bold */}
                   {msg.content.split("\n").map((line, i) => (
                     <span key={i}>
                       {i > 0 && <br />}
@@ -403,12 +395,12 @@ export default function Chat() {
                 : "Type your answer or ask a question..."
             }
             disabled={isGenerating || currentQuestion?.solved}
-            className="clay-input flex-1"
+            className="clay-input flex-1 rounded-2xl"
           />
           <Button
             type="submit"
             disabled={!input.trim() || isGenerating || currentQuestion?.solved}
-            className="clay-btn rounded-xl bg-purple-500 px-4 text-white hover:bg-purple-400 disabled:opacity-30"
+            className="clay-primary rounded-2xl px-4 py-2.5 disabled:opacity-30"
           >
             <Send className="h-4 w-4" />
           </Button>

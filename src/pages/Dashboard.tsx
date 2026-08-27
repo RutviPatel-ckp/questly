@@ -14,7 +14,6 @@ import {
 import {
   Terminal,
   Sparkles,
-  BookOpen,
   Search,
   Upload,
   MessageSquare,
@@ -22,7 +21,6 @@ import {
   ArrowRight,
   Settings,
   Flame,
-  Trophy,
   Swords,
   Bell,
   BellOff,
@@ -39,6 +37,7 @@ import {
   registerServiceWorker,
   showStreakReminder,
 } from "@/lib/notifications";
+import MascotCharacter from "@/components/MascotCharacter";
 
 const COLOR_THEMES: Record<string, string> = {
   Sunset: "#fb923c",
@@ -51,8 +50,6 @@ const COLOR_THEMES: Record<string, string> = {
   Coral: "#fb7185",
 };
 
-import MascotCharacter from "@/components/MascotCharacter";
-
 const quickActions = [
   {
     icon: MessageSquare,
@@ -60,7 +57,7 @@ const quickActions = [
     description: "Solve problems step-by-step with a Socratic tutor. Earn more points for fewer hints.",
     href: "/chat",
     color: "text-purple-400",
-    bg: "bg-purple-500/10",
+    bg: "bg-purple-500/12",
   },
   {
     icon: Search,
@@ -68,7 +65,7 @@ const quickActions = [
     description: "Explore shared lessons and resources from your team.",
     href: "/catalog",
     color: "text-teal-400",
-    bg: "bg-teal-500/10",
+    bg: "bg-teal-500/12",
   },
   {
     icon: Upload,
@@ -76,23 +73,23 @@ const quickActions = [
     description: "Upload notes, questions, or resources for your team.",
     href: "/content/create",
     color: "text-amber-400",
-    bg: "bg-amber-500/10",
+    bg: "bg-amber-500/12",
   },
   {
     icon: Swords,
     title: "Quiz Challenge",
     description: "Challenge a friend to a head-to-head quiz and earn bonus stars.",
     href: "/quiz",
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
+    color: "text-rose-400",
+    bg: "bg-rose-500/12",
   },
   {
     icon: Settings,
     title: "Admin Panel",
     description: "Manage users, content, and workspace settings.",
     href: "/admin",
-    color: "text-rose-400",
-    bg: "bg-rose-500/10",
+    color: "text-sky-400",
+    bg: "bg-sky-500/12",
   },
 ];
 
@@ -110,7 +107,6 @@ export default function Dashboard() {
   const [showStreakBanner, setShowStreakBanner] = useState(false);
   const [notifLoading, setNotifLoading] = useState(false);
 
-  // Register service worker + check notification state
   useEffect(() => {
     const supported = isPushSupported();
     setNotifSupported(supported);
@@ -120,19 +116,16 @@ export default function Dashboard() {
     }
   }, []);
 
-  // Record daily activity and check streak reminder
   useEffect(() => {
     if (character && character.streak && character.streak > 0) {
       const today = new Date().toISOString().split("T")[0];
       if (character.lastActiveDate !== today) {
         setShowStreakBanner(true);
-        // Show browser notification if permission granted
         if (Notification.permission === "granted") {
           showStreakReminder(character.name, character.streak);
         }
       }
     }
-    // Record today's activity
     if (character) {
       recordActivity();
     }
@@ -178,11 +171,11 @@ export default function Dashboard() {
         <div className="absolute bottom-0 -right-40 h-[400px] w-[400px] rounded-full bg-purple-600/5 blur-[100px]" />
       </div>
 
-      <div className="relative mx-auto max-w-4xl px-6 py-6">
+      <div className="relative mx-auto max-w-4xl px-6 py-8">
         {/* Header */}
-        <header className="mb-8 flex items-center justify-between">
+        <header className="mb-10 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="clay-card flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/15 p-1.5">
+            <div className="clay-card flex h-9 w-9 items-center justify-center rounded-2xl bg-purple-500/15 p-1.5">
               <Terminal className="h-5 w-5 text-purple-400" />
             </div>
             <span className="text-lg font-bold tracking-tight text-foreground">
@@ -196,7 +189,7 @@ export default function Dashboard() {
                 variant="outline"
                 onClick={toggleNotifications}
                 disabled={notifLoading}
-                className="clay-btn gap-2 rounded-xl border-white/5 bg-white/[0.03] text-sm text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+                className="clay-ghost gap-2 rounded-2xl px-3 py-2 text-sm"
                 title={subStatus?.subscribed ? "Disable notifications" : "Enable streak reminders"}
               >
                 {subStatus?.subscribed ? (
@@ -213,7 +206,7 @@ export default function Dashboard() {
               type="button"
               variant="outline"
               onClick={handleSignOut}
-              className="clay-btn gap-2 rounded-xl border-white/5 bg-white/[0.03] text-sm text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+              className="clay-ghost gap-2 rounded-2xl px-3 py-2 text-sm"
             >
               <LogOut className="h-4 w-4" />
               Sign out
@@ -228,7 +221,7 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             className="mb-6 clay-card flex items-center gap-4 rounded-2xl border border-orange-500/20 bg-orange-500/10 p-4"
           >
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-orange-500/20">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-orange-500/20">
               <Flame className="h-5 w-5 text-orange-400" />
             </div>
             <div className="flex-1 min-w-0">
@@ -242,13 +235,13 @@ export default function Dashboard() {
             <Button
               onClick={() => navigate("/lesson")}
               size="sm"
-              className="clay-btn shrink-0 rounded-xl bg-orange-500/20 text-xs font-medium text-orange-300 hover:bg-orange-500/30"
+              className="clay-btn shrink-0 rounded-2xl bg-orange-500/20 text-xs font-medium text-orange-300 hover:bg-orange-500/30 hover:text-orange-200"
             >
               Start Lesson
             </Button>
             <button
               onClick={() => setShowStreakBanner(false)}
-              className="text-muted-foreground/50 hover:text-muted-foreground text-xs"
+              className="text-muted-foreground/50 hover:text-muted-foreground text-xs transition-colors"
             >
               ✕
             </button>
@@ -260,20 +253,20 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-8"
+          className="mb-10"
         >
           <h1 className="text-2xl font-bold text-foreground">
             Hey{user?.name ? `, ${user.name}` : ""} 👋
           </h1>
-          <p className="mt-1 text-muted-foreground">
+          <p className="mt-1.5 text-sm text-muted-foreground">
             {character
               ? `${character.name} is hyped to teach you something new today!`
               : "Let's get you a study buddy — it only takes a minute!"}
           </p>
         </motion.div>
 
-        {/* Character card + Companion CTA */}
-        <div className="grid gap-5 md:grid-cols-2 mb-8">
+        {/* Character card + Quick stats */}
+        <div className="grid gap-5 md:grid-cols-2 mb-10">
           {/* Character card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -286,7 +279,7 @@ export default function Dashboard() {
                   {character ? (
                     <MascotCharacter color={themeColor} size={44} />
                   ) : (
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 text-sm font-bold text-muted-foreground">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-white/5 text-sm font-bold text-muted-foreground">
                       ?
                     </div>
                   )}
@@ -302,14 +295,14 @@ export default function Dashboard() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-2.5">
                 <Button
                   onClick={() =>
                     character
                       ? navigate("/lesson")
                       : navigate("/create-character")
                   }
-                  className="clay-btn w-full rounded-xl bg-purple-500/15 text-sm font-medium text-purple-300 hover:bg-purple-500/25 hover:text-purple-200"
+                  className="clay-primary w-full rounded-2xl py-2.5 text-sm font-semibold"
                 >
                   {character ? "🚀 Start Lesson" : "✨ Create Companion"}
                   <ArrowRight className="ml-2 h-3.5 w-3.5" />
@@ -318,7 +311,7 @@ export default function Dashboard() {
                   <Button
                     onClick={() => navigate("/chat")}
                     variant="outline"
-                    className="clay-btn w-full rounded-xl border-white/5 bg-white/[0.03] text-sm font-medium text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+                    className="clay-ghost w-full rounded-2xl py-2.5 text-sm font-medium"
                   >
                     <MessageSquare className="mr-2 h-3.5 w-3.5" />
                     Study Buddy Chat
@@ -340,8 +333,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-3">
-                  {/* Streak */}
-                  <div className="clay-card rounded-xl p-3 flex items-center gap-3">
+                  <div className="clay-card rounded-2xl p-3.5 flex items-center gap-3">
                     <Flame className="h-6 w-6 text-orange-400 flex-shrink-0" />
                     <div>
                       <p className="text-lg font-bold text-foreground">
@@ -350,8 +342,7 @@ export default function Dashboard() {
                       <p className="text-[11px] text-muted-foreground">Day Streak</p>
                     </div>
                   </div>
-                  {/* Stars */}
-                  <div className="clay-card rounded-xl p-3 flex items-center gap-3">
+                  <div className="clay-card rounded-2xl p-3.5 flex items-center gap-3">
                     <Sparkles className="h-6 w-6 text-amber-400 flex-shrink-0" />
                     <div>
                       <p className="text-lg font-bold text-foreground">
@@ -360,15 +351,13 @@ export default function Dashboard() {
                       <p className="text-[11px] text-muted-foreground">Stars</p>
                     </div>
                   </div>
-                  {/* Companions */}
-                  <div className="clay-card rounded-xl p-3">
+                  <div className="clay-card rounded-2xl p-3.5">
                     <p className="text-lg font-bold text-foreground">
                       {character ? "1" : "0"}
                     </p>
                     <p className="text-[11px] text-muted-foreground">Companion</p>
                   </div>
-                  {/* Lessons */}
-                  <div className="clay-card rounded-xl p-3">
+                  <div className="clay-card rounded-2xl p-3.5">
                     <p className="text-lg font-bold text-foreground">1</p>
                     <p className="text-[11px] text-muted-foreground">Lesson</p>
                   </div>
@@ -384,10 +373,8 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.5 }}
         >
-          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground/60 mb-4">
-            Quick Actions
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <p className="section-label mb-4">Quick Actions</p>
+          <div className="grid gap-3 sm:grid-cols-2">
             {quickActions.map((action, i) => (
               <motion.button
                 key={action.title}
@@ -395,10 +382,10 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + i * 0.06, duration: 0.4 }}
                 onClick={() => navigate(action.href)}
-                className="clay-card group flex items-start gap-4 p-4 text-left transition-all hover:bg-white/[0.02]"
+                className="clay-card clay-tile group flex items-start gap-4 p-4 text-left"
               >
                 <div
-                  className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${action.bg}`}
+                  className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl ${action.bg}`}
                 >
                   <action.icon className={`h-5 w-5 ${action.color}`} />
                 </div>
@@ -406,7 +393,7 @@ export default function Dashboard() {
                   <p className="text-sm font-semibold text-foreground group-hover:text-purple-300 transition-colors">
                     {action.title}
                   </p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
+                  <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
                     {action.description}
                   </p>
                 </div>
@@ -420,21 +407,17 @@ export default function Dashboard() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-8"
+          className="mt-10"
         >
-          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground/60 mb-4">
-            Achievements
-          </p>
-          <div className="flex flex-wrap gap-3">
+          <p className="section-label mb-4">Achievements</p>
+          <div className="flex flex-wrap gap-2.5">
             {ACHIEVEMENTS.map((ach) => {
               const earned = (character?.achievements || []).includes(ach.id);
               return (
                 <div
                   key={ach.id}
-                  className={`clay-card flex items-center gap-2 rounded-xl px-3 py-2 transition-all ${
-                    earned
-                      ? ""
-                      : "opacity-30 grayscale"
+                  className={`clay-card clay-tile flex items-center gap-2 rounded-2xl px-3.5 py-2.5 ${
+                    earned ? "" : "opacity-30 grayscale"
                   }`}
                   title={ach.description}
                 >
@@ -454,19 +437,17 @@ export default function Dashboard() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="mt-6"
+            className="mt-8"
           >
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground/60 mb-4">
-              Accessories
-            </p>
-            <div className="flex flex-wrap gap-3">
+            <p className="section-label mb-4">Accessories</p>
+            <div className="flex flex-wrap gap-2.5">
               {ACCESSORIES.map((acc) => {
                 const unlocked = (character.totalStars || 0) >= acc.cost;
                 const equipped = (character.accessories || []).includes(acc.id);
                 return (
                   <div
                     key={acc.id}
-                    className={`clay-card flex items-center gap-2 rounded-xl px-3 py-2 ${
+                    className={`clay-card clay-tile flex items-center gap-2 rounded-2xl px-3.5 py-2.5 ${
                       !unlocked ? "opacity-25 grayscale" : ""
                     } ${equipped ? "ring-2 ring-purple-500/50" : ""}`}
                     title={`${acc.name}${!unlocked ? ` (${acc.cost} stars to unlock)` : equipped ? " (equipped)" : ""}`}
@@ -487,7 +468,7 @@ export default function Dashboard() {
           </motion.div>
         )}
 
-        <p className="mt-10 text-center text-xs text-muted-foreground/40">
+        <p className="mt-12 text-center text-xs text-muted-foreground/40">
           Brainly Weird v1 · Making learning delightfully weird ✨
         </p>
       </div>

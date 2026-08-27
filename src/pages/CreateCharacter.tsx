@@ -21,6 +21,7 @@ import {
   Loader2,
   Terminal,
 } from "lucide-react";
+import MascotCharacter from "@/components/MascotCharacter";
 
 const COLOR_THEMES = [
   { name: "Sunset", bg: "bg-orange-400", ring: "ring-orange-300", hex: "#fb923c" },
@@ -40,8 +41,6 @@ const SUGGESTIONS = [
   "a brave toaster who surfs the internet",
   "a magical pencil that knows every subject",
 ];
-
-import MascotCharacter from "@/components/MascotCharacter";
 
 function CharacterPreview({
   name,
@@ -155,7 +154,7 @@ export default function CreateCharacter() {
               <button
                 key={s}
                 onClick={() => setDescription(s)}
-                className="clay-card rounded-xl px-3 py-1.5 text-xs text-muted-foreground transition-all hover:text-foreground"
+                className="clay-card clay-tile rounded-2xl px-3.5 py-2 text-xs text-muted-foreground"
               >
                 {s}
               </button>
@@ -198,7 +197,7 @@ export default function CreateCharacter() {
               }`}
             >
               <div
-                className={`h-10 w-10 rounded-xl ${theme.bg} transition-transform group-hover:scale-110`}
+                className={`h-10 w-10 rounded-2xl ${theme.bg} transition-transform duration-250 group-hover:scale-110`}
               />
               <span className="text-xs font-medium text-muted-foreground">
                 {theme.name}
@@ -229,12 +228,12 @@ export default function CreateCharacter() {
         <div className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-purple-600/8 blur-[100px]" />
       </div>
 
-      <div className="relative mx-auto max-w-lg px-6 py-6">
+      <div className="relative mx-auto max-w-lg px-6 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-10">
           <button
             onClick={() => (step > 0 ? setStep(step - 1) : navigate("/dashboard"))}
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-all duration-250"
           >
             <ArrowLeft className="h-4 w-4" />
             {step > 0 ? "Back" : "Dashboard"}
@@ -248,7 +247,7 @@ export default function CreateCharacter() {
         </div>
 
         {/* Progress dots */}
-        <div className="mb-8 flex justify-center gap-2">
+        <div className="mb-10 flex justify-center gap-2">
           {steps.map((_, i) => (
             <div
               key={i}
@@ -326,7 +325,7 @@ export default function CreateCharacter() {
                   />
                   <button
                     onClick={toggleTalking}
-                    className="clay-btn mx-auto flex items-center gap-2 rounded-xl bg-purple-500/15 px-4 py-2 text-sm font-medium text-purple-300 hover:bg-purple-500/25"
+                    className="clay-btn mx-auto flex items-center gap-2 rounded-2xl bg-purple-500/15 px-4 py-2.5 text-sm font-medium text-purple-300 hover:bg-purple-500/25"
                   >
                     <Sparkles className="h-4 w-4" />
                     {isTalking ? "Stop Preview" : "Preview Animation"}
@@ -338,12 +337,12 @@ export default function CreateCharacter() {
         </AnimatePresence>
 
         {/* Navigation */}
-        <div className="mt-6 flex justify-center">
+        <div className="mt-8 flex justify-center">
           {step < 3 ? (
             <Button
               onClick={() => setStep(step + 1)}
               disabled={!canProceed}
-              className="clay-btn rounded-xl bg-purple-500 px-8 py-2.5 font-semibold text-white hover:bg-purple-400 disabled:opacity-30"
+              className="clay-primary rounded-2xl px-8 py-2.5 font-semibold disabled:opacity-30"
             >
               Next
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -352,7 +351,7 @@ export default function CreateCharacter() {
             <Button
               onClick={handleSave}
               disabled={isSaving}
-              className="clay-glow rounded-xl bg-purple-500 px-8 py-2.5 font-semibold text-white hover:bg-purple-400"
+              className="clay-glow rounded-2xl px-8 py-2.5 font-semibold bg-purple-500 text-white hover:bg-purple-400"
             >
               {isSaving ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

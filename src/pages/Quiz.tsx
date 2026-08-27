@@ -70,13 +70,11 @@ export default function Quiz() {
     ? COLOR_THEMES[character.colorTheme] || "#c084fc"
     : "#c084fc";
 
-  // Poll room state every 2 seconds
   const room = useQuery(
     api.quiz.getRoom,
     roomCode ? { roomCode } : "skip"
   );
 
-  // Handle room state changes
   useEffect(() => {
     if (!room) return;
 
@@ -85,7 +83,6 @@ export default function Quiz() {
     }
 
     if (room.status === "active" && phase !== "active" && phase !== "results") {
-      // Game started — load questions
       const qs = room.questions
         .map((id) => QUIZ_QUESTIONS.find((q) => q.id === id))
         .filter(Boolean) as QuizQuestion[];
@@ -96,7 +93,6 @@ export default function Quiz() {
 
     if (room.status === "finished" && phase !== "results") {
       setPhase("results");
-      // Record activity
       recordActivity().catch(() => {});
     }
   }, [room, phase, recordActivity]);
@@ -129,12 +125,10 @@ export default function Quiz() {
     if (selectedAnswer !== null || !room) return;
     setSelectedAnswer(answerIndex);
 
-    // Determine if correct
     const q = QUIZ_QUESTIONS.find((q) => q.id === room.questions[room.currentQuestion]);
     const correct = q ? answerIndex === q.correctIndex : false;
     setLastAnswerCorrect(correct);
 
-    // Play sound + set mascot reaction
     if (correct) {
       playCorrect();
       setMascotReaction("happy");
@@ -143,7 +137,6 @@ export default function Quiz() {
       setMascotReaction("sad");
     }
 
-    // Reset mascot after a delay
     setTimeout(() => setMascotReaction("idle"), 2000);
 
     const qIndex = room.currentQuestion;
@@ -172,11 +165,6 @@ export default function Quiz() {
   const iWon = isHost ? hostScore > guestScore : guestScore > hostScore;
   const tie = hostScore === guestScore;
 
-  const themeColorVal = character
-    ? COLOR_THEMES[character.colorTheme] || "#c084fc"
-    : "#c084fc";
-
-  // Trigger confetti + fanfare on results
   useEffect(() => {
     if (phase === "results") {
       setShowConfetti(true);
@@ -192,18 +180,18 @@ export default function Quiz() {
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div
           className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full blur-[120px]"
-          style={{ backgroundColor: `${themeColorVal}10` }}
+          style={{ backgroundColor: `${themeColor}10` }}
         />
       </div>
 
-      <Confetti trigger={showConfetti} color={themeColorVal} type="confetti" />
+      <Confetti trigger={showConfetti} color={themeColor} type="confetti" />
 
-      <div className="relative mx-auto max-w-2xl px-6 py-6">
+      <div className="relative mx-auto max-w-2xl px-6 py-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <button
             onClick={() => navigate("/dashboard")}
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-all duration-250"
           >
             <ArrowLeft className="h-4 w-4" />
             Dashboard
@@ -229,13 +217,12 @@ export default function Quiz() {
                 <h1 className="text-2xl font-bold text-foreground">
                   Quiz Challenge
                 </h1>
-                <p className="mt-1 text-muted-foreground">
+                <p className="mt-1.5 text-sm text-muted-foreground">
                   Challenge a friend to a head-to-head quiz!
                 </p>
               </div>
 
               <div className="space-y-4">
-                {/* Create Room */}
                 <Card className="clay-card-lg border-0">
                   <CardHeader>
                     <CardTitle className="text-sm flex items-center gap-2">
@@ -249,7 +236,7 @@ export default function Quiz() {
                     </p>
                     <Button
                       onClick={handleCreateRoom}
-                      className="clay-glow w-full rounded-xl bg-purple-500 text-white hover:bg-purple-400"
+                      className="clay-primary w-full rounded-2xl py-2.5 font-semibold"
                     >
                       Create Room
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -257,7 +244,6 @@ export default function Quiz() {
                   </CardContent>
                 </Card>
 
-                {/* Join Room */}
                 <Card className="clay-card-lg border-0">
                   <CardHeader>
                     <CardTitle className="text-sm flex items-center gap-2">
@@ -282,7 +268,7 @@ export default function Quiz() {
                       <Button
                         onClick={handleJoin}
                         disabled={joinInput.trim().length !== 6}
-                        className="clay-btn rounded-xl bg-amber-500 px-6 text-white hover:bg-amber-400 disabled:opacity-30"
+                        className="clay-primary rounded-2xl px-6 font-semibold disabled:opacity-30"
                       >
                         Join
                       </Button>
@@ -303,12 +289,12 @@ export default function Quiz() {
               className="text-center"
             >
               <div className="mb-6">
-                <MascotCharacter color={themeColorVal} size={100} reaction="happy" accessories={character?.accessories} />
+                <MascotCharacter color={themeColor} size={100} reaction="happy" accessories={character?.accessories} />
               </div>
               <h2 className="text-xl font-bold text-foreground mb-2">
                 Challenge Sent! 🎯
               </h2>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-sm text-muted-foreground mb-6">
                 Share this code with your friend to start the showdown:
               </p>
 
@@ -325,7 +311,7 @@ export default function Quiz() {
                   setTimeout(() => setCopied(false), 2000);
                 }}
                 variant="outline"
-                className="clay-btn rounded-xl border-white/5 bg-white/[0.03] mb-4"
+                className="clay-ghost rounded-2xl mb-4"
               >
                 {copied ? (
                   <Check className="mr-2 h-4 w-4 text-emerald-400" />
@@ -352,19 +338,19 @@ export default function Quiz() {
             >
               {/* Scoreboard */}
               <div className="mb-6 flex items-center justify-between">
-                <div className="clay-card flex items-center gap-2 rounded-xl px-4 py-2">
+                <div className="clay-card flex items-center gap-2 rounded-2xl px-4 py-2.5">
                   <span className="text-sm font-semibold text-foreground">
                     {room.hostName}
                   </span>
-                  <span className="text-lg font-bold" style={{ color: themeColorVal }}>
+                  <span className="text-lg font-bold" style={{ color: themeColor }}>
                     {hostScore}
                   </span>
                 </div>
                 <div className="text-xs text-muted-foreground font-medium">
                   Q{(room.currentQuestion || 0) + 1}/{totalQuestions}
                 </div>
-                <div className="clay-card flex items-center gap-2 rounded-xl px-4 py-2">
-                  <span className="text-lg font-bold" style={{ color: themeColorVal }}>
+                <div className="clay-card flex items-center gap-2 rounded-2xl px-4 py-2.5">
+                  <span className="text-lg font-bold" style={{ color: themeColor }}>
                     {guestScore}
                   </span>
                   <span className="text-sm font-semibold text-foreground">
@@ -376,7 +362,7 @@ export default function Quiz() {
               {/* Mascot + Question */}
               <div className="flex justify-center mb-4">
                 <MascotCharacter
-                  color={themeColorVal}
+                  color={themeColor}
                   size={80}
                   reaction={mascotReaction || "idle"}
                   accessories={character?.accessories}
@@ -395,15 +381,14 @@ export default function Quiz() {
                     {currentQ.options.map((opt, i) => {
                       const isSelected = selectedAnswer === i;
                       const isCorrect = i === currentQ.correctIndex;
-                      const isRevealed =
-                        selectedAnswer !== null;
+                      const isRevealed = selectedAnswer !== null;
 
                       return (
                         <button
                           key={i}
                           onClick={() => handleAnswer(i)}
                           disabled={selectedAnswer !== null}
-                          className={`clay-btn w-full rounded-xl p-4 text-left text-sm font-medium transition-all ${
+                          className={`clay-btn w-full rounded-2xl p-4 text-left text-sm font-medium transition-all duration-250 ${
                             isRevealed && isCorrect
                               ? "bg-emerald-500/20 text-emerald-300 ring-2 ring-emerald-500/50"
                               : isRevealed && isSelected && !isCorrect
@@ -449,7 +434,7 @@ export default function Quiz() {
             >
               <div className="text-center mb-6">
                 <MascotCharacter
-                  color={themeColorVal}
+                  color={themeColor}
                   size={100}
                   reaction={tie ? "idle" : "happy"}
                   accessories={character?.accessories}
@@ -463,13 +448,12 @@ export default function Quiz() {
                 </h2>
               </div>
 
-              {/* Score comparison */}
               <Card className="clay-card-lg border-0 mb-6">
                 <CardContent className="p-6">
                   <div className="grid grid-cols-3 gap-4 items-center">
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground">{room.hostName}</p>
-                      <p className="text-3xl font-bold" style={{ color: themeColorVal }}>
+                      <p className="text-3xl font-bold" style={{ color: themeColor }}>
                         {hostScore}
                       </p>
                       <p className="text-xs text-muted-foreground">
@@ -483,7 +467,7 @@ export default function Quiz() {
                     </div>
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground">{room.guestName || "Opponent"}</p>
-                      <p className="text-3xl font-bold" style={{ color: themeColorVal }}>
+                      <p className="text-3xl font-bold" style={{ color: themeColor }}>
                         {guestScore}
                       </p>
                       <p className="text-xs text-muted-foreground">
@@ -494,7 +478,6 @@ export default function Quiz() {
                 </CardContent>
               </Card>
 
-              {/* Stars */}
               <div className="clay-card rounded-2xl p-5 mb-6 text-center">
                 <p className="text-sm text-muted-foreground mb-2">
                   Stars earned
@@ -516,7 +499,6 @@ export default function Quiz() {
                 </p>
               </div>
 
-              {/* Actions */}
               <div className="flex gap-3">
                 <Button
                   onClick={() => {
@@ -525,14 +507,14 @@ export default function Quiz() {
                     setSelectedAnswer(null);
                   }}
                   variant="outline"
-                  className="clay-btn flex-1 rounded-xl border-white/5 bg-white/[0.03]"
+                  className="clay-ghost flex-1 rounded-2xl py-2.5"
                 >
                   <RotateCcw className="mr-2 h-4 w-4" />
                   Play Again
                 </Button>
                 <Button
                   onClick={() => navigate("/dashboard")}
-                  className="clay-glow flex-1 rounded-xl bg-purple-500 text-white hover:bg-purple-400"
+                  className="clay-primary flex-1 rounded-2xl py-2.5 font-semibold"
                 >
                   Back to Dashboard
                 </Button>
