@@ -22,6 +22,7 @@ import {
   Terminal,
 } from "lucide-react";
 import MascotCharacter from "@/components/MascotCharacter";
+import FloatingShapes from "@/components/FloatingShapes";
 
 const COLOR_THEMES = [
   { name: "Sunset", bg: "bg-orange-400", ring: "ring-orange-300", hex: "#fb923c" },
@@ -226,9 +227,12 @@ export default function CreateCharacter() {
 
   return (
     <div className="min-h-screen overflow-hidden bg-grid">
+      <FloatingShapes count={8} />
       {/* Background accents */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-purple-600/8 blur-[100px]" />
+        <div className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full blur-[120px] bg-purple-600/8" />
+        <div className="absolute bottom-1/4 -right-40 h-[400px] w-[400px] rounded-full bg-pink-500/5 blur-[100px]" />
+        <div className="absolute top-1/3 -left-32 h-[300px] w-[300px] rounded-full bg-teal-500/5 blur-[100px]" />
       </div>
 
       <div className="relative mx-auto max-w-lg px-6 py-8">

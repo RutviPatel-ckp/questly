@@ -25,6 +25,7 @@ import {
   TOPICS_BY_SUBJECT,
 } from "@/lib/onboarding-data";
 import MascotCharacter from "@/components/MascotCharacter";
+import FloatingShapes from "@/components/FloatingShapes";
 
 const COLOR_THEMES: Record<string, string> = {
   Sunset: "#fb923c",
@@ -119,12 +120,14 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen overflow-hidden bg-grid">
+      <FloatingShapes count={8} />
       {/* Background accents */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div
           className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full blur-[120px]"
-          style={{ backgroundColor: `${themeColor}10` }}
+          style={{ backgroundColor: `${themeColor}12` }}
         />
+        <div className="absolute bottom-0 -right-40 h-[350px] w-[350px] rounded-full bg-purple-600/8 blur-[100px]" />
       </div>
 
       <div className="relative mx-auto max-w-lg px-6 py-8">

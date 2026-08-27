@@ -29,6 +29,7 @@ import {
 import MascotCharacter, { type MascotReaction } from "@/components/MascotCharacter";
 import Confetti from "@/components/Confetti";
 import { playCorrect, playIncorrect, playFanfare, playPop } from "@/lib/sounds";
+import FloatingShapes from "@/components/FloatingShapes";
 
 const COLOR_THEMES: Record<string, string> = {
   Sunset: "#fb923c",
@@ -176,12 +177,15 @@ export default function Quiz() {
 
   return (
     <div className="min-h-screen overflow-hidden bg-grid">
-      {/* Background */}
+      <FloatingShapes count={12} />
+      {/* Background accents */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div
-          className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full blur-[120px]"
-          style={{ backgroundColor: `${themeColor}10` }}
+          className="absolute -top-40 left-1/3 h-[500px] w-[500px] -translate-x-1/2 rounded-full blur-[120px]"
+          style={{ backgroundColor: `${themeColor}12` }}
         />
+        <div className="absolute bottom-0 -right-40 h-[400px] w-[400px] rounded-full bg-purple-600/8 blur-[100px]" />
+        <div className="absolute top-1/2 -left-40 h-[350px] w-[350px] rounded-full bg-teal-500/5 blur-[100px]" />
       </div>
 
       <Confetti trigger={showConfetti} color={themeColor} type="confetti" />
