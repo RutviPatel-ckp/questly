@@ -37,7 +37,21 @@ const schema = defineSchema(
       name: v.string(),
       description: v.string(),
       colorTheme: v.string(),
+      grade: v.optional(v.string()),
+      subject: v.optional(v.string()),
+      region: v.optional(v.string()),
+      topic: v.optional(v.string()),
     }).index("by_user", ["userId"]),
+
+    lessons: defineTable({
+      userId: v.string(),
+      grade: v.string(),
+      subject: v.string(),
+      region: v.string(),
+      topic: v.string(),
+      content: v.string(),
+      characterName: v.string(),
+    }).index("by_key", ["userId", "grade", "subject", "region", "topic"]),
   },
   {
     schemaValidation: false,

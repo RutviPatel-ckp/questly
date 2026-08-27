@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
-import { useQuery } from "convex/react";
+import { useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +19,12 @@ import {
   ArrowLeft,
   Settings,
   Terminal,
+  Loader2,
+  RefreshCw,
+  AlertTriangle,
 } from "lucide-react";
+import MascotCharacter from "@/components/MascotCharacter";
+import { FALLBACK_LESSONS } from "@/lib/onboarding-data";
 
 const COLOR_THEMES: Record<string, string> = {
   Sunset: "#fb923c",
@@ -32,54 +37,91 @@ const COLOR_THEMES: Record<string, string> = {
   Coral: "#fb7185",
 };
 
-import MascotCharacter from "@/components/MascotCharacter";
-
-const LESSON_TEXT = `Welcome to your first lesson! Today we're going to learn about the water cycle.
-
-The water cycle is the journey water takes as it circulates from the land to the sky and back again. Here's how it works:
-
-First, the sun heats up water in rivers, lakes, and oceans. This turns the water into vapor, which rises into the air. This process is called evaporation.
-
-As the vapor rises, it cools down and forms tiny water droplets in clouds. This is called condensation. It's the same thing that happens when you see fog on a cold morning!
-
-When the clouds get heavy enough, the water falls back to Earth as rain or snow. This is called precipitation.
-
-The water then flows into rivers and lakes, and the whole cycle starts again!
-
-Great job learning about the water cycle today. Remember: evaporation, condensation, precipitation. You've got this!`;
+type LessonState = "loading" | "ready" | "error";
 
 export default function Lesson() {
   const navigate = useNavigate();
   const character = useQuery(api.characters.getCharacter);
+  const generateLesson = useAction(api.lessons.generateLesson);
+
+  const [lessonText, setLessonText] = useState("");
+  const [lessonState, setLessonState] = useState<LessonState>("loading");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isUsingFallback, setIsUsingFallback] = useState(false);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isTalking, setIsTalking] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
-  const [voicesLoaded, setVoicesLoaded] = useState(false);
 
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-  const sentencesRef = useRef<string[]>([]);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
     null
   );
 
+  const themeColor = character
+    ? COLOR_THEMES[character.colorTheme] || "#c084fc"
+    : "#c084fc";
+
+  // Check if profile exists; redirect to onboarding if not
   useEffect(() => {
-    const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length > 0) {
-        setVoicesLoaded(true);
+    if (character && !character.grade) {
+      navigate("/onboarding");
+    }
+  }, [character, navigate]);
+
+  // Generate or load lesson
+  const loadLesson = useCallback(
+    async (forceRegenerate = false) => {
+      if (!character?.grade || !character?.subject || !character?.region || !character?.topic) return;
+
+      setLessonState("loading");
+      setErrorMessage("");
+      setIsUsingFallback(false);
+
+      // If not forcing, check cache first via the query
+      if (!forceRegenerate) {
+        // The query will return cached data automatically
+        // We'll proceed to the action which also checks cache internally
       }
-    };
 
-    loadVoices();
-    window.speechSynthesis.addEventListener("voiceschanged", loadVoices);
-    return () => {
-      window.speechSynthesis.removeEventListener("voiceschanged", loadVoices);
-    };
-  }, []);
+      try {
+        const result = await generateLesson({
+          grade: character.grade,
+          subject: character.subject,
+          region: character.region,
+          topic: character.topic,
+          companionName: character.name,
+          companionDescription: character.description,
+        });
 
+        setLessonText(result.content);
+        setLessonState("ready");
+      } catch (error) {
+        console.error("Lesson generation failed:", error);
+        // Use fallback
+        const fallback = FALLBACK_LESSONS[character.subject] || FALLBACK_LESSONS["General Knowledge"];
+        setLessonText(fallback);
+        setIsUsingFallback(true);
+        setLessonState("error");
+        setErrorMessage(
+          error instanceof Error && error.message === "TIMEOUT"
+            ? "Timed out waiting for response"
+            : "Couldn't generate a personalized lesson"
+        );
+      }
+    },
+    [character, generateLesson]
+  );
+
+  // Auto-load on mount
+  useEffect(() => {
+    if (character?.grade) {
+      loadLesson();
+    }
+  }, [character?.grade, loadLesson]);
+
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       window.speechSynthesis.cancel();
@@ -95,7 +137,6 @@ export default function Lesson() {
     setIsPaused(false);
     setIsTalking(false);
     setProgress(0);
-    setCurrentSentenceIndex(0);
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current);
       progressIntervalRef.current = null;
@@ -104,16 +145,12 @@ export default function Lesson() {
   }, []);
 
   const speak = useCallback(() => {
+    if (!lessonText) return;
+
     if (isPaused) {
       window.speechSynthesis.resume();
       setIsPaused(false);
       setIsTalking(true);
-
-      const totalLength = sentencesRef.current.join(" ").length;
-      const currentLength = sentencesRef.current
-        .slice(0, currentSentenceIndex)
-        .join(" ").length;
-      const startProgress = (currentLength / totalLength) * 100;
 
       progressIntervalRef.current = setInterval(() => {
         setProgress((prev) => {
@@ -130,15 +167,9 @@ export default function Lesson() {
       return;
     }
 
-    sentencesRef.current = LESSON_TEXT.match(/[^.!?]+[.!?]+/g) || [
-      LESSON_TEXT,
-    ];
-    setCurrentSentenceIndex(0);
     setProgress(0);
 
-    const totalLength = LESSON_TEXT.length;
-
-    const utterance = new SpeechSynthesisUtterance(LESSON_TEXT);
+    const utterance = new SpeechSynthesisUtterance(lessonText);
     utterance.rate = 0.9;
     utterance.pitch = 1.1;
 
@@ -173,19 +204,13 @@ export default function Lesson() {
       }
     };
 
-    utterance.onboundary = (event) => {
-      if (event.name === "sentence") {
-        setCurrentSentenceIndex((prev) => prev + 1);
-      }
-    };
-
     utteranceRef.current = utterance;
     window.speechSynthesis.speak(utterance);
     setIsPlaying(true);
     setIsTalking(true);
 
-    const estimatedDuration =
-      (totalLength / (utterance.rate * 150)) * 1000;
+    const totalLength = lessonText.length;
+    const estimatedDuration = (totalLength / (utterance.rate * 150)) * 1000;
     const incrementMs = 50;
     const progressPerTick = (incrementMs / estimatedDuration) * 100;
 
@@ -201,7 +226,7 @@ export default function Lesson() {
         return next;
       });
     }, incrementMs);
-  }, [isPaused, currentSentenceIndex]);
+  }, [isPaused, lessonText]);
 
   const pauseSpeaking = useCallback(() => {
     window.speechSynthesis.pause();
@@ -223,11 +248,8 @@ export default function Lesson() {
     }
   }, [isPlaying, isPaused, speak, pauseSpeaking]);
 
-  const themeColor = character
-    ? COLOR_THEMES[character.colorTheme] || "#c084fc"
-    : "#c084fc";
-
-  if (character === undefined) {
+  // Loading state
+  if (character === undefined || character === null || !character.grade) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-grid">
         <div className="animate-pulse text-muted-foreground">Loading...</div>
@@ -339,8 +361,8 @@ export default function Lesson() {
           >
             {isTalking
               ? `${character.name} is teaching you...`
-              : isPlaying && !isPaused
-                ? `${character.name} is thinking...`
+              : lessonState === "loading"
+                ? `${character.name} is thinking of something fun to teach you...`
                 : `${character.name} is ready to teach`}
           </motion.p>
         </div>
@@ -350,9 +372,11 @@ export default function Lesson() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg">🌊 The Water Cycle</CardTitle>
+                <CardTitle className="text-lg">
+                  {character.topic || "Today's Lesson"}
+                </CardTitle>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Science · 5 min read
+                  {character.subject} · {character.grade}
                 </p>
               </div>
               <div
@@ -368,80 +392,131 @@ export default function Lesson() {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Progress bar */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Progress</span>
-                <span>{Math.round(progress)}%</span>
-              </div>
-              <div className="clay-input h-3 overflow-hidden rounded-full p-0">
-                <motion.div
-                  className="h-full rounded-full"
-                  style={{ backgroundColor: themeColor }}
-                  animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.1, ease: "linear" }}
+            {/* Loading state */}
+            {lessonState === "loading" && (
+              <div className="flex flex-col items-center justify-center py-12">
+                <Loader2
+                  className="h-8 w-8 animate-spin mb-4"
+                  style={{ color: themeColor }}
                 />
+                <p className="text-sm text-muted-foreground text-center">
+                  {character.name} is thinking of something fun to teach you...
+                </p>
+                <p className="text-xs text-muted-foreground/50 mt-2">
+                  This usually takes a few seconds
+                </p>
               </div>
-            </div>
+            )}
+
+            {/* Error banner with retry */}
+            {lessonState === "error" && (
+              <div className="clay-card rounded-xl p-4 flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-amber-400 mt-0.5 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">
+                    {isUsingFallback
+                      ? "Showing a standard lesson"
+                      : "Something went wrong"}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {errorMessage || "Using a pre-written lesson instead."}
+                  </p>
+                </div>
+                <Button
+                  onClick={() => loadLesson(true)}
+                  variant="outline"
+                  size="sm"
+                  className="clay-btn shrink-0 border-white/5 bg-white/[0.03] text-xs"
+                >
+                  <RefreshCw className="mr-1 h-3 w-3" />
+                  Try again
+                </Button>
+              </div>
+            )}
+
+            {/* Progress bar */}
+            {lessonState !== "loading" && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Progress</span>
+                  <span>{Math.round(progress)}%</span>
+                </div>
+                <div className="clay-input h-3 overflow-hidden rounded-full p-0">
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ backgroundColor: themeColor }}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.1, ease: "linear" }}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Lesson text */}
-            <div className="clay-input rounded-2xl p-5">
-              <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/80">
-                {LESSON_TEXT}
-              </p>
-            </div>
+            {lessonState !== "loading" && lessonText && (
+              <div className="clay-input rounded-2xl p-5">
+                <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/80">
+                  {lessonText}
+                </p>
+              </div>
+            )}
 
             {/* Controls */}
-            <div className="flex items-center justify-center gap-4">
-              <Button
-                onClick={stopSpeaking}
-                disabled={!isPlaying}
-                variant="outline"
-                size="icon"
-                className="clay-btn h-12 w-12 rounded-2xl border-white/5 bg-white/[0.03]"
-              >
-                <Square className="h-5 w-5" />
-              </Button>
+            {lessonState !== "loading" && lessonText && (
+              <div className="flex items-center justify-center gap-4">
+                <Button
+                  onClick={stopSpeaking}
+                  disabled={!isPlaying}
+                  variant="outline"
+                  size="icon"
+                  className="clay-btn h-12 w-12 rounded-2xl border-white/5 bg-white/[0.03]"
+                >
+                  <Square className="h-5 w-5" />
+                </Button>
 
-              <Button
-                onClick={togglePlayPause}
-                className="clay-glow flex h-16 w-16 items-center justify-center rounded-full p-0"
-                style={{ backgroundColor: themeColor }}
-              >
-                {isPlaying && !isPaused ? (
-                  <Pause className="h-6 w-6 text-white" />
-                ) : (
-                  <Play className="ml-1 h-6 w-6 text-white" />
-                )}
-              </Button>
+                <Button
+                  onClick={togglePlayPause}
+                  className="clay-glow flex h-16 w-16 items-center justify-center rounded-full p-0"
+                  style={{ backgroundColor: themeColor }}
+                >
+                  {isPlaying && !isPaused ? (
+                    <Pause className="h-6 w-6 text-white" />
+                  ) : (
+                    <Play className="ml-1 h-6 w-6 text-white" />
+                  )}
+                </Button>
 
-              <Button
-                onClick={() => navigate("/create-character")}
-                variant="outline"
-                size="icon"
-                className="clay-btn h-12 w-12 rounded-2xl border-white/5 bg-white/[0.03]"
-              >
-                <Settings className="h-5 w-5" />
-              </Button>
-            </div>
+                <Button
+                  onClick={() => loadLesson(true)}
+                  variant="outline"
+                  size="icon"
+                  className="clay-btn h-12 w-12 rounded-2xl border-white/5 bg-white/[0.03]"
+                  title="Regenerate lesson"
+                >
+                  <RefreshCw className="h-5 w-5" />
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Fun fact */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="clay-card mt-6 rounded-2xl p-5"
-        >
-          <p className="text-sm font-medium text-foreground">
-            💡 Fun Fact
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            About 97% of Earth's water is saltwater in the oceans. Only about
-            3% is freshwater — and most of that is locked in ice caps!
-          </p>
-        </motion.div>
+        {/* Fun fact — only when lesson is loaded */}
+        {lessonState === "ready" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="clay-card mt-6 rounded-2xl p-5"
+          >
+            <p className="text-sm font-medium text-foreground">
+              💡 Study Tip
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Listening while reading along helps reinforce memory. Try following
+              the text as {character.name} reads it aloud!
+            </p>
+          </motion.div>
+        )}
       </div>
     </div>
   );

@@ -128,7 +128,7 @@ export default function CreateCharacter() {
         description: description.trim(),
         colorTheme,
       });
-      navigate("/lesson");
+      navigate("/onboarding");
     } catch (e) {
       console.error("Failed to save character:", e);
       setIsSaving(false);
