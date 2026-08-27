@@ -144,8 +144,8 @@ export default function Dashboard() {
           </h1>
           <p className="mt-1 text-muted-foreground">
             {character
-              ? `Your companion "${character.name}" is ready to teach.`
-              : "Set up your first learning companion to get started."}
+              ? `${character.name} is hyped to teach you something new today!`
+              : "Let's get you a study buddy — it only takes a minute!"}
           </p>
         </motion.div>
 
@@ -169,12 +169,12 @@ export default function Dashboard() {
                   )}
                   <div>
                     <CardTitle className="text-sm">
-                      {character ? character.name : "No Companion Yet"}
+                      {character ? character.name : "No buddy yet 👋"}
                     </CardTitle>
                     <p className="text-xs text-muted-foreground">
                       {character
                         ? character.description
-                        : "Create a study companion to unlock lessons"}
+                        : "Your future study buddy is waiting to be born!"}
                     </p>
                   </div>
                 </div>
@@ -188,7 +188,7 @@ export default function Dashboard() {
                   }
                   className="clay-btn w-full rounded-xl bg-purple-500/15 text-sm font-medium text-purple-300 hover:bg-purple-500/25 hover:text-purple-200"
                 >
-                  {character ? "Start Lesson" : "Create Companion"}
+                  {character ? "🚀 Start Lesson" : "✨ Create Companion"}
                   <ArrowRight className="ml-2 h-3.5 w-3.5" />
                 </Button>
                 {character && (
@@ -365,7 +365,7 @@ export default function Dashboard() {
         )}
 
         <p className="mt-10 text-center text-xs text-muted-foreground/40">
-          Brainly Weird v1 · Companions & Interactive Lessons
+          Brainly Weird v1 · Making learning delightfully weird ✨
         </p>
       </div>
     </div>

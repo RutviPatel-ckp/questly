@@ -24,8 +24,11 @@ import {
   Loader2,
   RotateCcw,
   Zap,
+  Swords,
 } from "lucide-react";
-import MascotCharacter from "@/components/MascotCharacter";
+import MascotCharacter, { type MascotReaction } from "@/components/MascotCharacter";
+import Confetti from "@/components/Confetti";
+import { playCorrect, playIncorrect, playFanfare, playPop } from "@/lib/sounds";
 
 const COLOR_THEMES: Record<string, string> = {
   Sunset: "#fb923c",
@@ -59,6 +62,9 @@ export default function Quiz() {
   const [isHost, setIsHost] = useState(true);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [mascotReaction, setMascotReaction] = useState<MascotReaction>("idle");
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
 
   const themeColor = character
     ? COLOR_THEMES[character.colorTheme] || "#c084fc"
@@ -123,6 +129,23 @@ export default function Quiz() {
     if (selectedAnswer !== null || !room) return;
     setSelectedAnswer(answerIndex);
 
+    // Determine if correct
+    const q = QUIZ_QUESTIONS.find((q) => q.id === room.questions[room.currentQuestion]);
+    const correct = q ? answerIndex === q.correctIndex : false;
+    setLastAnswerCorrect(correct);
+
+    // Play sound + set mascot reaction
+    if (correct) {
+      playCorrect();
+      setMascotReaction("happy");
+    } else {
+      playIncorrect();
+      setMascotReaction("sad");
+    }
+
+    // Reset mascot after a delay
+    setTimeout(() => setMascotReaction("idle"), 2000);
+
     const qIndex = room.currentQuestion;
     try {
       await submitAnswer({
@@ -143,9 +166,25 @@ export default function Quiz() {
   const guestScore = room?.guestScore ?? 0;
   const totalQuestions = room?.questions.length ?? QUESTIONS_PER_QUIZ;
 
+  const hostResult = room ? scoreAnswers(room.questions, room.hostAnswers) : { correct: 0, total: 0, stars: 0 };
+  const guestResult = room ? scoreAnswers(room.questions, room.guestAnswers) : { correct: 0, total: 0, stars: 0 };
+  const myResult = isHost ? hostResult : guestResult;
+  const iWon = isHost ? hostScore > guestScore : guestScore > hostScore;
+  const tie = hostScore === guestScore;
+
   const themeColorVal = character
     ? COLOR_THEMES[character.colorTheme] || "#c084fc"
     : "#c084fc";
+
+  // Trigger confetti + fanfare on results
+  useEffect(() => {
+    if (phase === "results") {
+      setShowConfetti(true);
+      setMascotReaction("happy");
+      playFanfare();
+      setTimeout(() => setMascotReaction("idle"), 3000);
+    }
+  }, [phase]);
 
   return (
     <div className="min-h-screen overflow-hidden bg-grid">
@@ -156,6 +195,8 @@ export default function Quiz() {
           style={{ backgroundColor: `${themeColorVal}10` }}
         />
       </div>
+
+      <Confetti trigger={showConfetti} color={themeColorVal} type="confetti" />
 
       <div className="relative mx-auto max-w-2xl px-6 py-6">
         {/* Header */}
@@ -262,13 +303,13 @@ export default function Quiz() {
               className="text-center"
             >
               <div className="mb-6">
-                <MascotCharacter color={themeColorVal} size={100} />
+                <MascotCharacter color={themeColorVal} size={100} reaction="happy" accessories={character?.accessories} />
               </div>
               <h2 className="text-xl font-bold text-foreground mb-2">
-                Room Created!
+                Challenge Sent! 🎯
               </h2>
               <p className="text-muted-foreground mb-6">
-                Share this code with your friend:
+                Share this code with your friend to start the showdown:
               </p>
 
               <div className="clay-card-lg mx-auto max-w-xs rounded-2xl p-6 mb-6">
@@ -296,7 +337,7 @@ export default function Quiz() {
 
               <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Waiting for opponent to join...
+                Scanning for worthy opponents...
               </div>
             </motion.div>
           )}
@@ -332,7 +373,15 @@ export default function Quiz() {
                 </div>
               </div>
 
-              {/* Question */}
+              {/* Mascot + Question */}
+              <div className="flex justify-center mb-4">
+                <MascotCharacter
+                  color={themeColorVal}
+                  size={80}
+                  reaction={mascotReaction || "idle"}
+                  accessories={character?.accessories}
+                />
+              </div>
               <Card className="clay-card-lg border-0">
                 <CardContent className="p-6 space-y-4">
                   <p className="text-xs text-muted-foreground uppercase tracking-wide">
@@ -375,10 +424,14 @@ export default function Quiz() {
 
                   {selectedAnswer !== null && (
                     <p className="text-center text-xs text-muted-foreground">
-                      {room.hostAnswers[room.currentQuestion] !== undefined &&
-                      room.guestAnswers[room.currentQuestion] !== undefined
-                        ? "Both players answered — next question coming..."
-                        : "Waiting for opponent to answer..."}
+                      {lastAnswerCorrect === true
+                        ? "🎉 Nailed it!"
+                        : lastAnswerCorrect === false
+                          ? "😅 Almost! Keep going..."
+                          : room.hostAnswers[room.currentQuestion] !== undefined &&
+                            room.guestAnswers[room.currentQuestion] !== undefined
+                            ? "Both answered — next question incoming..."
+                            : "Waiting for your opponent..."}
                     </p>
                   )}
                 </CardContent>
@@ -395,17 +448,18 @@ export default function Quiz() {
               exit={{ opacity: 0, y: -20 }}
             >
               <div className="text-center mb-6">
-                <MascotCharacter color={themeColorVal} size={100} />
+                <MascotCharacter
+                  color={themeColorVal}
+                  size={100}
+                  reaction={tie ? "idle" : "happy"}
+                  accessories={character?.accessories}
+                />
                 <h2 className="text-2xl font-bold text-foreground mt-4">
-                  {hostScore > guestScore
-                    ? isHost
-                      ? "You Won! 🏆"
-                      : `${room.hostName} Wins!`
-                    : guestScore > hostScore
-                      ? isHost
-                        ? `${room.guestName} Wins!`
-                        : "You Won! 🏆"
-                      : "It's a Tie! 🤝"}
+                  {tie
+                    ? "What a battle! It's a tie! 🤝"
+                    : iWon
+                      ? "Woohoo! You crushed that quiz! 🏆"
+                      : `${isHost ? room.guestName : room.hostName} got you this time! Better luck next round! 💪`}
                 </h2>
               </div>
 
@@ -443,17 +497,14 @@ export default function Quiz() {
               {/* Stars */}
               <div className="clay-card rounded-2xl p-5 mb-6 text-center">
                 <p className="text-sm text-muted-foreground mb-2">
-                  Stars earned (including friend bonus!)
+                  Stars earned
                 </p>
                 <div className="flex justify-center gap-1">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <Star
                       key={i}
                       className={`h-8 w-8 ${
-                        i <
-                        (hostScore >= guestScore && isHost
-                          ? scoreAnswers(room.questions, room.hostAnswers).stars
-                          : scoreAnswers(room.questions, room.guestAnswers).stars)
+                        i < myResult.stars
                           ? "text-amber-400 fill-amber-400"
                           : "text-white/10"
                       }`}
@@ -461,7 +512,7 @@ export default function Quiz() {
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  +5 bonus stars for playing with a friend!
+                  {myResult.stars} quiz stars + 5 bonus stars for the team-up! 🎉
                 </p>
               </div>
 

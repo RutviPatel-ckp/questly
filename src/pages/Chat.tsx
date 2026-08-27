@@ -116,7 +116,7 @@ export default function Chat() {
       {
         id: "welcome",
         role: "tutor",
-        content: `Hey there! I'm your study buddy. I won't just give you answers — I'll help you think through problems step by step. Ready?`,
+        content: `Hey there! I'm your study buddy. I won't just hand you answers on a silver platter — I'll nudge you to think it through yourself. Ready to flex those brain muscles? 🧠`,
         timestamp: Date.now(),
       },
       {
@@ -222,13 +222,13 @@ export default function Chat() {
               role: "tutor",
               content: `🏆 **Session Complete!**\n\nYou scored **${updatedSession.totalPoints} points** out of a possible ${totalPossible} (${percentage}%).\n\n${
                 percentage >= 90
-                  ? "Incredible! You really understand this material."
+                  ? "Absolute legend! You crushed every single one! 🎉"
                   : percentage >= 70
-                    ? "Great work! You're making solid progress."
+                    ? "Solid work! Your brain is warming up nicely! 🔥"
                     : percentage >= 50
-                      ? "Good effort! Practice will help you get even better."
-                      : "Keep at it! Every attempt helps you learn."
-              }\n\nWant to try another round?`,
+                      ? "Not bad at all! A few more rounds and you'll be unstoppable! 💪"
+                      : "Every try makes you stronger — the comeback arc starts now! 🚀"
+              }\n\nReady for another round of brain gains?`,
               timestamp: Date.now(),
             },
           ]);

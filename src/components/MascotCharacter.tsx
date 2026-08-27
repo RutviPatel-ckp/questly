@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 
+export type MascotReaction = "idle" | "talking" | "happy" | "sad";
+
 interface MascotCharacterProps {
   color: string;
   size?: number;
   isTalking?: boolean;
+  reaction?: MascotReaction;
   className?: string;
   accessories?: string[];
 }
@@ -22,9 +25,12 @@ export default function MascotCharacter({
   color,
   size = 128,
   isTalking = false,
+  reaction,
   className = "",
   accessories = [],
 }: MascotCharacterProps) {
+  // Derive effective state: reaction prop overrides isTalking
+  const effectiveReaction: MascotReaction = reaction || (isTalking ? "talking" : "idle");
   const [mouthOpen, setMouthOpen] = useState(false);
   const [isBlinking, setIsBlinking] = useState(false);
 
@@ -37,12 +43,14 @@ export default function MascotCharacter({
   const rafRef = useRef<number>(0);
   const startTimeRef = useRef<number>(0);
 
-  // Mouth toggling while talking
+  // Mouth toggling while talking/happy
   useEffect(() => {
-    if (isTalking) {
+    const shouldAnimate = effectiveReaction === "talking" || effectiveReaction === "happy";
+    if (shouldAnimate) {
+      const speed = effectiveReaction === "happy" ? 120 : 170;
       mouthTimerRef.current = setInterval(() => {
         setMouthOpen((prev) => !prev);
-      }, 170);
+      }, speed);
     } else {
       setMouthOpen(false);
       if (mouthTimerRef.current) {
@@ -55,7 +63,7 @@ export default function MascotCharacter({
         clearInterval(mouthTimerRef.current);
       }
     };
-  }, [isTalking]);
+  }, [effectiveReaction]);
 
   // Eye blinking — every 2-5 seconds
   useEffect(() => {
@@ -81,29 +89,52 @@ export default function MascotCharacter({
     const animate = (now: number) => {
       const elapsed = (now - startTimeRef.current) / 1000;
 
-      if (isTalking) {
-        // Body: gentle wiggle
-        const bodyScale = 1 + Math.sin(elapsed * 6) * 0.02;
-        const bodyRotate = Math.sin(elapsed * 8) * 1.5;
-        const bodyY = Math.sin(elapsed * 5) * 3;
-        setBodyTransform(
-          `translateY(${bodyY}px) scale(${bodyScale}) rotate(${bodyRotate}deg)`
-        );
-
-        // Arms: wave
-        const leftArm = Math.sin(elapsed * 5) * 18;
-        const rightArm = Math.sin(elapsed * 5 + 0.5) * 18;
-        setLeftArmTransform(`rotate(${leftArm}deg)`);
-        setRightArmTransform(`rotate(${rightArm}deg)`);
-      } else {
-        // Idle: slow breathing
-        const breathScale = 1 + Math.sin(elapsed * 1.8) * 0.015;
-        const breathY = Math.sin(elapsed * 1.8) * 2;
-        setBodyTransform(
-          `translateY(${breathY}px) scale(${breathScale})`
-        );
-        setLeftArmTransform("");
-        setRightArmTransform("");
+      switch (effectiveReaction) {
+        case "talking": {
+          const bodyScale = 1 + Math.sin(elapsed * 6) * 0.02;
+          const bodyRotate = Math.sin(elapsed * 8) * 1.5;
+          const bodyY = Math.sin(elapsed * 5) * 3;
+          setBodyTransform(
+            `translateY(${bodyY}px) scale(${bodyScale}) rotate(${bodyRotate}deg)`
+          );
+          const leftArm = Math.sin(elapsed * 5) * 18;
+          const rightArm = Math.sin(elapsed * 5 + 0.5) * 18;
+          setLeftArmTransform(`rotate(${leftArm}deg)`);
+          setRightArmTransform(`rotate(${rightArm}deg)`);
+          break;
+        }
+        case "happy": {
+          // Excited bounce — fast scale pulse + arms up
+          const bounceY = -Math.abs(Math.sin(elapsed * 8)) * 12;
+          const bounceScale = 1 + Math.sin(elapsed * 8) * 0.08;
+          setBodyTransform(
+            `translateY(${bounceY}px) scale(${bounceScale})`
+          );
+          setLeftArmTransform(`rotate(${-25 + Math.sin(elapsed * 10) * 10}deg)`);
+          setRightArmTransform(`rotate(${25 + Math.sin(elapsed * 10 + 1) * 10}deg)`);
+          break;
+        }
+        case "sad": {
+          // Gentle droop — slight lean + arms down
+          const droopY = Math.sin(elapsed * 2) * 1.5;
+          setBodyTransform(
+            `translateY(${droopY}px) rotate(${Math.sin(elapsed * 1.5) * 1}deg)`
+          );
+          setLeftArmTransform(`rotate(5deg)`);
+          setRightArmTransform(`rotate(-5deg)`);
+          break;
+        }
+        default: {
+          // Idle: slow breathing
+          const breathScale = 1 + Math.sin(elapsed * 1.8) * 0.015;
+          const breathY = Math.sin(elapsed * 1.8) * 2;
+          setBodyTransform(
+            `translateY(${breathY}px) scale(${breathScale})`
+          );
+          setLeftArmTransform("");
+          setRightArmTransform("");
+          break;
+        }
       }
 
       rafRef.current = requestAnimationFrame(animate);
@@ -115,7 +146,7 @@ export default function MascotCharacter({
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [isTalking]);
+  }, [effectiveReaction]);
 
   const bodyLight = adjustBrightness(color, 20);
   const bodyDark = adjustBrightness(color, -15);

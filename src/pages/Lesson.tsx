@@ -21,7 +21,9 @@ import {
   RefreshCw,
   AlertTriangle,
 } from "lucide-react";
-import MascotCharacter from "@/components/MascotCharacter";
+import MascotCharacter, { type MascotReaction } from "@/components/MascotCharacter";
+import Confetti from "@/components/Confetti";
+import { playCheer, playPop } from "@/lib/sounds";
 import { FALLBACK_LESSONS } from "@/lib/onboarding-data";
 
 const COLOR_THEMES: Record<string, string> = {
@@ -51,6 +53,8 @@ export default function Lesson() {
   const [isPaused, setIsPaused] = useState(false);
   const [isTalking, setIsTalking] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [mascotReaction, setMascotReaction] = useState<MascotReaction>("idle");
+  const [showConfetti, setShowConfetti] = useState(false);
 
   // Use refs to avoid stale closures in speak/pause callbacks
   const isPausedRef = useRef(false);
@@ -106,6 +110,11 @@ export default function Lesson() {
 
         setLessonText(result.content);
         setLessonState("ready");
+        // Celebrate!
+        setShowConfetti(true);
+        setMascotReaction("happy");
+        playCheer();
+        setTimeout(() => setMascotReaction("idle"), 3000);
       } catch (error) {
         console.error("Lesson generation failed:", error);
         const fallback =
@@ -252,6 +261,7 @@ export default function Lesson() {
   }, []);
 
   const togglePlayPause = useCallback(() => {
+    playPop();
     if (!isPlaying) {
       speak();
     } else if (isPaused) {
@@ -280,6 +290,8 @@ export default function Lesson() {
         />
         <div className="absolute bottom-1/4 -right-40 h-[400px] w-[400px] rounded-full bg-purple-600/5 blur-[100px]" />
       </div>
+
+      <Confetti trigger={showConfetti} color={themeColor} type="sparkles" />
 
       <div className="relative mx-auto max-w-2xl px-6 py-6">
         {/* Header */}
@@ -311,7 +323,8 @@ export default function Lesson() {
             <MascotCharacter
               color={themeColor}
               size={200}
-              isTalking={isTalking}
+              reaction={mascotReaction || (isTalking ? "talking" : "idle")}
+              accessories={character?.accessories}
             />
           </div>
 
@@ -322,10 +335,12 @@ export default function Lesson() {
             className="mt-4 text-center text-sm text-muted-foreground"
           >
             {isTalking
-              ? `${character.name} is teaching you...`
+              ? `${character.name} is vibing while you listen...`
               : lessonState === "loading"
-                ? `${character.name} is thinking of something fun to teach you...`
-                : `${character.name} is ready to teach`}
+                ? `${character.name} is cooking up something fun...`
+                : lessonState === "error"
+                  ? `${character.name} had a hiccup, but has a backup ready!`
+                  : `${character.name} is pumped to teach you!`}
           </motion.p>
         </div>
 
@@ -362,11 +377,11 @@ export default function Lesson() {
                   style={{ color: themeColor }}
                 />
                 <p className="text-sm text-muted-foreground text-center">
-                  {character.name} is thinking of something fun to teach
-                  you...
+                  {character.name} is cooking up something fun to teach
+                  you... 🍳
                 </p>
                 <p className="text-xs text-muted-foreground/50 mt-2">
-                  This usually takes a few seconds
+                  Great lessons can't be rushed!
                 </p>
               </div>
             )}
@@ -378,11 +393,11 @@ export default function Lesson() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground">
                     {isUsingFallback
-                      ? "Showing a standard lesson"
-                      : "Something went wrong"}
+                      ? "Oops! The personal touch hit a snag"
+                      : "Something went sideways"}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {errorMessage || "Using a pre-written lesson instead."}
+                    {errorMessage || "No worries — we've got a backup lesson ready for you."}
                   </p>
                 </div>
                 <Button
@@ -473,11 +488,11 @@ export default function Lesson() {
             className="clay-card mt-6 rounded-2xl p-5"
           >
             <p className="text-sm font-medium text-foreground">
-              💡 Study Tip
+              💡 Pro tip from {character.name}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Listening while reading along helps reinforce memory. Try
-              following the text as {character.name} reads it aloud!
+              Follow along with the text while listening — it's like a
+              superpower for your memory. You've got this! 💪
             </p>
           </motion.div>
         )}
