@@ -25,6 +25,7 @@ import {
   ChevronRight,
   BookOpen,
   Zap,
+  Crown,
 } from "lucide-react";
 import MascotCharacter from "@/components/MascotCharacter";
 import type { MascotReaction } from "@/components/MascotCharacter";
@@ -52,6 +53,7 @@ export default function Lesson() {
   const character = useQuery(api.characters.getCharacter);
   const generateLesson = useAction(api.lessons.generateLesson);
   const advancePart = useMutation(api.lessons.advancePart);
+  const addCoins = useMutation(api.quiz.addCoins);
 
   const [lessonText, setLessonText] = useState("");
   const [phase, setPhase] = useState<LessonPhase>("loading");
@@ -64,6 +66,8 @@ export default function Lesson() {
   const [progress, setProgress] = useState(0);
   const [mascotReaction, setMascotReaction] = useState<MascotReaction>("idle");
   const [showConfetti, setShowConfetti] = useState(false);
+  const [coinsEarned, setCoinsEarned] = useState(0);
+  const [starsFromCoins, setStarsFromCoins] = useState(0);
 
   const [testAnswers, setTestAnswers] = useState<(number | null)[]>([]);
   const [testSubmitted, setTestSubmitted] = useState(false);
@@ -75,7 +79,7 @@ export default function Lesson() {
   useEffect(() => { isPausedRef.current = isPaused; }, [isPaused]);
   useEffect(() => { lessonTextRef.current = lessonText; }, [lessonText]);
 
-  const themeColor = character ? COLOR_THEMES[character.colorTheme] || "#c084fc" : "#c084fc";
+  const themeColor = character ? COLOR_THEMES[character.colorTheme] || "#fbbf24" : "#fbbf24";
   const currentPart = character?.currentPart || 1;
   const totalParts = PARTS_PER_TOPIC;
   const partTitle = useMemo(() => character ? getPartTitle(character.subject || "", character.topic || "", currentPart) : "", [character, currentPart]);
@@ -100,6 +104,8 @@ export default function Lesson() {
     setLessonText("");
     setTestAnswers([]);
     setTestSubmitted(false);
+    setCoinsEarned(0);
+    setStarsFromCoins(0);
     try {
       const result = await generateLesson({
         grade: character.grade, subject: character.subject, region: character.region,
@@ -165,10 +171,19 @@ export default function Lesson() {
     if (testAnswers.some(a => a === null)) return;
     playPop(); setTestSubmitted(true);
     if (testCorrectCount >= Math.ceil(testQuestions.length * 0.5)) {
-      playCorrect(); setMascotReaction("happy"); setShowConfetti(true); setTimeout(() => setMascotReaction("idle"), 3000);
+      playCorrect(); setMascotReaction("happy"); setShowConfetti(true);
+      // Award 1 coin for completing the chapter
+      try {
+        const result = await addCoins({ amount: 1 });
+        if (result) {
+          setCoinsEarned(1);
+          if (result.starsAdded > 0) setStarsFromCoins(result.starsAdded);
+        }
+      } catch (e) { console.error("Failed to award coin:", e); }
+      setTimeout(() => setMascotReaction("idle"), 3000);
       try { await advancePart(); } catch (e) { console.error("Failed to advance:", e); }
     } else { playIncorrect(); setMascotReaction("sad"); setTimeout(() => setMascotReaction("idle"), 2000); }
-  }, [testAnswers, testCorrectCount, testQuestions, advancePart]);
+  }, [testAnswers, testCorrectCount, testQuestions, advancePart, addCoins]);
   const handleBackToLesson = useCallback(() => { playPop(); setPhase("ready"); setTestAnswers([]); setTestSubmitted(false); }, []);
   const handleGoToNextPart = useCallback(() => { playPop(); setPhase("loading"); setTestAnswers([]); setTestSubmitted(false); loadLesson(); }, [loadLesson]);
 
@@ -182,7 +197,7 @@ export default function Lesson() {
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-40 left-1/3 h-[500px] w-[500px] -translate-x-1/2 rounded-full blur-[120px]" style={{ backgroundColor: `${themeColor}12` }} />
         <div className="absolute bottom-1/4 -right-40 h-[400px] w-[400px] rounded-full bg-purple-600/8 blur-[100px]" />
-        <div className="absolute top-1/3 -left-32 h-[300px] w-[300px] rounded-full bg-teal-500/5 blur-[100px]" />
+        <div className="absolute top-1/3 -left-32 h-[300px] w-[300px] rounded-full bg-amber-500/5 blur-[100px]" />
       </div>
       <Confetti trigger={showConfetti} color={themeColor} type="sparkles" />
 
@@ -190,7 +205,7 @@ export default function Lesson() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <button onClick={() => { stopSpeaking(); navigate("/dashboard"); }} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-all duration-250">
-            <ArrowLeft className="h-4 w-4" /> Dashboard
+            <ArrowLeft className="h-4 w-4" /> Kingdom
           </button>
           <div className="clay-card flex items-center gap-2 rounded-2xl px-3.5 py-1.5">
             <MascotCharacter color={themeColor} size={24} />
@@ -198,12 +213,12 @@ export default function Lesson() {
           </div>
         </div>
 
-        {/* Part progress indicator */}
+        {/* Chapter progress indicator */}
         {totalParts > 1 && (
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-muted-foreground">{partTitle}</span>
-              <span className="text-xs font-bold" style={{ color: themeColor }}>Part {currentPart} of {totalParts}</span>
+              <span className="text-xs font-bold" style={{ color: themeColor }}>Chapter {currentPart} of {totalParts}</span>
             </div>
             <div className="clay-input h-2 overflow-hidden rounded-full p-0">
               <div className="h-full rounded-full transition-all duration-500 ease-out" style={{ backgroundColor: themeColor, width: `${(currentPart / totalParts) * 100}%` }} />
@@ -228,12 +243,12 @@ export default function Lesson() {
             <MascotCharacter color={themeColor} size={200} reaction={mascotReaction || (isTalking ? "talking" : "idle")} accessories={character?.accessories} />
           </div>
           <motion.p key={isTalking ? "talking" : phase} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="mt-4 text-center text-sm text-muted-foreground">
-            {isTalking ? `${character.name} is vibing while you listen...`
-              : phase === "loading" ? `${character.name} is cooking up something fun...`
+            {isTalking ? `${character.name} is teaching while you listen...`
+              : phase === "loading" ? `${character.name} is preparing your quest...`
               : phase === "error" ? `${character.name} had a hiccup, but has a backup ready!`
-              : phase === "finished" ? `${character.name} finished the lesson! What's next? 🎉`
+              : phase === "finished" ? `${character.name} completed the lesson! What's next? 🎉`
               : phase === "test" ? (testSubmitted ? (testPassed ? `${character.name} is so proud of you! 🌟` : `${character.name} says: "No worries, let's try again!" 💪`) : `Quick check — how well did you listen? 🤔`)
-              : `${character.name} is pumped to teach you!`}
+              : `${character.name} is ready to teach!`}
           </motion.p>
         </div>
 
@@ -244,7 +259,7 @@ export default function Lesson() {
               <Card className="clay-card-lg border-0"><CardContent className="p-6">
                 <div className="flex flex-col items-center justify-center py-12">
                   <Loader2 className="h-8 w-8 animate-spin mb-4" style={{ color: themeColor }} />
-                  <p className="text-sm text-muted-foreground text-center">{character.name} is cooking up something fun to teach you... 🍳</p>
+                  <p className="text-sm text-muted-foreground text-center">{character.name} is preparing your quest... ⚔️</p>
                   <p className="text-xs text-muted-foreground/50 mt-2">Great lessons can't be rushed!</p>
                 </div>
               </CardContent></Card>
@@ -259,7 +274,7 @@ export default function Lesson() {
                   <AlertTriangle className="h-5 w-5 text-amber-400 mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground">{isUsingFallback ? "Oops! The personal touch hit a snag" : "Something went sideways"}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{errorMessage || "No worries — we've got a backup lesson ready for you."}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{errorMessage || "No worries — we've got a backup quest ready for you."}</p>
                   </div>
                 </div>
                 <div className="clay-input rounded-2xl p-5"><p className="whitespace-pre-line text-sm leading-relaxed text-foreground/80">{lessonText}</p></div>
@@ -281,7 +296,7 @@ export default function Lesson() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-lg">{partTitle || character.topic || "Today's Lesson"}</CardTitle>
+                      <CardTitle className="text-lg">{partTitle || character.topic || "Today's Quest"}</CardTitle>
                       <p className="mt-1 text-xs text-muted-foreground">{character.subject} · {character.grade}</p>
                     </div>
                     <div className="clay-card flex h-10 w-10 items-center justify-center rounded-2xl" style={{ backgroundColor: `${themeColor}15` }}>
@@ -312,7 +327,7 @@ export default function Lesson() {
                   {phase === "finished" && !isPlaying && (
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 pt-2">
                       <div className="text-center">
-                        <p className="text-lg font-bold text-foreground">🎉 Lesson Complete!</p>
+                        <p className="text-lg font-bold text-foreground">🎉 Chapter Complete!</p>
                         <p className="text-sm text-muted-foreground mt-1">What would you like to do next?</p>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
@@ -321,17 +336,17 @@ export default function Lesson() {
                             <RotateCcw className="h-6 w-6" style={{ color: themeColor }} />
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-foreground group-hover:text-purple-300 transition-colors">Repeat This Lesson</p>
+                            <p className="text-sm font-semibold text-foreground group-hover:text-amber-300 transition-colors">Repeat This Chapter</p>
                             <p className="text-xs text-muted-foreground mt-0.5">Listen again from the start</p>
                           </div>
                         </button>
                         <button onClick={handleStartTest} className="clay-card clay-tile group flex flex-col items-center gap-3 rounded-2xl p-5 text-center">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-500/15">
-                            <Zap className="h-6 w-6 text-purple-400" />
+                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/15">
+                            <Zap className="h-6 w-6 text-amber-400" />
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-foreground group-hover:text-purple-300 transition-colors">Quick Check ✨</p>
-                            <p className="text-xs text-muted-foreground mt-0.5">Test what you learned</p>
+                            <p className="text-sm font-semibold text-foreground group-hover:text-amber-300 transition-colors">Quick Trial ✨</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">Test what you learned (earn 1 🪙)</p>
                           </div>
                         </button>
                       </div>
@@ -342,7 +357,7 @@ export default function Lesson() {
 
               {phase === "ready" && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="clay-card mt-6 rounded-2xl p-5">
-                  <p className="text-sm font-medium text-foreground">💡 Pro tip from {character.name}</p>
+                  <p className="text-sm font-medium text-foreground">💡 Royal Advice from {character.name}</p>
                   <p className="mt-1 text-sm text-muted-foreground">Follow along with the text while listening — it's like a superpower for your memory. You've got this! 💪</p>
                 </motion.div>
               )}
@@ -357,11 +372,11 @@ export default function Lesson() {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="text-lg flex items-center gap-2">
-                        <BookOpen className="h-5 w-5" style={{ color: themeColor }} /> Quick Check
+                        <BookOpen className="h-5 w-5" style={{ color: themeColor }} /> Quick Trial
                       </CardTitle>
-                      <p className="mt-1 text-xs text-muted-foreground">{partTitle} · {testQuestions.length} questions</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{partTitle} · {testQuestions.length} questions · 1 🪙 reward</p>
                     </div>
-                    {!testSubmitted && <Button onClick={handleBackToLesson} variant="outline" size="sm" className="clay-ghost rounded-2xl text-xs">Back to Lesson</Button>}
+                    {!testSubmitted && <Button onClick={handleBackToLesson} variant="outline" size="sm" className="clay-ghost rounded-2xl text-xs">Back to Chapter</Button>}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-5">
@@ -377,7 +392,7 @@ export default function Lesson() {
                               className={`clay-btn w-full rounded-2xl p-3 text-left text-sm font-medium transition-all duration-250 ${
                                 testSubmitted && isCorrect ? "bg-emerald-500/20 text-emerald-300 ring-2 ring-emerald-500/50"
                                 : testSubmitted && isSelected && !isCorrect ? "bg-rose-500/20 text-rose-300 ring-2 ring-rose-500/50"
-                                : isSelected ? "bg-purple-500/20 text-purple-300"
+                                : isSelected ? "bg-amber-500/20 text-amber-300"
                                 : "bg-white/[0.03] text-foreground hover:bg-white/[0.06]"
                               }`}>
                               <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[10px]">{String.fromCharCode(65 + oi)}</span>
@@ -398,13 +413,22 @@ export default function Lesson() {
                       <div className="clay-card rounded-2xl p-5 text-center">
                         <p className="text-2xl font-bold" style={{ color: themeColor }}>{testCorrectCount}/{testQuestions.length}</p>
                         <p className="text-sm text-muted-foreground mt-1">{testPassed ? "🎉 Amazing work! You passed!" : "💪 Almost there! Give it another shot!"}</p>
+                        {coinsEarned > 0 && (
+                          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="mt-3 inline-flex items-center gap-2 rounded-2xl bg-amber-500/15 px-4 py-2">
+                            <span className="text-lg">🪙</span>
+                            <span className="text-sm font-bold text-amber-300">+1 Coin earned!</span>
+                            {starsFromCoins > 0 && (
+                              <span className="text-sm text-purple-300">→ +{starsFromCoins} Star{starsFromCoins > 1 ? "s" : ""}! ⭐</span>
+                            )}
+                          </motion.div>
+                        )}
                       </div>
                       <div className="flex gap-3">
                         {!testPassed ? (
                           <Button onClick={handleRepeatLesson} className="clay-primary flex-1 rounded-2xl py-2.5 font-semibold"><RotateCcw className="mr-2 h-4 w-4" /> Review & Retry</Button>
                         ) : (
                           <Button onClick={handleGoToNextPart} className="clay-primary flex-1 rounded-2xl py-2.5 font-semibold">
-                            {currentPart < totalParts ? "Next Part" : "Back to Dashboard"} <ChevronRight className="ml-2 h-4 w-4" />
+                            {currentPart < totalParts ? "Next Chapter" : "Back to Kingdom"} <ChevronRight className="ml-2 h-4 w-4" />
                           </Button>
                         )}
                       </div>

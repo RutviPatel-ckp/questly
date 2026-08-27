@@ -15,8 +15,9 @@ import {
 import {
   ArrowRight,
   ArrowLeft,
-  Terminal,
+  Crown,
   Loader2,
+  Map,
 } from "lucide-react";
 import {
   GRADES,
@@ -57,8 +58,8 @@ export default function Onboarding() {
   const topics = subject ? TOPICS_BY_SUBJECT[subject] || [] : [];
 
   const themeColor = character
-    ? COLOR_THEMES[character.colorTheme] || "#c084fc"
-    : "#c084fc";
+    ? COLOR_THEMES[character.colorTheme] || "#fbbf24"
+    : "#fbbf24";
 
   const handleSave = async () => {
     if (!grade || !subject || !region || !topic) return;
@@ -75,22 +76,22 @@ export default function Onboarding() {
   const steps = [
     {
       title: "What grade are you in?",
-      description: "This helps us match the lesson difficulty to your level.",
+      description: "This helps us match the quest difficulty to your level.",
       value: grade,
       onChange: setGrade,
       options: GRADES,
       placeholder: "Select your grade",
     },
     {
-      title: "What subject do you want to learn?",
-      description: "Pick the subject you'd like your companion to teach you.",
+      title: "Which Kingdom shall you explore?",
+      description: "Pick the kingdom (subject) you'd like your companion to teach you.",
       value: subject,
       onChange: setSubject,
       options: SUBJECTS,
-      placeholder: "Select a subject",
+      placeholder: "Select a kingdom",
     },
     {
-      title: "Where are you based?",
+      title: "Where is your realm?",
       description: "We'll tailor examples and content to be relevant to your region.",
       value: region,
       onChange: setRegion,
@@ -98,12 +99,12 @@ export default function Onboarding() {
       placeholder: "Select your region",
     },
     {
-      title: "What topic interests you?",
-      description: `Choose a ${subject || "subject"} topic to start with.`,
+      title: "Choose your quest topic",
+      description: `Pick a ${subject || "kingdom"} topic to begin your quest.`,
       value: topic,
       onChange: setTopic,
       options: topics,
-      placeholder: "Select a topic",
+      placeholder: "Select a quest topic",
     },
   ];
 
@@ -138,12 +139,12 @@ export default function Onboarding() {
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-all duration-250"
           >
             <ArrowLeft className="h-4 w-4" />
-            {step > 0 ? "Back" : "Character"}
+            {step > 0 ? "Back" : "Companion"}
           </button>
           <div className="flex items-center gap-2">
-            <Terminal className="h-4 w-4 text-purple-400" />
+            <Crown className="h-4 w-4 text-amber-400" />
             <span className="text-sm font-medium text-muted-foreground">
-              Brainly<span className="text-purple-400"> Weird</span>
+              Quest<span className="text-amber-400">ly</span>
             </span>
           </div>
         </div>
@@ -155,9 +156,9 @@ export default function Onboarding() {
               key={i}
               className={`h-2 rounded-full transition-all duration-300 ${
                 i === step
-                  ? "w-8 bg-purple-500"
+                  ? "w-8 bg-amber-500"
                   : i < step
-                    ? "w-2 bg-purple-400/60"
+                    ? "w-2 bg-amber-400/60"
                     : "w-2 bg-white/10"
               }`}
             />
@@ -239,14 +240,14 @@ export default function Onboarding() {
             <Button
               onClick={handleSave}
               disabled={!canProceed || isSaving}
-              className="clay-glow rounded-2xl px-8 py-2.5 font-semibold bg-purple-500 text-white hover:bg-purple-400 disabled:opacity-30"
+              className="clay-glow rounded-2xl px-8 py-2.5 font-semibold bg-amber-500 text-gray-900 hover:bg-amber-400 disabled:opacity-30"
             >
               {isSaving ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <ArrowRight className="mr-2 h-4 w-4" />
               )}
-              Start Learning
+              Begin Your Quest
             </Button>
           )}
         </div>

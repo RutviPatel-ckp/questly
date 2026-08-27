@@ -244,6 +244,40 @@ export const addStars = mutation({
 });
 
 /**
+ * Award coins for completing a lesson chapter.
+ * Every 3 coins auto-convert to 1 star.
+ */
+export const addCoins = mutation({
+  args: { amount: v.number() },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const character = await ctx.db
+      .query("characters")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+
+    if (!character) return { coins: 0, starsAdded: 0 };
+
+    const currentCoins = character.coins || 0;
+    const newCoins = currentCoins + args.amount;
+
+    // Auto-convert every 3 coins to 1 star
+    const starsToAdd = Math.floor(newCoins / 3);
+    const remainingCoins = newCoins % 3;
+    const currentStars = character.totalStars || 0;
+
+    await ctx.db.patch(character._id, {
+      coins: remainingCoins,
+      totalStars: currentStars + starsToAdd,
+    });
+
+    return { coins: remainingCoins, starsAdded: starsToAdd };
+  },
+});
+
+/**
  * Equip or unequip an accessory.
  */
 export const toggleAccessory = mutation({

@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   ArrowLeft,
-  Terminal,
+  Crown,
   Send,
   Lightbulb,
   Trophy,
@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 
 import MascotCharacter from "@/components/MascotCharacter";
+import { WISE_OLD_KING_INTRO } from "@/lib/onboarding-data";
 
 const COLOR_THEMES: Record<string, string> = {
   Sunset: "#fb923c",
@@ -81,7 +82,7 @@ function ScoreDisplay({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-2xl bg-purple-500/15 px-2.5 py-0.5 text-xs font-semibold text-purple-300 ${className}`}
+      className={`inline-flex items-center gap-1 rounded-2xl bg-amber-500/15 px-2.5 py-0.5 text-xs font-semibold text-amber-300 ${className}`}
     >
       <Star className="h-3 w-3" />
       {points}
@@ -100,8 +101,8 @@ export default function Chat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const themeColor = character
-    ? COLOR_THEMES[character.colorTheme] || "#c084fc"
-    : "#c084fc";
+    ? COLOR_THEMES[character.colorTheme] || "#fbbf24"
+    : "#fbbf24";
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -114,13 +115,13 @@ export default function Chat() {
       {
         id: "welcome",
         role: "tutor",
-        content: `Hey there! I'm your study buddy. I won't just hand you answers on a silver platter — I'll nudge you to think it through yourself. Ready to flex those brain muscles? 🧠`,
+        content: WISE_OLD_KING_INTRO,
         timestamp: Date.now(),
       },
       {
         id: `q-${newSession.questions[0].id}`,
         role: "tutor",
-        content: `**Question 1** (${newSession.questions[0].subject} · ${newSession.questions[0].difficulty})\n\n${newSession.questions[0].question}`,
+        content: `**Quest I** (${newSession.questions[0].subject} · ${newSession.questions[0].difficulty})\n\n${newSession.questions[0].question}`,
         timestamp: Date.now() + 1,
       },
     ]);
@@ -175,7 +176,7 @@ export default function Chat() {
       const tutorMsg: ChatMessage = {
         id: `t-${Date.now()}`,
         role: "tutor",
-        content: `${result.response}\n\n**+${points} points** ${sq.hintsUsed === 0 ? "(No hints needed! 🏆)" : sq.hintsUsed <= 2 ? `(${sq.hintsUsed} hint${sq.hintsUsed > 1 ? "s" : ""} used)` : ""}`,
+        content: `${result.response}\n\n**+${points} glory** ${sq.hintsUsed === 0 ? "(No hints needed! A true scholar! 🏆)" : sq.hintsUsed <= 2 ? `(${sq.hintsUsed} hint${sq.hintsUsed > 1 ? "s" : ""} used)` : ""}`,
         timestamp: Date.now(),
       };
       setMessages((prev) => [...prev, tutorMsg]);
@@ -192,7 +193,7 @@ export default function Chat() {
             {
               id: `q-${nextQ.question.id}`,
               role: "tutor",
-              content: `**Question ${nextIndex + 1}** (${nextQ.question.subject} · ${nextQ.question.difficulty})\n\n${nextQ.question.question}`,
+              content: `**Quest ${nextIndex + 1}** (${nextQ.question.subject} · ${nextQ.question.difficulty})\n\n${nextQ.question.question}`,
               timestamp: Date.now(),
             },
           ]);
@@ -213,15 +214,15 @@ export default function Chat() {
             {
               id: "complete",
               role: "tutor",
-              content: `🏆 **Session Complete!**\n\nYou scored **${updatedSession.totalPoints} points** out of a possible ${totalPossible} (${percentage}%).\n\n${
+              content: `🏆 **Quest Complete!**\n\nYou earned **${updatedSession.totalPoints} glory** out of a possible ${totalPossible} (${percentage}%).\n\n${
                 percentage >= 90
-                  ? "Absolute legend! You crushed every single one! 🎉"
+                  ? "A true Legend of the Realm! The kingdom celebrates your wisdom! 🎉"
                   : percentage >= 70
-                    ? "Solid work! Your brain is warming up nicely! 🔥"
+                    ? "A worthy Knight's performance! The King is pleased! 🔥"
                     : percentage >= 50
-                      ? "Not bad at all! A few more rounds and you'll be unstoppable! 💪"
-                      : "Every try makes you stronger — the comeback arc starts now! 🚀"
-              }\n\nReady for another round of brain gains?`,
+                      ? "A fine showing, Squire! Practice makes perfect and the crown shall be yours! 💪"
+                      : "Every great hero stumbles before they soar. The comeback arc begins now! 🚀"
+              }\n\nShall we venture forth into another quest?`,
               timestamp: Date.now(),
             },
           ]);
@@ -281,18 +282,18 @@ export default function Chat() {
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-all duration-250"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">Dashboard</span>
+            <span className="hidden sm:inline">Kingdom</span>
           </button>
           <div className="h-4 w-px bg-white/10" />
           {character && (
-            <MascotCharacter color={themeColor} size={32} isTalking={isGenerating} />
+            <MascotCharacter color="#94a3b8" size={32} isTalking={isGenerating} />
           )}
           <div>
             <p className="text-sm font-semibold text-foreground">
-              {character?.name || "Study Buddy"}
+              The Wise Old King
             </p>
             <p className="text-[11px] text-muted-foreground/60">
-              Socratic Tutor · {currentQuestion?.question.subject || "Ready"}
+              Royal Advisor · {currentQuestion?.question.subject || "Ready"}
             </p>
           </div>
         </div>
@@ -335,10 +336,16 @@ export default function Chat() {
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                     msg.role === "student"
-                      ? "bg-purple-500/20 text-foreground"
+                      ? "bg-amber-500/20 text-foreground"
                       : "clay-card text-foreground"
                   }`}
                 >
+                  {msg.role === "tutor" && msg.id !== "welcome" && msg.id !== "complete" && (
+                    <div className="mb-1.5 flex items-center gap-1.5">
+                      <Crown className="h-3 w-3 text-amber-400" />
+                      <span className="text-[10px] font-medium text-amber-400/80">King</span>
+                    </div>
+                  )}
                   {msg.content.split("\n").map((line, i) => (
                     <span key={i}>
                       {i > 0 && <br />}
@@ -367,11 +374,11 @@ export default function Chat() {
             >
               <div className="clay-card flex items-center gap-2 rounded-2xl px-4 py-3 text-sm text-muted-foreground">
                 <div className="flex gap-1">
-                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-purple-400 [animation-delay:0ms]" />
-                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-purple-400 [animation-delay:150ms]" />
-                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-purple-400 [animation-delay:300ms]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-amber-400 [animation-delay:0ms]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-amber-400 [animation-delay:150ms]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-amber-400 [animation-delay:300ms]" />
                 </div>
-                thinking...
+                The King ponders...
               </div>
             </motion.div>
           )}
@@ -391,8 +398,8 @@ export default function Chat() {
             onChange={(e) => setInput(e.target.value)}
             placeholder={
               currentQuestion?.solved
-                ? "Waiting for next question..."
-                : "Type your answer or ask a question..."
+                ? "Awaiting the next quest..."
+                : "Share your thoughts with the King..."
             }
             disabled={isGenerating || currentQuestion?.solved}
             className="clay-input flex-1 rounded-2xl"
@@ -408,7 +415,7 @@ export default function Chat() {
         {currentQuestion && !currentQuestion.solved && (
           <p className="mx-auto mt-2 max-w-2xl text-center text-[11px] text-muted-foreground/40">
             {currentQuestion.hintsUsed === 0
-              ? "Try to answer on your own first — you'll earn more points!"
+              ? "Attempt the quest on your own first — greater glory awaits!"
               : `${currentQuestion.hintsUsed} hint${currentQuestion.hintsUsed > 1 ? "s" : ""} used · Fewer hints = higher score`}
           </p>
         )}

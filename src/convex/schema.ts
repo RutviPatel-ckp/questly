@@ -42,6 +42,7 @@ const schema = defineSchema(
       region: v.optional(v.string()),
       topic: v.optional(v.string()),
       totalStars: v.optional(v.number()),
+      coins: v.optional(v.number()),
       streak: v.optional(v.number()),
       lastActiveDate: v.optional(v.string()),
       accessories: v.optional(v.array(v.string())),

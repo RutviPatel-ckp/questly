@@ -19,7 +19,7 @@ import {
   ArrowLeft,
   Check,
   Loader2,
-  Terminal,
+  Crown,
 } from "lucide-react";
 import MascotCharacter from "@/components/MascotCharacter";
 import FloatingShapes from "@/components/FloatingShapes";
@@ -36,11 +36,11 @@ const COLOR_THEMES = [
 ];
 
 const SUGGESTIONS = [
-  "a sarcastic mango who loves basketball",
-  "a wise old owl who tells dad jokes",
-  "a shy robot that paints watercolors",
-  "a brave toaster who surfs the internet",
-  "a magical pencil that knows every subject",
+  "a wise old dragon who loves teaching math",
+  "a mischievous fairy who knows every science fact",
+  "a brave knight who tells stories about history",
+  "a magical owl who recites poetry",
+  "a friendly griffin who makes grammar fun",
 ];
 
 function CharacterPreview({
@@ -54,7 +54,7 @@ function CharacterPreview({
   colorTheme: string;
   isTalking: boolean;
 }) {
-  const themeColor = COLOR_THEMES.find((t) => t.name === colorTheme)?.hex || "#c084fc";
+  const themeColor = COLOR_THEMES.find((t) => t.name === colorTheme)?.hex || "#fbbf24";
 
   return (
     <div className="flex flex-col items-center gap-5">
@@ -143,13 +143,13 @@ export default function CreateCharacter() {
   const steps = [
     {
       title: "Describe your companion",
-      description: "What should your study buddy be like? A few words go a long way.",
+      description: "What should your quest companion be like? A few words go a long way.",
       content: (
         <div className="space-y-4">
           <Textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="a sarcastic mango who loves basketball"
+            placeholder="a wise old dragon who loves teaching math"
             className="clay-input min-h-[100px] resize-none text-base"
             maxLength={200}
           />
@@ -169,13 +169,13 @@ export default function CreateCharacter() {
     },
     {
       title: "Name your companion",
-      description: "Pick something memorable — this is the name your team will see.",
+      description: "Pick something memorable — this is the name your kingdom will know.",
       content: (
         <div className="space-y-3">
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Captain Mango"
+            placeholder="Dragon Sage"
             className="clay-input text-center text-lg font-semibold"
             maxLength={30}
           />
@@ -186,8 +186,8 @@ export default function CreateCharacter() {
       ),
     },
     {
-      title: "Choose a color",
-      description: "This sets the visual theme for your companion throughout the platform.",
+      title: "Choose a realm color",
+      description: "This sets the visual theme for your companion throughout the kingdom.",
       content: (
         <div className="grid grid-cols-4 gap-3">
           {COLOR_THEMES.map((theme) => (
@@ -213,7 +213,7 @@ export default function CreateCharacter() {
     },
     {
       title: "Meet your companion",
-      description: "Looking good. Ready to start learning?",
+      description: "Looking noble and ready for adventure. Shall we begin?",
       content: null,
     },
   ];
@@ -230,9 +230,9 @@ export default function CreateCharacter() {
       <FloatingShapes count={8} />
       {/* Background accents */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full blur-[120px] bg-purple-600/8" />
-        <div className="absolute bottom-1/4 -right-40 h-[400px] w-[400px] rounded-full bg-pink-500/5 blur-[100px]" />
-        <div className="absolute top-1/3 -left-32 h-[300px] w-[300px] rounded-full bg-teal-500/5 blur-[100px]" />
+        <div className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full blur-[120px] bg-amber-600/6" />
+        <div className="absolute bottom-1/4 -right-40 h-[400px] w-[400px] rounded-full bg-purple-600/6 blur-[100px]" />
+        <div className="absolute top-1/3 -left-32 h-[300px] w-[300px] rounded-full bg-amber-500/5 blur-[100px]" />
       </div>
 
       <div className="relative mx-auto max-w-lg px-6 py-8">
@@ -243,12 +243,12 @@ export default function CreateCharacter() {
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-all duration-250"
           >
             <ArrowLeft className="h-4 w-4" />
-            {step > 0 ? "Back" : "Dashboard"}
+            {step > 0 ? "Back" : "Kingdom"}
           </button>
           <div className="flex items-center gap-2">
-            <Terminal className="h-4 w-4 text-purple-400" />
+            <Crown className="h-4 w-4 text-amber-400" />
             <span className="text-sm font-medium text-muted-foreground">
-              Brainly<span className="text-purple-400"> Weird</span>
+              Quest<span className="text-amber-400">ly</span>
             </span>
           </div>
         </div>
@@ -260,9 +260,9 @@ export default function CreateCharacter() {
               key={i}
               className={`h-2 rounded-full transition-all duration-300 ${
                 i === step
-                  ? "w-8 bg-purple-500"
+                  ? "w-8 bg-amber-500"
                   : i < step
-                    ? "w-2 bg-purple-400/60"
+                    ? "w-2 bg-amber-400/60"
                     : "w-2 bg-white/10"
               }`}
             />
@@ -294,7 +294,7 @@ export default function CreateCharacter() {
                       <div className="clay-card flex items-center gap-3 rounded-2xl px-4 py-3">
                         <MascotCharacter
                           color={
-                            COLOR_THEMES.find((t) => t.name === colorTheme)?.hex || "#c084fc"
+                            COLOR_THEMES.find((t) => t.name === colorTheme)?.hex || "#fbbf24"
                           }
                           size={44}
                         />
@@ -332,7 +332,7 @@ export default function CreateCharacter() {
                   />
                   <button
                     onClick={toggleTalking}
-                    className="clay-btn mx-auto flex items-center gap-2 rounded-2xl bg-purple-500/15 px-4 py-2.5 text-sm font-medium text-purple-300 hover:bg-purple-500/25"
+                    className="clay-btn mx-auto flex items-center gap-2 rounded-2xl bg-amber-500/15 px-4 py-2.5 text-sm font-medium text-amber-300 hover:bg-amber-500/25"
                   >
                     <Sparkles className="h-4 w-4" />
                     {isTalking ? "Stop Preview" : "Preview Animation"}
@@ -358,14 +358,14 @@ export default function CreateCharacter() {
             <Button
               onClick={handleSave}
               disabled={isSaving}
-              className="clay-glow rounded-2xl px-8 py-2.5 font-semibold bg-purple-500 text-white hover:bg-purple-400"
+              className="clay-glow rounded-2xl px-8 py-2.5 font-semibold bg-amber-500 text-gray-900 hover:bg-amber-400"
             >
               {isSaving ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Check className="mr-2 h-4 w-4" />
               )}
-              {existingCharacter ? "Update Companion" : "Start Learning"}
+              {existingCharacter ? "Update Companion" : "Begin Your Quest"}
             </Button>
           )}
         </div>

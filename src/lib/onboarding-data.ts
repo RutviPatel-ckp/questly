@@ -66,53 +66,53 @@ export const TOPICS_BY_SUBJECT: Record<string, string[]> = {
 };
 
 // ============================================================================
-// MULTI-PART LESSON STRUCTURE
+// MULTI-PART LESSON STRUCTURE (Chapters within Kingdoms)
 // ============================================================================
 
 export const PARTS_PER_TOPIC = 4;
 
 export const PART_TITLES: Record<string, Record<string, string[]>> = {
   Science: {
-    "The Water Cycle": ["Part 1: Where Does Water Come From?", "Part 2: How Water Travels", "Part 3: Why the Water Cycle Matters", "Part 4: Water Cycle Fun Facts"],
-    "States of Matter": ["Part 1: Solids, Liquids, and Gases", "Part 2: How Matter Changes State", "Part 3: Why States of Matter Matter", "Part 4: Matter Fun Facts"],
-    "The Solar System": ["Part 1: Meet the Planets", "Part 2: The Sun and Inner Planets", "Part 3: Outer Planets and Moons", "Part 4: Space Fun Facts"],
-    Photosynthesis: ["Part 1: How Plants Make Food", "Part 2: Sunlight, Water, and CO2", "Part 3: Why Photosynthesis Matters", "Part 4: Plant Science Fun Facts"],
-    "Simple Machines": ["Part 1: What Are Simple Machines?", "Part 2: Levers, Pulleys, and Wheels", "Part 3: Machines in Everyday Life", "Part 4: Simple Machines Fun Facts"],
+    "The Water Cycle": ["Chapter 1: Where Does Water Come From?", "Chapter 2: How Water Travels", "Chapter 3: Why the Water Cycle Matters", "Chapter 4: Water Cycle Fun Facts"],
+    "States of Matter": ["Chapter 1: Solids, Liquids, and Gases", "Chapter 2: How Matter Changes State", "Chapter 3: Why States of Matter Matter", "Chapter 4: Matter Fun Facts"],
+    "The Solar System": ["Chapter 1: Meet the Planets", "Chapter 2: The Sun and Inner Planets", "Chapter 3: Outer Planets and Moons", "Chapter 4: Space Fun Facts"],
+    Photosynthesis: ["Chapter 1: How Plants Make Food", "Chapter 2: Sunlight, Water, and CO2", "Chapter 3: Why Photosynthesis Matters", "Chapter 4: Plant Science Fun Facts"],
+    "Simple Machines": ["Chapter 1: What Are Simple Machines?", "Chapter 2: Levers, Pulleys, and Wheels", "Chapter 3: Machines in Everyday Life", "Chapter 4: Simple Machines Fun Facts"],
   },
   Math: {
-    "Integers and Number Lines": ["Part 1: Positive and Negative Numbers", "Part 2: Working with Number Lines", "Part 3: Adding and Subtracting Integers", "Part 4: Integer Fun Facts"],
-    "Fractions and Decimals": ["Part 1: What Are Fractions?", "Part 2: Converting Between Fractions and Decimals", "Part 3: Adding, Subtracting, and Comparing", "Part 4: Fraction Fun Facts"],
-    "Algebraic Expressions": ["Part 1: Variables and Constants", "Part 2: Writing Expressions", "Part 3: Simplifying Expressions", "Part 4: Algebra Fun Facts"],
-    "Geometry and Angles": ["Part 1: Shapes and Their Properties", "Part 2: Understanding Angles", "Part 3: Area and Perimeter", "Part 4: Geometry Fun Facts"],
-    "Data and Probability": ["Part 1: Reading Charts and Graphs", "Part 2: Mean, Median, and Mode", "Part 3: Basics of Probability", "Part 4: Data Fun Facts"],
+    "Integers and Number Lines": ["Chapter 1: Positive and Negative Numbers", "Chapter 2: Working with Number Lines", "Chapter 3: Adding and Subtracting Integers", "Chapter 4: Integer Fun Facts"],
+    "Fractions and Decimals": ["Chapter 1: What Are Fractions?", "Chapter 2: Converting Between Fractions and Decimals", "Chapter 3: Adding, Subtracting, and Comparing", "Chapter 4: Fraction Fun Facts"],
+    "Algebraic Expressions": ["Chapter 1: Variables and Constants", "Chapter 2: Writing Expressions", "Chapter 3: Simplifying Expressions", "Chapter 4: Algebra Fun Facts"],
+    "Geometry and Angles": ["Chapter 1: Shapes and Their Properties", "Chapter 2: Understanding Angles", "Chapter 3: Area and Perimeter", "Chapter 4: Geometry Fun Facts"],
+    "Data and Probability": ["Chapter 1: Reading Charts and Graphs", "Chapter 2: Mean, Median, and Mode", "Chapter 3: Basics of Probability", "Chapter 4: Data Fun Facts"],
   },
   History: {
-    "Ancient Civilizations": ["Part 1: Early Human Societies", "Part 2: Egypt, Mesopotamia, and China", "Part 3: Greece and Rome", "Part 4: Ancient World Fun Facts"],
-    "Independence Movements": ["Part 1: What Drives Independence?", "Part 2: Famous Leaders and Movements", "Part 3: Independence in Africa and Asia", "Part 4: Freedom Fun Facts"],
-    "Explorers and Trade Routes": ["Part 1: The Age of Exploration", "Part 2: Silk Road and Spice Trade", "Part 3: Maritime Explorers", "Part 4: Exploration Fun Facts"],
-    "World War II Basics": ["Part 1: What Caused the War?", "Part 2: Key Events and Battles", "Part 3: The Home Front", "Part 4: WWII Fun Facts"],
-    "Local and Regional History": ["Part 1: Your Region's Ancient Past", "Part 2: Colonial Era and Change", "Part 3: Modern History and Independence", "Part 4: Local History Fun Facts"],
+    "Ancient Civilizations": ["Chapter 1: Early Human Societies", "Chapter 2: Egypt, Mesopotamia, and China", "Chapter 3: Greece and Rome", "Chapter 4: Ancient World Fun Facts"],
+    "Independence Movements": ["Chapter 1: What Drives Independence?", "Chapter 2: Famous Leaders and Movements", "Chapter 3: Independence in Africa and Asia", "Chapter 4: Freedom Fun Facts"],
+    "Explorers and Trade Routes": ["Chapter 1: The Age of Exploration", "Chapter 2: Silk Road and Spice Trade", "Chapter 3: Maritime Explorers", "Chapter 4: Exploration Fun Facts"],
+    "World War II Basics": ["Chapter 1: What Caused the War?", "Chapter 2: Key Events and Battles", "Chapter 3: The Home Front", "Chapter 4: WWII Fun Facts"],
+    "Local and Regional History": ["Chapter 1: Your Region's Ancient Past", "Chapter 2: Colonial Era and Change", "Chapter 3: Modern History and Independence", "Chapter 4: Local History Fun Facts"],
   },
   English: {
-    "Parts of Speech": ["Part 1: Nouns and Verbs", "Part 2: Adjectives and Adverbs", "Part 3: Pronouns, Prepositions, and Conjunctions", "Part 4: Parts of Speech Fun Facts"],
-    "Reading Comprehension": ["Part 1: What Is Reading Comprehension?", "Part 2: Finding the Main Idea", "Part 3: Making Inferences", "Part 4: Reading Fun Facts"],
-    "Creative Writing Basics": ["Part 1: Story Structure", "Part 2: Character and Dialogue", "Part 3: Show, Don't Tell", "Part 4: Writing Fun Facts"],
-    "Figurative Language": ["Part 1: Similes and Metaphors", "Part 2: Personification and Hyperbole", "Part 3: Idioms and Allusions", "Part 4: Figurative Language Fun Facts"],
-    "Essay Structure": ["Part 1: Introduction Paragraphs", "Part 2: Body Paragraphs and Evidence", "Part 3: Conclusions That Stick", "Part 4: Essay Writing Fun Facts"],
+    "Parts of Speech": ["Chapter 1: Nouns and Verbs", "Chapter 2: Adjectives and Adverbs", "Chapter 3: Pronouns, Prepositions, and Conjunctions", "Chapter 4: Parts of Speech Fun Facts"],
+    "Reading Comprehension": ["Chapter 1: What Is Reading Comprehension?", "Chapter 2: Finding the Main Idea", "Chapter 3: Making Inferences", "Chapter 4: Reading Fun Facts"],
+    "Creative Writing Basics": ["Chapter 1: Story Structure", "Chapter 2: Character and Dialogue", "Chapter 3: Show, Don't Tell", "Chapter 4: Writing Fun Facts"],
+    "Figurative Language": ["Chapter 1: Similes and Metaphors", "Chapter 2: Personification and Hyperbole", "Chapter 3: Idioms and Allusions", "Chapter 4: Figurative Language Fun Facts"],
+    "Essay Structure": ["Chapter 1: Introduction Paragraphs", "Chapter 2: Body Paragraphs and Evidence", "Chapter 3: Conclusions That Stick", "Chapter 4: Essay Writing Fun Facts"],
   },
   "General Knowledge": {
-    "World Geography": ["Part 1: Continents and Oceans", "Part 2: Mountains, Rivers, and Deserts", "Part 3: Climate and Biomes", "Part 4: Geography Fun Facts"],
-    "Current Events Awareness": ["Part 1: How to Follow the News", "Part 2: Understanding Headlines", "Part 3: Media Literacy Basics", "Part 4: News Fun Facts"],
-    "Famous Inventors and Inventions": ["Part 1: Pioneers of Invention", "Part 2: Inventions That Changed the World", "Part 3: Modern Innovation", "Part 4: Invention Fun Facts"],
-    "Environmental Issues": ["Part 1: Climate Change Basics", "Part 2: Pollution and Conservation", "Part 3: What Can We Do?", "Part 4: Environment Fun Facts"],
-    "Cultural Traditions Around the World": ["Part 1: Festivals and Celebrations", "Part 2: Food and Customs", "Part 3: Art, Music, and Storytelling", "Part 4: Culture Fun Facts"],
+    "World Geography": ["Chapter 1: Continents and Oceans", "Chapter 2: Mountains, Rivers, and Deserts", "Chapter 3: Climate and Biomes", "Chapter 4: Geography Fun Facts"],
+    "Current Events Awareness": ["Chapter 1: How to Follow the News", "Chapter 2: Understanding Headlines", "Chapter 3: Media Literacy Basics", "Chapter 4: News Fun Facts"],
+    "Famous Inventors and Inventions": ["Chapter 1: Pioneers of Invention", "Chapter 2: Inventions That Changed the World", "Chapter 3: Modern Innovation", "Chapter 4: Invention Fun Facts"],
+    "Environmental Issues": ["Chapter 1: Climate Change Basics", "Chapter 2: Pollution and Conservation", "Chapter 3: What Can We Do?", "Chapter 4: Environment Fun Facts"],
+    "Cultural Traditions Around the World": ["Chapter 1: Festivals and Celebrations", "Chapter 2: Food and Customs", "Chapter 3: Art, Music, and Storytelling", "Chapter 4: Culture Fun Facts"],
   },
 };
 
 export function getPartTitle(subject: string, topic: string, part: number): string {
   const topicParts = PART_TITLES[subject]?.[topic];
   if (topicParts && topicParts[part - 1]) return topicParts[part - 1];
-  return `Part ${part}: ${topic}`;
+  return `Chapter ${part}: ${topic}`;
 }
 
 // ============================================================================
@@ -209,61 +209,27 @@ export function getInlineTestQuestions(topic: string, part: number): InlineTestQ
  * Used when the Groq API times out or fails.
  */
 export const FALLBACK_LESSONS: Record<string, string> = {
-  Math: `Welcome to today's math adventure! Let's talk about something you use more than you think — numbers and patterns.
+  Math: `Welcome to today's math quest! Let's explore something you use more than you think — numbers and patterns.\n\nEvery time you count your change, measure ingredients for a recipe, or check the time, you're doing math. It's like a secret code that helps you understand the world.\n\nHere's a fun thought: the word "algebra" comes from Arabic! The Persian mathematician Al-Khwarizmi wrote about it over a thousand years ago. Math has been connecting people across cultures for centuries.\n\nHere's something to try: pick any number, multiply it by 2, add 10, then divide by 2. Now subtract your original number. What did you get? Try it with different numbers — you'll always get 5. That's the beauty of algebraic patterns!\n\nNow, here's my question for you: if you could use math to solve any real-world problem in your daily life, what would it be?`,
 
-Every time you count your change, measure ingredients for a recipe, or check the time, you're doing math. It's like a secret language that helps you understand the world.
+  Science: `Hey there, brave explorer! Today we're going to zoom out — way out — and explore the vast reaches of space.\n\nOur solar system has eight planets orbiting the Sun, and each one is totally unique. Mercury is tiny and super hot. Jupiter is so massive that over 1,300 Earths could fit inside it!\n\nHere's something cool: Saturn's rings aren't solid — they're made of billions of pieces of ice and rock, ranging from tiny grains to house-sized chunks. Imagine throwing a snowball that big!\n\nAnd get this — a day on Venus is longer than a year on Venus. It takes longer to spin once on its axis than it does to orbit the Sun. Time works differently out there.\n\nOh, and if you could fly a plane to the Sun, it would take about 20 years. The Sun is roughly 150 million kilometers away. That's a LOT of airplane tickets.\n\nMy question for you: if you could visit any planet in our solar system, which one would you choose and why?`,
 
-Here's a fun thought: the word "algebra" comes from Arabic! The Persian mathematician Al-Khwarizmi wrote about it over a thousand years ago. Math has been connecting people across cultures for centuries.
+  History: `Welcome to the realm of history — but way more exciting than you're expecting! Let's journey back in time to explore the great civilizations of old.\n\nThousands of years ago, people built incredible things without modern technology. The Great Pyramids of Giza were built around 2560 BCE using over 2 million stone blocks, each weighing about 2.5 tons. No cranes, no trucks — just human ingenuity and determination.\n\nThe ancient Mesopotamians invented writing around 3400 BCE. They pressed wedge-shaped marks into clay tablets. Imagine writing your homework on a clay cookie! That system was called cuneiform.\n\nIn ancient China, students had to pass incredibly difficult exams to become government officials. These exams tested knowledge of poetry, history, and philosophy. Some students studied for their whole lives!\n\nAnd here's a fun one: the ancient Romans had a festival called Saturnalia where, for one week, normal rules were flipped upside down. Servants got to boss masters around, and schools closed. Sounds like the best holiday ever.\n\nMy question for you: if you could time-travel to any ancient civilization for one day, which would you visit?`,
 
-Here's something to try: pick any number, multiply it by 2, add 10, then divide by 2. Now subtract your original number. What did you get? Try it with different numbers — you'll always get 5. That's the beauty of algebraic patterns!
+  English: `Time for some English magic! Today we're going to explore the building blocks of language — words and how they work together.\n\nEvery word you speak or write is a tool. Nouns name things, verbs show action, and adjectives add color. Together, they paint pictures in people's minds.\n\nHere's something amazing: the English language has over 170,000 words in current use. But you only need about 3,000 to cover 95% of everyday conversation. That's like having a huge toolbox but only really needing a few key tools.\n\nHave you ever noticed how some words just sound like what they mean? "Buzz" sounds like a bee. "Splash" sounds like water hitting something. These are called onomatopoeias, and writers use them to make stories come alive.\n\nAnd here's a secret: even the best authors rewrite their work dozens of times. Hemingway once said he rewrote the ending of A Farewell to Arms 39 times. Writing isn't about getting it perfect on the first try — it's about making it better each time.\n\nMy question for you: if you could make up a brand-new English word that doesn't exist yet, what would it mean and how would you spell it?`,
 
-Now, here's my question for you: if you could use math to solve any real-world problem in your daily life, what would it be?`,
-
-  Science: `Hey there, science explorer! Today we're going to zoom out — way out — and talk about our solar system.
-
-Our solar system has eight planets orbiting the Sun, and each one is totally unique. Mercury is tiny and super hot. Jupiter is so massive that over 1,300 Earths could fit inside it!
-
-Here's something cool: Saturn's rings aren't solid — they're made of billions of pieces of ice and rock, ranging from tiny grains to house-sized chunks. Imagine throwing a snowball that big!
-
-And get this — a day on Venus is longer than a year on Venus. It takes longer to spin once on its axis than it does to orbit the Sun. Time works differently out there.
-
-Oh, and if you could fly a plane to the Sun, it would take about 20 years. The Sun is roughly 150 million kilometers away. That's a LOT of airplane tickets.
-
-My question for you: if you could visit any planet in our solar system, which one would you choose and why?`,
-
-  History: `Welcome to history class — but way more fun than you're expecting! Let's travel back in time to explore ancient civilizations.
-
-Thousands of years ago, people built incredible things without modern technology. The Great Pyramids of Giza were built around 2560 BCE using over 2 million stone blocks, each weighing about 2.5 tons. No cranes, no trucks — just human ingenuity.
-
-The ancient Mesopotamians invented writing around 3400 BCE. They pressed wedge-shaped marks into clay tablets. Imagine writing your homework on a clay cookie! That system was called cuneiform.
-
-In ancient China, students had to pass incredibly difficult exams to become government officials. These exams tested knowledge of poetry, history, and philosophy. Some students studied for their whole lives!
-
-And here's a fun one: the ancient Romans had a festival called Saturnalia where, for one week, normal rules were flipped upside down. Servants got to boss masters around, and schools closed. Sounds like the best holiday ever.
-
-My question for you: if you could time-travel to any ancient civilization for one day, which would you visit?`,
-
-  English: `Time for some English magic! Today we're going to explore the building blocks of language — words and how they work together.
-
-Every word you speak or write is a tool. Nouns name things, verbs show action, and adjectives add color. Together, they paint pictures in people's minds.
-
-Here's something amazing: the English language has over 170,000 words in current use. But you only need about 3,000 to cover 95% of everyday conversation. That's like having a huge toolbox but only really needing a few key tools.
-
-Have you ever noticed how some words just sound like what they mean? "Buzz" sounds like a bee. "Splash" sounds like water hitting something. These are called onomatopoeias, and writers use them to make stories come alive.
-
-And here's a secret: even the best authors rewrite their work dozens of times. Hemingway once said he rewrote the ending of A Farewell to Arms 39 times. Writing isn't about getting it perfect on the first try — it's about making it better each time.
-
-My question for you: if you could make up a brand-new English word that doesn't exist yet, what would it mean and how would you spell it?`,
-
-  "General Knowledge": `Welcome to General Knowledge — where we connect dots across all kinds of topics! Let's take a trip around the world.
-
-Did you know that the smallest country in the world is Vatican City? It's only about 0.44 square kilometers — smaller than most city parks. Yet it has its own postal system, newspaper, and radio station.
-
-Here's a wild fact: honey never spoils. Archaeologists found 3,000-year-old honey in Egyptian tombs that was still perfectly edible. Bees are basically tiny food preservation scientists.
-
-The world's most spoken language by total number of speakers is English, with over 1.5 billion speakers worldwide. But the most spoken language by native speakers is Mandarin Chinese, with about 920 million people.
-
-And something to think about: every two minutes, we take more photos than all of humanity took in the entire 19th century. We live in an incredible time of technology and information.
-
-My question for you: what's the most interesting fact you know, and how did you learn it?`,
+  "General Knowledge": `Welcome to the Hall of Knowledge — where we connect dots across all kinds of topics! Let's take a grand tour around the world.\n\nDid you know that the smallest country in the world is Vatican City? It's only about 0.44 square kilometers — smaller than most city parks. Yet it has its own postal system, newspaper, and radio station.\n\nHere's a wild fact: honey never spoils. Archaeologists found 3,000-year-old honey in Egyptian tombs that was still perfectly edible. Bees are basically tiny food preservation scientists.\n\nThe world's most spoken language by total number of speakers is English, with over 1.5 billion speakers worldwide. But the most spoken language by native speakers is Mandarin Chinese, with about 920 million people.\n\nAnd something to think about: every two minutes, we take more photos than all of humanity took in the entire 19th century. We live in an incredible time of technology and information.\n\nMy question for you: what's the most interesting fact you know, and how did you learn it?`,
 };
+
+// ============================================================================
+// WISE OLD KING - Chat tutor personality
+// ============================================================================
+
+export const WISE_OLD_KING_INTRO = `Ah, greetings, young scholar! I am the Wise Old King, keeper of knowledge across all the realms. I shan't simply hand you the answers like a merchant selling wares — nay, I shall guide you to discover them yourself, as all true learners must. Shall we begin our quest? 🏰`;
+
+export const WISE_OLD_KING_HINT_PREFIXES = [
+  "Hmm, an interesting thought, but let us look at this from another angle...",
+  "Ah, you're getting warm, young one, but not quite there yet. Consider this...",
+  "A noble effort! But I sense there's more to uncover. Think about...",
+  "Not quite, brave adventurer. Let me offer you a small clue...",
+  "You're closer than you think! Here's a hint to guide your path...",
+];

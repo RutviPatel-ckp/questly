@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ArrowLeft,
-  Terminal,
+  Crown,
   Users,
   Copy,
   Check,
@@ -25,6 +25,7 @@ import {
   RotateCcw,
   Zap,
   Swords,
+  Shield,
 } from "lucide-react";
 import MascotCharacter, { type MascotReaction } from "@/components/MascotCharacter";
 import Confetti from "@/components/Confetti";
@@ -44,7 +45,7 @@ const COLOR_THEMES: Record<string, string> = {
 
 const QUESTIONS_PER_QUIZ = 5;
 
-type QuizPhase = "lobby" | "waiting" | "active" | "results";
+type QuizPhase = "lobby" | "waiting" | "countdown" | "active" | "results";
 
 export default function Quiz() {
   const navigate = useNavigate();
@@ -66,10 +67,11 @@ export default function Quiz() {
   const [mascotReaction, setMascotReaction] = useState<MascotReaction>("idle");
   const [showConfetti, setShowConfetti] = useState(false);
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
+  const [countdown, setCountdown] = useState(3);
 
   const themeColor = character
-    ? COLOR_THEMES[character.colorTheme] || "#c084fc"
-    : "#c084fc";
+    ? COLOR_THEMES[character.colorTheme] || "#fbbf24"
+    : "#fbbf24";
 
   const room = useQuery(
     api.quiz.getRoom,
@@ -83,13 +85,14 @@ export default function Quiz() {
       // Still waiting
     }
 
-    if (room.status === "active" && phase !== "active" && phase !== "results") {
+    if (room.status === "active" && phase !== "active" && phase !== "results" && phase !== "countdown") {
       const qs = room.questions
         .map((id) => QUIZ_QUESTIONS.find((q) => q.id === id))
         .filter(Boolean) as QuizQuestion[];
       setQuestions(qs);
-      setPhase("active");
-      setSelectedAnswer(null);
+      // Start countdown
+      setPhase("countdown");
+      setCountdown(3);
     }
 
     if (room.status === "finished" && phase !== "results") {
@@ -97,6 +100,18 @@ export default function Quiz() {
       recordActivity().catch(() => {});
     }
   }, [room, phase, recordActivity]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (phase !== "countdown") return;
+    if (countdown <= 0) {
+      setPhase("active");
+      setSelectedAnswer(null);
+      return;
+    }
+    const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [phase, countdown]);
 
   const handleCreateRoom = async () => {
     const q = pickQuestions(QUESTIONS_PER_QUIZ);
@@ -185,7 +200,7 @@ export default function Quiz() {
           style={{ backgroundColor: `${themeColor}12` }}
         />
         <div className="absolute bottom-0 -right-40 h-[400px] w-[400px] rounded-full bg-purple-600/8 blur-[100px]" />
-        <div className="absolute top-1/2 -left-40 h-[350px] w-[350px] rounded-full bg-teal-500/5 blur-[100px]" />
+        <div className="absolute top-1/2 -left-40 h-[350px] w-[350px] rounded-full bg-rose-500/5 blur-[100px]" />
       </div>
 
       <Confetti trigger={showConfetti} color={themeColor} type="confetti" />
@@ -198,12 +213,12 @@ export default function Quiz() {
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-all duration-250"
           >
             <ArrowLeft className="h-4 w-4" />
-            Dashboard
+            Kingdom
           </button>
           <div className="flex items-center gap-2">
-            <Terminal className="h-4 w-4 text-purple-400" />
+            <Swords className="h-4 w-4 text-amber-400" />
             <span className="text-sm font-medium text-muted-foreground">
-              Brainly<span className="text-purple-400"> Weird</span>
+              Quiz <span className="text-amber-400">Battle</span>
             </span>
           </div>
         </div>
@@ -218,11 +233,34 @@ export default function Quiz() {
               exit={{ opacity: 0, y: -20 }}
             >
               <div className="mb-8 text-center">
+                {/* Battle banners */}
+                <div className="flex items-center justify-center gap-6 mb-6">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="clay-card flex h-16 w-12 items-center justify-center rounded-t-full bg-amber-500/15 border-b-4 border-amber-500/30">
+                      <span className="text-2xl">🛡️</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground">You</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <Swords className="h-8 w-8 text-amber-400" />
+                    <p className="text-[10px] font-medium text-amber-400">VS</p>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="clay-card flex h-16 w-12 items-center justify-center rounded-t-full bg-purple-500/15 border-b-4 border-purple-500/30">
+                      <span className="text-2xl">⚔️</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground">Challenger</span>
+                  </div>
+                </div>
+
                 <h1 className="text-2xl font-bold text-foreground">
-                  Quiz Challenge
+                  Quiz Battle
                 </h1>
                 <p className="mt-1.5 text-sm text-muted-foreground">
-                  Challenge a friend to a head-to-head quiz!
+                  Challenge a fellow adventurer to a head-to-head duel!
+                </p>
+                <p className="mt-1 text-xs text-amber-400/80">
+                  Winner earns 1 ⭐ Star!
                 </p>
               </div>
 
@@ -230,19 +268,19 @@ export default function Quiz() {
                 <Card className="clay-card-lg border-0">
                   <CardHeader>
                     <CardTitle className="text-sm flex items-center gap-2">
-                      <Users className="h-4 w-4 text-purple-400" />
-                      Create a Room
+                      <Users className="h-4 w-4 text-amber-400" />
+                      Summon a Challenger
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-xs text-muted-foreground mb-4">
-                      Generate a room code and share it with a friend.
+                      Generate a battle code and share it with your opponent.
                     </p>
                     <Button
                       onClick={handleCreateRoom}
                       className="clay-primary w-full rounded-2xl py-2.5 font-semibold"
                     >
-                      Create Room
+                      Create Battle Room
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </CardContent>
@@ -252,12 +290,12 @@ export default function Quiz() {
                   <CardHeader>
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Zap className="h-4 w-4 text-amber-400" />
-                      Join a Room
+                      Accept a Challenge
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <p className="text-xs text-muted-foreground">
-                      Enter the 6-character room code from your friend.
+                      Enter the battle code from your opponent.
                     </p>
                     <div className="flex gap-2">
                       <Input
@@ -296,10 +334,10 @@ export default function Quiz() {
                 <MascotCharacter color={themeColor} size={100} reaction="happy" accessories={character?.accessories} />
               </div>
               <h2 className="text-xl font-bold text-foreground mb-2">
-                Challenge Sent! 🎯
+                Challenge Issued! 🎯
               </h2>
               <p className="text-sm text-muted-foreground mb-6">
-                Share this code with your friend to start the showdown:
+                Share this battle code with your opponent:
               </p>
 
               <div className="clay-card-lg mx-auto max-w-xs rounded-2xl p-6 mb-6">
@@ -332,6 +370,35 @@ export default function Quiz() {
             </motion.div>
           )}
 
+          {/* ========== COUNTDOWN ========== */}
+          {phase === "countdown" && (
+            <motion.div
+              key="countdown"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.2 }}
+              className="flex flex-col items-center justify-center py-20"
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={countdown}
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 1.5, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-center"
+                >
+                  <p className="text-8xl font-extrabold" style={{ color: themeColor }}>
+                    {countdown > 0 ? countdown : "⚔️"}
+                  </p>
+                  <p className="mt-4 text-lg font-semibold text-foreground">
+                    {countdown > 0 ? "Prepare for Battle!" : "FIGHT!"}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
+            </motion.div>
+          )}
+
           {/* ========== ACTIVE QUIZ ========== */}
           {phase === "active" && room && currentQ && (
             <motion.div
@@ -343,6 +410,7 @@ export default function Quiz() {
               {/* Scoreboard */}
               <div className="mb-6 flex items-center justify-between">
                 <div className="clay-card flex items-center gap-2 rounded-2xl px-4 py-2.5">
+                  <Shield className="h-4 w-4 text-amber-400" />
                   <span className="text-sm font-semibold text-foreground">
                     {room.hostName}
                   </span>
@@ -351,15 +419,16 @@ export default function Quiz() {
                   </span>
                 </div>
                 <div className="text-xs text-muted-foreground font-medium">
-                  Q{(room.currentQuestion || 0) + 1}/{totalQuestions}
+                  Round {(room.currentQuestion || 0) + 1}/{totalQuestions}
                 </div>
                 <div className="clay-card flex items-center gap-2 rounded-2xl px-4 py-2.5">
                   <span className="text-lg font-bold" style={{ color: themeColor }}>
                     {guestScore}
                   </span>
                   <span className="text-sm font-semibold text-foreground">
-                    {room.guestName || "Opponent"}
+                    {room.guestName || "Challenger"}
                   </span>
+                  <Swords className="h-4 w-4 text-purple-400" />
                 </div>
               </div>
 
@@ -398,7 +467,7 @@ export default function Quiz() {
                               : isRevealed && isSelected && !isCorrect
                                 ? "bg-rose-500/20 text-rose-300 ring-2 ring-rose-500/50"
                                 : isSelected
-                                  ? "bg-purple-500/20 text-purple-300"
+                                  ? "bg-amber-500/20 text-amber-300"
                                   : "bg-white/[0.03] text-foreground hover:bg-white/[0.06]"
                           }`}
                         >
@@ -416,11 +485,8 @@ export default function Quiz() {
                       {lastAnswerCorrect === true
                         ? "🎉 Nailed it!"
                         : lastAnswerCorrect === false
-                          ? "😅 Almost! Keep going..."
-                          : room.hostAnswers[room.currentQuestion] !== undefined &&
-                            room.guestAnswers[room.currentQuestion] !== undefined
-                            ? "Both answered — next question incoming..."
-                            : "Waiting for your opponent..."}
+                          ? "😅 Almost! Keep fighting..."
+                          : "Waiting for your opponent..."}
                     </p>
                   )}
                 </CardContent>
@@ -436,6 +502,7 @@ export default function Quiz() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, y: -20 }}
             >
+              {/* Victory/Defeat banner */}
               <div className="text-center mb-6">
                 <MascotCharacter
                   color={themeColor}
@@ -445,17 +512,21 @@ export default function Quiz() {
                 />
                 <h2 className="text-2xl font-bold text-foreground mt-4">
                   {tie
-                    ? "What a battle! It's a tie! 🤝"
+                    ? "What a battle! It's a draw! 🤝"
                     : iWon
-                      ? "Woohoo! You crushed that quiz! 🏆"
-                      : `${isHost ? room.guestName : room.hostName} got you this time! Better luck next round! 💪`}
+                      ? "⚔️ Victory! You conquered the challenger! 🏆"
+                      : `${isHost ? room.guestName : room.hostName} bested you in combat! Train harder! 💪`}
                 </h2>
               </div>
 
+              {/* Battle results with crests */}
               <Card className="clay-card-lg border-0 mb-6">
                 <CardContent className="p-6">
                   <div className="grid grid-cols-3 gap-4 items-center">
                     <div className="text-center">
+                      <div className="clay-card flex h-12 w-12 items-center justify-center rounded-t-full mx-auto mb-2 bg-amber-500/15 border-b-2 border-amber-500/30">
+                        <span className="text-lg">🛡️</span>
+                      </div>
                       <p className="text-sm text-muted-foreground">{room.hostName}</p>
                       <p className="text-3xl font-bold" style={{ color: themeColor }}>
                         {hostScore}
@@ -465,12 +536,18 @@ export default function Quiz() {
                       </p>
                     </div>
                     <div className="text-center">
+                      <Swords className="h-6 w-6 text-amber-400 mx-auto mb-1" />
                       <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                        vs
+                        Battle Result
                       </p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground">{room.guestName || "Opponent"}</p>
+                      <div className="clay-card flex h-12 w-12 items-center justify-center rounded-t-full mx-auto mb-2 bg-purple-500/15 border-b-2 border-purple-500/30">
+                        <span className="text-lg">⚔️</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {room.guestName || "Challenger"}
+                      </p>
                       <p className="text-3xl font-bold" style={{ color: themeColor }}>
                         {guestScore}
                       </p>
@@ -482,47 +559,32 @@ export default function Quiz() {
                 </CardContent>
               </Card>
 
-              <div className="clay-card rounded-2xl p-5 mb-6 text-center">
-                <p className="text-sm text-muted-foreground mb-2">
-                  Stars earned
-                </p>
-                <div className="flex justify-center gap-1">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-8 w-8 ${
-                        i < myResult.stars
-                          ? "text-amber-400 fill-amber-400"
-                          : "text-white/10"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {myResult.stars} quiz stars + 5 bonus stars for the team-up! 🎉
-                </p>
-              </div>
+              {/* Star reward */}
+              {iWon && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="clay-card rounded-2xl p-5 text-center mb-4"
+                >
+                  <p className="text-sm font-medium text-foreground">Battle Victory Reward</p>
+                  <p className="text-lg font-bold text-amber-300 mt-1">+1 ⭐ Star</p>
+                  <p className="text-xs text-muted-foreground mt-1">Winner of the battle earns a Star!</p>
+                </motion.div>
+              )}
 
-              <div className="flex gap-3">
-                <Button
-                  onClick={() => {
-                    setPhase("lobby");
-                    setRoomCode("");
-                    setSelectedAnswer(null);
-                  }}
-                  variant="outline"
-                  className="clay-ghost flex-1 rounded-2xl py-2.5"
-                >
-                  <RotateCcw className="mr-2 h-4 w-4" />
-                  Play Again
-                </Button>
-                <Button
-                  onClick={() => navigate("/dashboard")}
-                  className="clay-primary flex-1 rounded-2xl py-2.5 font-semibold"
-                >
-                  Back to Dashboard
-                </Button>
-              </div>
+              <Button
+                onClick={() => {
+                  setPhase("lobby");
+                  setRoomCode("");
+                  setJoinInput("");
+                  setSelectedAnswer(null);
+                  setShowConfetti(false);
+                }}
+                className="clay-primary w-full rounded-2xl py-2.5 font-semibold"
+              >
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Challenge Again
+              </Button>
             </motion.div>
           )}
         </AnimatePresence>
