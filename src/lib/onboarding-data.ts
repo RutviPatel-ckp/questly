@@ -65,6 +65,145 @@ export const TOPICS_BY_SUBJECT: Record<string, string[]> = {
   ],
 };
 
+// ============================================================================
+// MULTI-PART LESSON STRUCTURE
+// ============================================================================
+
+export const PARTS_PER_TOPIC = 4;
+
+export const PART_TITLES: Record<string, Record<string, string[]>> = {
+  Science: {
+    "The Water Cycle": ["Part 1: Where Does Water Come From?", "Part 2: How Water Travels", "Part 3: Why the Water Cycle Matters", "Part 4: Water Cycle Fun Facts"],
+    "States of Matter": ["Part 1: Solids, Liquids, and Gases", "Part 2: How Matter Changes State", "Part 3: Why States of Matter Matter", "Part 4: Matter Fun Facts"],
+    "The Solar System": ["Part 1: Meet the Planets", "Part 2: The Sun and Inner Planets", "Part 3: Outer Planets and Moons", "Part 4: Space Fun Facts"],
+    Photosynthesis: ["Part 1: How Plants Make Food", "Part 2: Sunlight, Water, and CO2", "Part 3: Why Photosynthesis Matters", "Part 4: Plant Science Fun Facts"],
+    "Simple Machines": ["Part 1: What Are Simple Machines?", "Part 2: Levers, Pulleys, and Wheels", "Part 3: Machines in Everyday Life", "Part 4: Simple Machines Fun Facts"],
+  },
+  Math: {
+    "Integers and Number Lines": ["Part 1: Positive and Negative Numbers", "Part 2: Working with Number Lines", "Part 3: Adding and Subtracting Integers", "Part 4: Integer Fun Facts"],
+    "Fractions and Decimals": ["Part 1: What Are Fractions?", "Part 2: Converting Between Fractions and Decimals", "Part 3: Adding, Subtracting, and Comparing", "Part 4: Fraction Fun Facts"],
+    "Algebraic Expressions": ["Part 1: Variables and Constants", "Part 2: Writing Expressions", "Part 3: Simplifying Expressions", "Part 4: Algebra Fun Facts"],
+    "Geometry and Angles": ["Part 1: Shapes and Their Properties", "Part 2: Understanding Angles", "Part 3: Area and Perimeter", "Part 4: Geometry Fun Facts"],
+    "Data and Probability": ["Part 1: Reading Charts and Graphs", "Part 2: Mean, Median, and Mode", "Part 3: Basics of Probability", "Part 4: Data Fun Facts"],
+  },
+  History: {
+    "Ancient Civilizations": ["Part 1: Early Human Societies", "Part 2: Egypt, Mesopotamia, and China", "Part 3: Greece and Rome", "Part 4: Ancient World Fun Facts"],
+    "Independence Movements": ["Part 1: What Drives Independence?", "Part 2: Famous Leaders and Movements", "Part 3: Independence in Africa and Asia", "Part 4: Freedom Fun Facts"],
+    "Explorers and Trade Routes": ["Part 1: The Age of Exploration", "Part 2: Silk Road and Spice Trade", "Part 3: Maritime Explorers", "Part 4: Exploration Fun Facts"],
+    "World War II Basics": ["Part 1: What Caused the War?", "Part 2: Key Events and Battles", "Part 3: The Home Front", "Part 4: WWII Fun Facts"],
+    "Local and Regional History": ["Part 1: Your Region's Ancient Past", "Part 2: Colonial Era and Change", "Part 3: Modern History and Independence", "Part 4: Local History Fun Facts"],
+  },
+  English: {
+    "Parts of Speech": ["Part 1: Nouns and Verbs", "Part 2: Adjectives and Adverbs", "Part 3: Pronouns, Prepositions, and Conjunctions", "Part 4: Parts of Speech Fun Facts"],
+    "Reading Comprehension": ["Part 1: What Is Reading Comprehension?", "Part 2: Finding the Main Idea", "Part 3: Making Inferences", "Part 4: Reading Fun Facts"],
+    "Creative Writing Basics": ["Part 1: Story Structure", "Part 2: Character and Dialogue", "Part 3: Show, Don't Tell", "Part 4: Writing Fun Facts"],
+    "Figurative Language": ["Part 1: Similes and Metaphors", "Part 2: Personification and Hyperbole", "Part 3: Idioms and Allusions", "Part 4: Figurative Language Fun Facts"],
+    "Essay Structure": ["Part 1: Introduction Paragraphs", "Part 2: Body Paragraphs and Evidence", "Part 3: Conclusions That Stick", "Part 4: Essay Writing Fun Facts"],
+  },
+  "General Knowledge": {
+    "World Geography": ["Part 1: Continents and Oceans", "Part 2: Mountains, Rivers, and Deserts", "Part 3: Climate and Biomes", "Part 4: Geography Fun Facts"],
+    "Current Events Awareness": ["Part 1: How to Follow the News", "Part 2: Understanding Headlines", "Part 3: Media Literacy Basics", "Part 4: News Fun Facts"],
+    "Famous Inventors and Inventions": ["Part 1: Pioneers of Invention", "Part 2: Inventions That Changed the World", "Part 3: Modern Innovation", "Part 4: Invention Fun Facts"],
+    "Environmental Issues": ["Part 1: Climate Change Basics", "Part 2: Pollution and Conservation", "Part 3: What Can We Do?", "Part 4: Environment Fun Facts"],
+    "Cultural Traditions Around the World": ["Part 1: Festivals and Celebrations", "Part 2: Food and Customs", "Part 3: Art, Music, and Storytelling", "Part 4: Culture Fun Facts"],
+  },
+};
+
+export function getPartTitle(subject: string, topic: string, part: number): string {
+  const topicParts = PART_TITLES[subject]?.[topic];
+  if (topicParts && topicParts[part - 1]) return topicParts[part - 1];
+  return `Part ${part}: ${topic}`;
+}
+
+// ============================================================================
+// INLINE TEST QUESTIONS
+// ============================================================================
+
+export interface InlineTestQuestion {
+  question: string;
+  options: [string, string, string, string];
+  correctIndex: number;
+}
+
+export const INLINE_TEST_BANK: Record<string, InlineTestQuestion[][]> = {
+  "The Water Cycle": [
+    [
+      { question: "What is the process called when water turns into vapor?", options: ["Condensation", "Evaporation", "Freezing", "Precipitation"], correctIndex: 1 },
+      { question: "What falls from clouds back to Earth?", options: ["Snow only", "Precipitation", "Wind", "Sunlight"], correctIndex: 1 },
+      { question: "Where does most of Earth's water cycle begin?", options: ["Underground", "Oceans and lakes", "Clouds", "Mountains"], correctIndex: 1 },
+    ],
+    [
+      { question: "What carries water vapor upward into the atmosphere?", options: ["Wind", "Gravity", "Heat and rising air", "Moonlight"], correctIndex: 2 },
+      { question: "When water vapor cools and forms droplets, it's called...", options: ["Evaporation", "Condensation", "Boiling", "Melting"], correctIndex: 1 },
+      { question: "Streams and rivers carry water toward...", options: ["The sky", "Mountains", "Oceans and lakes", "Deserts"], correctIndex: 2 },
+    ],
+    [
+      { question: "Why is the water cycle important for life on Earth?", options: ["It makes waves", "It distributes fresh water", "It creates wind", "It makes planets spin"], correctIndex: 1 },
+      { question: "Plants play a role in the water cycle by...", options: ["Blocking rain", "Releasing water through transpiration", "Freezing water", "Creating clouds"], correctIndex: 1 },
+      { question: "What would happen without the water cycle?", options: ["Nothing changes", "All water would stay in one place", "The Earth would spin faster", "Stars would disappear"], correctIndex: 1 },
+    ],
+    [
+      { question: "How old is the water on Earth?", options: ["About 1,000 years", "About 1 million years", "About 4.5 billion years", "About 100 years"], correctIndex: 2 },
+      { question: "Which planet has evidence of a water cycle?", options: ["Mars", "Jupiter", "Venus", "Mercury"], correctIndex: 0 },
+      { question: "What percentage of Earth's water is saltwater?", options: ["About 50%", "About 70%", "About 97%", "About 10%"], correctIndex: 2 },
+    ],
+  ],
+  "States of Matter": [
+    [
+      { question: "What are the three main states of matter?", options: ["Hot, cold, warm", "Solid, liquid, gas", "Big, small, tiny", "Fast, slow, stopped"], correctIndex: 1 },
+      { question: "Which state of matter has a fixed shape?", options: ["Liquid", "Gas", "Solid", "Plasma"], correctIndex: 2 },
+      { question: "Water in a glass is an example of which state?", options: ["Solid", "Liquid", "Gas", "Plasma"], correctIndex: 1 },
+    ],
+    [
+      { question: "When ice melts, it changes from solid to...", options: ["Gas", "Liquid", "Plasma", "Stays solid"], correctIndex: 1 },
+      { question: "What is it called when a liquid becomes a gas?", options: ["Freezing", "Melting", "Boiling/Evaporation", "Condensation"], correctIndex: 2 },
+      { question: "Steam rising from boiling water is...", options: ["Solid water", "Liquid water", "Gas (water vapor)", "Plasma"], correctIndex: 2 },
+    ],
+    [
+      { question: "Why do we need to understand states of matter?", options: ["For fun only", "It helps in cooking, science, and daily life", "It's not important", "Only scientists need it"], correctIndex: 1 },
+      { question: "Which state takes the shape of its container?", options: ["Solid", "Liquid", "Both liquid and gas", "Neither"], correctIndex: 2 },
+      { question: "What happens to particles when matter is heated?", options: ["They shrink", "They move faster and spread out", "They disappear", "They freeze"], correctIndex: 1 },
+    ],
+    [
+      { question: "What is plasma?", options: ["A type of solid", "A superheated gas with charged particles", "Another name for ice", "A liquid found in oceans"], correctIndex: 1 },
+      { question: "Where can you find plasma in everyday life?", options: ["In your fridge", "In lightning and the Sun", "In a glass of milk", "Under the ground"], correctIndex: 1 },
+      { question: "What state of matter is the air around you?", options: ["Solid", "Liquid", "Gas", "Plasma"], correctIndex: 2 },
+    ],
+  ],
+  "The Solar System": [
+    [
+      { question: "How many planets are in our solar system?", options: ["6", "7", "8", "9"], correctIndex: 2 },
+      { question: "Which planet is closest to the Sun?", options: ["Earth", "Venus", "Mercury", "Mars"], correctIndex: 2 },
+      { question: "What is the large star at the center of our solar system?", options: ["The Moon", "The Sun", "Mars", "Jupiter"], correctIndex: 1 },
+    ],
+    [
+      { question: "Which planet is known as the Red Planet?", options: ["Venus", "Jupiter", "Mars", "Saturn"], correctIndex: 2 },
+      { question: "What is the hottest planet in our solar system?", options: ["Mercury", "Venus", "Mars", "Jupiter"], correctIndex: 1 },
+      { question: "Which planet has the most visible rings?", options: ["Jupiter", "Neptune", "Saturn", "Uranus"], correctIndex: 2 },
+    ],
+    [
+      { question: "Why does the solar system matter to us?", options: ["It doesn't", "It helps us understand our place in the universe", "It keeps us warm", "It creates gravity on Earth"], correctIndex: 1 },
+      { question: "Which planet is the largest?", options: ["Saturn", "Jupiter", "Neptune", "Earth"], correctIndex: 1 },
+      { question: "What keeps the planets orbiting the Sun?", options: ["Wind", "Magnetism", "Gravity", "Electricity"], correctIndex: 2 },
+    ],
+    [
+      { question: "How long does light from the Sun take to reach Earth?", options: ["1 second", "About 8 minutes", "1 hour", "1 day"], correctIndex: 1 },
+      { question: "Which planet rotates on its side?", options: ["Mars", "Jupiter", "Uranus", "Venus"], correctIndex: 2 },
+      { question: "What is a 'dwarf planet'?", options: ["A small moon", "An object that orbits the Sun but hasn't cleared its orbit", "A broken planet", "A gas cloud"], correctIndex: 1 },
+    ],
+  ],
+};
+
+export function getInlineTestQuestions(topic: string, part: number): InlineTestQuestion[] {
+  const bank = INLINE_TEST_BANK[topic];
+  if (bank && bank[part - 1]) return bank[part - 1];
+  return [
+    { question: "What was the main idea of this lesson?", options: ["I'm not sure", "I remember some of it", "I understood most of it", "It was confusing"], correctIndex: 2 },
+    { question: "Can you explain this topic to a friend?", options: ["Not at all", "Maybe a little", "Yes, with some parts", "Definitely!"], correctIndex: 2 },
+    { question: "How confident do you feel about this material?", options: ["Not confident", "Somewhat confident", "Pretty confident", "Very confident"], correctIndex: 2 },
+  ];
+}
+
 /**
  * Pre-written fallback lessons keyed by subject.
  * Used when the Groq API times out or fails.
