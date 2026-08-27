@@ -17,8 +17,6 @@ import {
   Volume2,
   VolumeX,
   ArrowLeft,
-  Settings,
-  Terminal,
   Loader2,
   RefreshCw,
   AlertTriangle,
@@ -54,18 +52,28 @@ export default function Lesson() {
   const [isTalking, setIsTalking] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  // Use refs to avoid stale closures in speak/pause callbacks
+  const isPausedRef = useRef(false);
+  const lessonTextRef = useRef("");
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
     null
   );
+
+  // Keep refs in sync
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
+  useEffect(() => {
+    lessonTextRef.current = lessonText;
+  }, [lessonText]);
 
   const themeColor = character
     ? COLOR_THEMES[character.colorTheme] || "#c084fc"
     : "#c084fc";
 
-  // Check if profile exists; redirect to onboarding if not
+  // Redirect to onboarding if no profile
   useEffect(() => {
-    if (character && !character.grade) {
+    if (character && character !== null && !character.grade) {
       navigate("/onboarding");
     }
   }, [character, navigate]);
@@ -73,17 +81,18 @@ export default function Lesson() {
   // Generate or load lesson
   const loadLesson = useCallback(
     async (forceRegenerate = false) => {
-      if (!character?.grade || !character?.subject || !character?.region || !character?.topic) return;
+      if (
+        !character?.grade ||
+        !character?.subject ||
+        !character?.region ||
+        !character?.topic
+      )
+        return;
 
       setLessonState("loading");
       setErrorMessage("");
       setIsUsingFallback(false);
-
-      // If not forcing, check cache first via the query
-      if (!forceRegenerate) {
-        // The query will return cached data automatically
-        // We'll proceed to the action which also checks cache internally
-      }
+      setLessonText("");
 
       try {
         const result = await generateLesson({
@@ -99,14 +108,15 @@ export default function Lesson() {
         setLessonState("ready");
       } catch (error) {
         console.error("Lesson generation failed:", error);
-        // Use fallback
-        const fallback = FALLBACK_LESSONS[character.subject] || FALLBACK_LESSONS["General Knowledge"];
+        const fallback =
+          FALLBACK_LESSONS[character.subject] ||
+          FALLBACK_LESSONS["General Knowledge"];
         setLessonText(fallback);
         setIsUsingFallback(true);
         setLessonState("error");
         setErrorMessage(
           error instanceof Error && error.message === "TIMEOUT"
-            ? "Timed out waiting for response"
+            ? "Timed out waiting for response — showing a standard lesson"
             : "Couldn't generate a personalized lesson"
         );
       }
@@ -141,14 +151,16 @@ export default function Lesson() {
       clearInterval(progressIntervalRef.current);
       progressIntervalRef.current = null;
     }
-    utteranceRef.current = null;
   }, []);
 
   const speak = useCallback(() => {
-    if (!lessonText) return;
+    const text = lessonTextRef.current;
+    if (!text) return;
 
-    if (isPaused) {
+    // Resume from pause
+    if (isPausedRef.current) {
       window.speechSynthesis.resume();
+      isPausedRef.current = false;
       setIsPaused(false);
       setIsTalking(true);
 
@@ -163,13 +175,14 @@ export default function Lesson() {
           return prev + 0.3;
         });
       }, 50);
-
       return;
     }
 
+    // Fresh start
     setProgress(0);
+    window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(lessonText);
+    const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.9;
     utterance.pitch = 1.1;
 
@@ -204,13 +217,12 @@ export default function Lesson() {
       }
     };
 
-    utteranceRef.current = utterance;
     window.speechSynthesis.speak(utterance);
     setIsPlaying(true);
     setIsTalking(true);
 
-    const totalLength = lessonText.length;
-    const estimatedDuration = (totalLength / (utterance.rate * 150)) * 1000;
+    const totalLength = text.length;
+    const estimatedDuration = (totalLength / (0.9 * 150)) * 1000;
     const incrementMs = 50;
     const progressPerTick = (incrementMs / estimatedDuration) * 100;
 
@@ -226,10 +238,11 @@ export default function Lesson() {
         return next;
       });
     }, incrementMs);
-  }, [isPaused, lessonText]);
+  }, []);
 
   const pauseSpeaking = useCallback(() => {
     window.speechSynthesis.pause();
+    isPausedRef.current = true;
     setIsPaused(true);
     setIsTalking(false);
     if (progressIntervalRef.current) {
@@ -248,49 +261,11 @@ export default function Lesson() {
     }
   }, [isPlaying, isPaused, speak, pauseSpeaking]);
 
-  // Loading state
+  // Loading / null guard
   if (character === undefined || character === null || !character.grade) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-grid">
         <div className="animate-pulse text-muted-foreground">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!character) {
-    return (
-      <div className="min-h-screen overflow-hidden bg-grid">
-        <div className="pointer-events-none fixed inset-0 overflow-hidden">
-          <div className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-purple-600/8 blur-[100px]" />
-        </div>
-        <div className="relative mx-auto max-w-lg px-6 py-6">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="mb-8 flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Dashboard
-          </button>
-          <Card className="clay-card-lg border-0 p-8 text-center">
-            <CardContent className="space-y-4">
-              <div className="clay-card mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-purple-500/15">
-                <Terminal className="h-8 w-8 text-purple-400" />
-              </div>
-              <h2 className="text-xl font-bold text-foreground">
-                No companion yet
-              </h2>
-              <p className="text-muted-foreground">
-                Create your study companion first, then come back for lessons.
-              </p>
-              <Button
-                onClick={() => navigate("/create-character")}
-                className="clay-glow mt-4 rounded-xl bg-purple-500 px-6 py-2.5 font-semibold text-white hover:bg-purple-400"
-              >
-                Create Companion
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     );
   }
@@ -320,41 +295,28 @@ export default function Lesson() {
             Dashboard
           </button>
           <div className="clay-card flex items-center gap-2 rounded-xl px-3 py-1.5">
-            <MascotCharacter color={themeColor} size={24} isTalking={false} />
+            <MascotCharacter color={themeColor} size={24} />
             <span className="text-sm font-medium text-foreground">
               {character.name}
             </span>
           </div>
         </div>
 
-        {/* Character */}
+        {/* Character — no Framer Motion wrapper, mascot handles its own animation */}
         <div className="mb-8 flex flex-col items-center">
-          <motion.div
-            animate={
-              isTalking
-                ? {
-                    scale: [1, 1.08, 0.95, 1.06, 1],
-                    rotate: [0, -3, 3, -2, 0],
-                    y: [0, -6, 0, -3, 0],
-                  }
-                : {
-                    scale: [1, 1.015, 1],
-                    y: [0, -4, 0],
-                  }
-            }
-            transition={
-              isTalking
-                ? { duration: 0.5, repeat: Infinity, ease: "easeInOut" }
-                : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }
-            }
+          <div
             className="clay-card-lg flex items-center justify-center rounded-full p-1.5"
             style={{ backgroundColor: `${themeColor}15` }}
           >
-            <MascotCharacter color={themeColor} size={200} isTalking={isTalking} />
-          </motion.div>
+            <MascotCharacter
+              color={themeColor}
+              size={200}
+              isTalking={isTalking}
+            />
+          </div>
 
           <motion.p
-            key={isTalking ? "talking" : "idle"}
+            key={isTalking ? "talking" : lessonState}
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             className="mt-4 text-center text-sm text-muted-foreground"
@@ -400,7 +362,8 @@ export default function Lesson() {
                   style={{ color: themeColor }}
                 />
                 <p className="text-sm text-muted-foreground text-center">
-                  {character.name} is thinking of something fun to teach you...
+                  {character.name} is thinking of something fun to teach
+                  you...
                 </p>
                 <p className="text-xs text-muted-foreground/50 mt-2">
                   This usually takes a few seconds
@@ -442,11 +405,12 @@ export default function Lesson() {
                   <span>{Math.round(progress)}%</span>
                 </div>
                 <div className="clay-input h-3 overflow-hidden rounded-full p-0">
-                  <motion.div
-                    className="h-full rounded-full"
-                    style={{ backgroundColor: themeColor }}
-                    animate={{ width: `${progress}%` }}
-                    transition={{ duration: 0.1, ease: "linear" }}
+                  <div
+                    className="h-full rounded-full transition-[width] duration-100 ease-linear"
+                    style={{
+                      backgroundColor: themeColor,
+                      width: `${progress}%`,
+                    }}
                   />
                 </div>
               </div>
@@ -500,7 +464,7 @@ export default function Lesson() {
           </CardContent>
         </Card>
 
-        {/* Fun fact — only when lesson is loaded */}
+        {/* Study tip — only when lesson is loaded */}
         {lessonState === "ready" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -512,8 +476,8 @@ export default function Lesson() {
               💡 Study Tip
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Listening while reading along helps reinforce memory. Try following
-              the text as {character.name} reads it aloud!
+              Listening while reading along helps reinforce memory. Try
+              following the text as {character.name} reads it aloud!
             </p>
           </motion.div>
         )}

@@ -8,16 +8,14 @@ interface MascotCharacterProps {
 }
 
 /**
- * A cute, simple mascot character built entirely from SVG shapes.
+ * Cute SVG mascot with state-driven animation — no CSS keyframes.
  *
- * - Rounded body/head blob in the companion's theme color
- * - Two eyes that blink every few seconds
- * - A mouth that toggles between open (oval) and closed (line)
- * - Two simple arm shapes on the sides
+ * All motion is computed in requestAnimationFrame and applied via
+ * inline style transforms, so there's zero conflict with parent
+ * Framer Motion wrappers.
  *
- * Animations:
- * - Talking: mouth toggles 150-200ms, arms wave, body wiggles
- * - Idle: eyes blink, body breathes, mouth closed, arms still
+ * Talking: mouth toggles ~170ms, arms wave, body wiggles
+ * Idle: eyes blink every 2-5s, body breathes gently, mouth closed, arms still
  */
 export default function MascotCharacter({
   color,
@@ -27,15 +25,22 @@ export default function MascotCharacter({
 }: MascotCharacterProps) {
   const [mouthOpen, setMouthOpen] = useState(false);
   const [isBlinking, setIsBlinking] = useState(false);
+
+  // Animated transform values driven by rAF
+  const [bodyTransform, setBodyTransform] = useState("");
+  const [leftArmTransform, setLeftArmTransform] = useState("");
+  const [rightArmTransform, setRightArmTransform] = useState("");
+
   const mouthTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const blinkTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rafRef = useRef<number>(0);
+  const startTimeRef = useRef<number>(0);
 
   // Mouth toggling while talking
   useEffect(() => {
     if (isTalking) {
       mouthTimerRef.current = setInterval(() => {
         setMouthOpen((prev) => !prev);
-      }, 170); // ~170ms toggle for natural talking rhythm
+      }, 170);
     } else {
       setMouthOpen(false);
       if (mouthTimerRef.current) {
@@ -50,10 +55,9 @@ export default function MascotCharacter({
     };
   }, [isTalking]);
 
-  // Eye blinking — every 2-5 seconds (randomized)
+  // Eye blinking — every 2-5 seconds
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
-
     const scheduleBlink = () => {
       const delay = 2000 + Math.random() * 3000;
       timeout = setTimeout(() => {
@@ -64,86 +68,78 @@ export default function MascotCharacter({
         }, 150);
       }, delay);
     };
-
     scheduleBlink();
     return () => clearTimeout(timeout);
   }, []);
 
-  // Derived colors
+  // rAF animation loop — drives body, arm transforms
+  useEffect(() => {
+    startTimeRef.current = performance.now();
+
+    const animate = (now: number) => {
+      const elapsed = (now - startTimeRef.current) / 1000;
+
+      if (isTalking) {
+        // Body: gentle wiggle
+        const bodyScale = 1 + Math.sin(elapsed * 6) * 0.02;
+        const bodyRotate = Math.sin(elapsed * 8) * 1.5;
+        const bodyY = Math.sin(elapsed * 5) * 3;
+        setBodyTransform(
+          `translateY(${bodyY}px) scale(${bodyScale}) rotate(${bodyRotate}deg)`
+        );
+
+        // Arms: wave
+        const leftArm = Math.sin(elapsed * 5) * 18;
+        const rightArm = Math.sin(elapsed * 5 + 0.5) * 18;
+        setLeftArmTransform(`rotate(${leftArm}deg)`);
+        setRightArmTransform(`rotate(${rightArm}deg)`);
+      } else {
+        // Idle: slow breathing
+        const breathScale = 1 + Math.sin(elapsed * 1.8) * 0.015;
+        const breathY = Math.sin(elapsed * 1.8) * 2;
+        setBodyTransform(
+          `translateY(${breathY}px) scale(${breathScale})`
+        );
+        setLeftArmTransform("");
+        setRightArmTransform("");
+      }
+
+      rafRef.current = requestAnimationFrame(animate);
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, [isTalking]);
+
   const bodyLight = adjustBrightness(color, 20);
   const bodyDark = adjustBrightness(color, -15);
   const cheekColor = adjustBrightness(color, 30);
-
-  const viewBox = "0 0 120 130";
 
   return (
     <svg
       width={size}
       height={size}
-      viewBox={viewBox}
+      viewBox="0 0 120 130"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       role="img"
       aria-label="Mascot character"
     >
-      <style>{`
-        @keyframes mascot-breathe {
-          0%, 100% { transform: scale(1) translateY(0); }
-          50% { transform: scale(1.02) translateY(-2px); }
-        }
-        @keyframes mascot-talk-body {
-          0%, 100% { transform: scale(1) rotate(0deg); }
-          25% { transform: scale(1.01) rotate(-1deg); }
-          75% { transform: scale(1.01) rotate(1deg); }
-        }
-        @keyframes mascot-arm-wave-left {
-          0%, 100% { transform: rotate(0deg); }
-          50% { transform: rotate(-18deg); }
-        }
-        @keyframes mascot-arm-wave-right {
-          0%, 100% { transform: rotate(0deg); }
-          50% { transform: rotate(18deg); }
-        }
-        .mascot-body-idle {
-          animation: mascot-breathe 3.5s ease-in-out infinite;
-          transform-origin: 60px 70px;
-        }
-        .mascot-body-talking {
-          animation: mascot-talk-body 0.4s ease-in-out infinite;
-          transform-origin: 60px 70px;
-        }
-        .mascot-arm-left-idle {
-          transform-origin: 22px 75px;
-          transition: transform 0.3s ease;
-        }
-        .mascot-arm-left-talking {
-          animation: mascot-arm-wave-left 0.5s ease-in-out infinite;
-          transform-origin: 22px 75px;
-        }
-        .mascot-arm-right-idle {
-          transform-origin: 98px 75px;
-          transition: transform 0.3s ease;
-        }
-        .mascot-arm-right-talking {
-          animation: mascot-arm-wave-right 0.5s ease-in-out infinite 0.1s;
-          transform-origin: 98px 75px;
-        }
-        .mascot-eye-open {
-          transition: ry 0.08s ease, cy 0.08s ease;
-        }
-        .mascot-eye-blink {
-          ry: 1.5;
-          transition: ry 0.06s ease, cy 0.06s ease;
-        }
-      `}</style>
-
       {/* Shadow */}
       <ellipse cx="60" cy="124" rx="28" ry="5" fill="black" opacity="0.1" />
 
       {/* Left arm */}
       <g
-        className={isTalking ? "mascot-arm-left-talking" : "mascot-arm-left-idle"}
+        style={{
+          transformOrigin: "22px 75px",
+          transform: leftArmTransform,
+          transition: isTalking ? "none" : "transform 0.3s ease",
+        }}
       >
         <ellipse
           cx="18"
@@ -159,9 +155,11 @@ export default function MascotCharacter({
 
       {/* Right arm */}
       <g
-        className={
-          isTalking ? "mascot-arm-right-talking" : "mascot-arm-right-idle"
-        }
+        style={{
+          transformOrigin: "98px 75px",
+          transform: rightArmTransform,
+          transition: isTalking ? "none" : "transform 0.3s ease",
+        }}
       >
         <ellipse
           cx="102"
@@ -176,8 +174,13 @@ export default function MascotCharacter({
       </g>
 
       {/* Body / Head blob */}
-      <g className={isTalking ? "mascot-body-talking" : "mascot-body-idle"}>
-        {/* Main body shape — a slightly squished circle */}
+      <g
+        style={{
+          transformOrigin: "60px 70px",
+          transform: bodyTransform,
+        }}
+      >
+        {/* Main body shape */}
         <ellipse
           cx="60"
           cy="68"
@@ -199,8 +202,22 @@ export default function MascotCharacter({
         />
 
         {/* Cheeks */}
-        <ellipse cx="38" cy="72" rx="7" ry="4" fill={cheekColor} opacity="0.5" />
-        <ellipse cx="82" cy="72" rx="7" ry="4" fill={cheekColor} opacity="0.5" />
+        <ellipse
+          cx="38"
+          cy="72"
+          rx="7"
+          ry="4"
+          fill={cheekColor}
+          opacity="0.5"
+        />
+        <ellipse
+          cx="82"
+          cy="72"
+          rx="7"
+          ry="4"
+          fill={cheekColor}
+          opacity="0.5"
+        />
 
         {/* Left eye */}
         <ellipse
@@ -209,7 +226,7 @@ export default function MascotCharacter({
           rx="5"
           ry={isBlinking ? 1.5 : 5.5}
           fill="white"
-          className="mascot-eye-open"
+          style={{ transition: "ry 0.06s ease" }}
         />
         {!isBlinking && (
           <ellipse cx="48" cy="59" rx="2.5" ry="2.8" fill="#1a1a2e" />
@@ -225,7 +242,7 @@ export default function MascotCharacter({
           rx="5"
           ry={isBlinking ? 1.5 : 5.5}
           fill="white"
-          className="mascot-eye-open"
+          style={{ transition: "ry 0.06s ease" }}
         />
         {!isBlinking && (
           <ellipse cx="74" cy="59" rx="2.5" ry="2.8" fill="#1a1a2e" />
@@ -236,7 +253,6 @@ export default function MascotCharacter({
 
         {/* Mouth */}
         {mouthOpen ? (
-          /* Open mouth — oval */
           <ellipse
             cx="60"
             cy="80"
@@ -247,7 +263,6 @@ export default function MascotCharacter({
             strokeWidth="0.5"
           />
         ) : (
-          /* Closed mouth — simple smile line */
           <path
             d="M 53 79 Q 60 85 67 79"
             stroke="#1a1a2e"
@@ -265,18 +280,11 @@ export default function MascotCharacter({
   );
 }
 
-/**
- * Simple brightness adjuster — shifts an oklch or hex color lighter/darker.
- * Works with the hex colors used in our theme palette.
- */
 function adjustBrightness(hex: string, amount: number): string {
-  // If it's not a hex color, return as-is
   if (!hex.startsWith("#")) return hex;
-
   const num = parseInt(hex.replace("#", ""), 16);
   const r = Math.min(255, Math.max(0, ((num >> 16) & 0xff) + amount));
   const g = Math.min(255, Math.max(0, ((num >> 8) & 0xff) + amount));
   const b = Math.min(255, Math.max(0, (num & 0xff) + amount));
-
   return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
 }
