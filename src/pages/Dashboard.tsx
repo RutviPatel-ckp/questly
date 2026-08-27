@@ -56,26 +56,26 @@ function DashboardAvatar({
 
 const quickActions = [
   {
+    icon: MessageSquare,
+    title: "Study Buddy",
+    description: "Solve problems step-by-step with a Socratic tutor. Earn more points for fewer hints.",
+    href: "/chat",
+    color: "text-purple-400",
+    bg: "bg-purple-500/10",
+  },
+  {
     icon: Search,
     title: "Browse Catalog",
     description: "Explore shared lessons and resources from your team.",
     href: "/catalog",
-    color: "text-purple-400",
-    bg: "bg-purple-500/10",
+    color: "text-teal-400",
+    bg: "bg-teal-500/10",
   },
   {
     icon: Upload,
     title: "Create Content",
     description: "Upload notes, questions, or resources for your team.",
     href: "/content/create",
-    color: "text-teal-400",
-    bg: "bg-teal-500/10",
-  },
-  {
-    icon: MessageSquare,
-    title: "Messages",
-    description: "Check discussions and comments from your peers.",
-    href: "/dashboard",
     color: "text-amber-400",
     bg: "bg-amber-500/10",
   },
@@ -183,7 +183,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-2">
                 <Button
                   onClick={() =>
                     character
@@ -195,6 +195,16 @@ export default function Dashboard() {
                   {character ? "Start Lesson" : "Create Companion"}
                   <ArrowRight className="ml-2 h-3.5 w-3.5" />
                 </Button>
+                {character && (
+                  <Button
+                    onClick={() => navigate("/chat")}
+                    variant="outline"
+                    className="clay-btn w-full rounded-xl border-white/5 bg-white/[0.03] text-sm font-medium text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+                  >
+                    <MessageSquare className="mr-2 h-3.5 w-3.5" />
+                    Study Buddy Chat
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </motion.div>

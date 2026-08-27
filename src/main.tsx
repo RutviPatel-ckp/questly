@@ -18,6 +18,7 @@ const Lesson = lazy(() => import("./pages/Lesson.tsx"));
 const Catalog = lazy(() => import("./pages/Catalog.tsx"));
 const ContentDetail = lazy(() => import("./pages/ContentDetail.tsx"));
 const ContentCreate = lazy(() => import("./pages/ContentCreate.tsx"));
+const Chat = lazy(() => import("./pages/Chat.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 // Simple loading fallback for route transitions
@@ -174,6 +175,14 @@ createRoot(document.getElementById("root")!).render(
                 element={
                   <RequireAuth>
                     <ContentCreate />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/chat"
+                element={
+                  <RequireAuth>
+                    <Chat />
                   </RequireAuth>
                 }
               />
