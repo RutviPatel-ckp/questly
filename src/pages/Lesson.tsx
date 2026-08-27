@@ -21,7 +21,8 @@ import {
   RefreshCw,
   AlertTriangle,
 } from "lucide-react";
-import MascotCharacter, { type MascotReaction } from "@/components/MascotCharacter";
+import MascotCharacter from "@/components/MascotCharacter";
+import type { MascotReaction } from "@/components/MascotCharacter";
 import Confetti from "@/components/Confetti";
 import { playCheer, playPop } from "@/lib/sounds";
 import { FALLBACK_LESSONS } from "@/lib/onboarding-data";
