@@ -26,6 +26,7 @@ import type { MascotReaction } from "@/components/MascotCharacter";
 import Confetti from "@/components/Confetti";
 import { playCheer, playPop } from "@/lib/sounds";
 import { FALLBACK_LESSONS } from "@/lib/onboarding-data";
+import { getCharacterVoiceSettings, applyVoiceToUtterance } from "@/lib/voice";
 
 const COLOR_THEMES: Record<string, string> = {
   Sunset: "#fb923c",
@@ -182,19 +183,13 @@ export default function Lesson() {
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.9;
-    utterance.pitch = 1.1;
-
-    const voices = window.speechSynthesis.getVoices();
-    const englishVoice =
-      voices.find(
-        (v) => v.lang.startsWith("en") && v.name.includes("Google")
-      ) ||
-      voices.find((v) => v.lang.startsWith("en-US")) ||
-      voices.find((v) => v.lang.startsWith("en"));
-    if (englishVoice) {
-      utterance.voice = englishVoice;
-    }
+    // Apply character-specific voice profile
+    const voiceSettings = getCharacterVoiceSettings(
+      character?.voiceTone,
+      character?.pitchPreference,
+      character?.description || ""
+    );
+    applyVoiceToUtterance(utterance, voiceSettings);
 
     utterance.onend = () => {
       setIsPlaying(false);

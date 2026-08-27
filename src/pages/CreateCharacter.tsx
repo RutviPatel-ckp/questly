@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -101,6 +101,7 @@ export default function CreateCharacter() {
   const navigate = useNavigate();
   const existingCharacter = useQuery(api.characters.getCharacter);
   const saveCharacter = useMutation(api.characters.saveCharacter);
+  const analyzeVoice = useAction(api.voice.analyzeAndSaveVoice);
 
   const [step, setStep] = useState(0);
   const [name, setName] = useState(existingCharacter?.name ?? "");
@@ -127,6 +128,8 @@ export default function CreateCharacter() {
         description: description.trim(),
         colorTheme,
       });
+      // Analyze voice profile in background (don't block navigation)
+      analyzeVoice().catch(() => {});
       navigate("/onboarding");
     } catch (e) {
       console.error("Failed to save character:", e);

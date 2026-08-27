@@ -46,6 +46,8 @@ const schema = defineSchema(
       lastActiveDate: v.optional(v.string()),
       accessories: v.optional(v.array(v.string())),
       achievements: v.optional(v.array(v.string())),
+      voiceTone: v.optional(v.string()),
+      pitchPreference: v.optional(v.string()),
     }).index("by_user", ["userId"]),
 
     quizRooms: defineTable({
