@@ -33,26 +33,7 @@ const COLOR_THEMES: Record<string, string> = {
   Coral: "#fb7185",
 };
 
-const DICEBEAR_BASE = "https://api.dicebear.com/9.x/big-smile/svg";
-
-function DashboardAvatar({
-  name,
-  size = 40,
-}: {
-  name: string;
-  size?: number;
-}) {
-  const seed = encodeURIComponent(name);
-  return (
-    <img
-      src={`${DICEBEAR_BASE}?seed=${seed}&size=${size}`}
-      alt={`${name}'s avatar`}
-      width={size}
-      height={size}
-      className="rounded-xl bg-white object-cover"
-    />
-  );
-}
+import MascotCharacter from "@/components/MascotCharacter";
 
 const quickActions = [
   {
@@ -165,7 +146,7 @@ export default function Dashboard() {
               <CardHeader>
                 <div className="flex items-center gap-3">
                   {character ? (
-                    <DashboardAvatar name={character.name} />
+                    <MascotCharacter color={themeColor} size={44} />
                   ) : (
                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 text-sm font-bold text-muted-foreground">
                       ?

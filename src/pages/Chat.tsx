@@ -25,7 +25,7 @@ import {
   Star,
 } from "lucide-react";
 
-const DICEBEAR_BASE = "https://api.dicebear.com/9.x/big-smile/svg";
+import MascotCharacter from "@/components/MascotCharacter";
 
 const COLOR_THEMES: Record<string, string> = {
   Sunset: "#fb923c",
@@ -292,11 +292,7 @@ export default function Chat() {
           </button>
           <div className="h-4 w-px bg-white/10" />
           {character && (
-            <img
-              src={`${DICEBEAR_BASE}?seed=${encodeURIComponent(character.name)}&size=28`}
-              alt={character.name}
-              className="h-7 w-7 rounded-full bg-white object-cover"
-            />
+            <MascotCharacter color={themeColor} size={32} isTalking={isGenerating} />
           )}
           <div>
             <p className="text-sm font-semibold text-foreground">

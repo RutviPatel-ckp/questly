@@ -32,28 +32,7 @@ const COLOR_THEMES: Record<string, string> = {
   Coral: "#fb7185",
 };
 
-const DICEBEAR_BASE = "https://api.dicebear.com/9.x/big-smile/svg";
-
-function CompanionAvatar({
-  name,
-  size,
-  className = "",
-}: {
-  name: string;
-  size: number;
-  className?: string;
-}) {
-  const seed = encodeURIComponent(name);
-  return (
-    <img
-      src={`${DICEBEAR_BASE}?seed=${seed}&size=${size}`}
-      alt={`${name}'s avatar`}
-      width={size}
-      height={size}
-      className={`rounded-full bg-white object-cover ${className}`}
-    />
-  );
-}
+import MascotCharacter from "@/components/MascotCharacter";
 
 const LESSON_TEXT = `Welcome to your first lesson! Today we're going to learn about the water cycle.
 
@@ -319,7 +298,7 @@ export default function Lesson() {
             Dashboard
           </button>
           <div className="clay-card flex items-center gap-2 rounded-xl px-3 py-1.5">
-            <CompanionAvatar name={character.name} size={24} />
+            <MascotCharacter color={themeColor} size={24} isTalking={false} />
             <span className="text-sm font-medium text-foreground">
               {character.name}
             </span>
@@ -349,7 +328,7 @@ export default function Lesson() {
             className="clay-card-lg flex items-center justify-center rounded-full p-1.5"
             style={{ backgroundColor: `${themeColor}15` }}
           >
-            <CompanionAvatar name={character.name} size={192} />
+            <MascotCharacter color={themeColor} size={200} isTalking={isTalking} />
           </motion.div>
 
           <motion.p

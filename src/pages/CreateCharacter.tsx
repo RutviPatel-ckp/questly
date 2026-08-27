@@ -41,28 +41,7 @@ const SUGGESTIONS = [
   "a magical pencil that knows every subject",
 ];
 
-const DICEBEAR_BASE = "https://api.dicebear.com/9.x/big-smile/svg";
-
-function CharacterAvatar({
-  name,
-  size,
-  className = "",
-}: {
-  name: string;
-  size: number;
-  className?: string;
-}) {
-  const seed = encodeURIComponent(name || "default");
-  return (
-    <img
-      src={`${DICEBEAR_BASE}?seed=${seed}&size=${size}`}
-      alt={name ? `${name}'s avatar` : "Companion avatar"}
-      width={size}
-      height={size}
-      className={`rounded-full bg-white object-cover ${className}`}
-    />
-  );
-}
+import MascotCharacter from "@/components/MascotCharacter";
 
 function CharacterPreview({
   name,
@@ -99,7 +78,7 @@ function CharacterPreview({
         className="clay-card-lg flex items-center justify-center rounded-full p-1"
         style={{ backgroundColor: `${themeColor}20` }}
       >
-        <CharacterAvatar name={name} size={160} />
+        <MascotCharacter color={themeColor} size={170} isTalking={isTalking} />
       </motion.div>
       {name && (
         <motion.div
@@ -307,9 +286,11 @@ export default function CreateCharacter() {
                   {(step === 1 || step === 2) && description.trim() && (
                     <div className="flex justify-center">
                       <div className="clay-card flex items-center gap-3 rounded-2xl px-4 py-3">
-                        <CharacterAvatar
-                          name={name || "companion"}
-                          size={40}
+                        <MascotCharacter
+                          color={
+                            COLOR_THEMES.find((t) => t.name === colorTheme)?.hex || "#c084fc"
+                          }
+                          size={44}
                         />
                         <div>
                           <p className="text-sm font-semibold text-foreground">
