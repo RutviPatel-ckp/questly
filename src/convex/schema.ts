@@ -41,7 +41,32 @@ const schema = defineSchema(
       subject: v.optional(v.string()),
       region: v.optional(v.string()),
       topic: v.optional(v.string()),
+      totalStars: v.optional(v.number()),
+      streak: v.optional(v.number()),
+      lastActiveDate: v.optional(v.string()),
+      accessories: v.optional(v.array(v.string())),
+      achievements: v.optional(v.array(v.string())),
     }).index("by_user", ["userId"]),
+
+    quizRooms: defineTable({
+      roomCode: v.string(),
+      hostUserId: v.string(),
+      hostName: v.string(),
+      guestUserId: v.optional(v.string()),
+      guestName: v.optional(v.string()),
+      status: v.union(
+        v.literal("waiting"),
+        v.literal("active"),
+        v.literal("finished")
+      ),
+      currentQuestion: v.number(),
+      hostAnswers: v.array(v.number()),
+      guestAnswers: v.array(v.number()),
+      hostScore: v.number(),
+      guestScore: v.number(),
+      questions: v.array(v.string()),
+      createdAt: v.number(),
+    }).index("by_code", ["roomCode"]),
 
     lessons: defineTable({
       userId: v.string(),

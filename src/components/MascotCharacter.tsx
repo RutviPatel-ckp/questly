@@ -5,6 +5,7 @@ interface MascotCharacterProps {
   size?: number;
   isTalking?: boolean;
   className?: string;
+  accessories?: string[];
 }
 
 /**
@@ -22,6 +23,7 @@ export default function MascotCharacter({
   size = 128,
   isTalking = false,
   className = "",
+  accessories = [],
 }: MascotCharacterProps) {
   const [mouthOpen, setMouthOpen] = useState(false);
   const [isBlinking, setIsBlinking] = useState(false);
@@ -272,6 +274,69 @@ export default function MascotCharacter({
           />
         )}
       </g>
+
+      {/* Accessories */}
+      {accessories.includes("hat-party") && (
+        <g>
+          <polygon points="60,18 45,38 75,38" fill="#ff6b6b" stroke="#e55" strokeWidth="1" />
+          <circle cx="60" cy="15" r="4" fill="#ffd93d" />
+          <circle cx="52" cy="32" r="2" fill="#6bcb77" />
+          <circle cx="68" cy="30" r="2" fill="#4d96ff" />
+        </g>
+      )}
+      {accessories.includes("crown") && (
+        <g>
+          <path d="M 38,30 L 42,18 L 50,26 L 60,12 L 70,26 L 78,18 L 82,30 Z" fill="#ffd700" stroke="#daa520" strokeWidth="1" />
+          <circle cx="42" cy="22" r="1.5" fill="#ff6b6b" />
+          <circle cx="60" cy="16" r="1.5" fill="#4d96ff" />
+          <circle cx="78" cy="22" r="1.5" fill="#6bcb77" />
+        </g>
+      )}
+      {accessories.includes("glasses-smart") && (
+        <g>
+          <rect x="37" y="55" width="16" height="12" rx="3" fill="none" stroke="#555" strokeWidth="1.5" />
+          <rect x="67" y="55" width="16" height="12" rx="3" fill="none" stroke="#555" strokeWidth="1.5" />
+          <line x1="53" y1="60" x2="67" y2="60" stroke="#555" strokeWidth="1.5" />
+          <line x1="37" y1="60" x2="32" y2="58" stroke="#555" strokeWidth="1.5" />
+          <line x1="83" y1="60" x2="88" y2="58" stroke="#555" strokeWidth="1.5" />
+        </g>
+      )}
+      {accessories.includes("headphones") && (
+        <g>
+          <path d="M 30,58 Q 30,25 60,25 Q 90,25 90,58" fill="none" stroke="#333" strokeWidth="3" />
+          <rect x="25" y="52" width="10" height="16" rx="4" fill="#333" />
+          <rect x="85" y="52" width="10" height="16" rx="4" fill="#333" />
+        </g>
+      )}
+      {accessories.includes("bowtie") && (
+        <g>
+          <path d="M 50,95 L 60,100 L 70,95 L 60,90 Z" fill="#e74c3c" stroke="#c0392b" strokeWidth="0.8" />
+          <circle cx="60" cy="95" r="2.5" fill="#c0392b" />
+        </g>
+      )}
+      {accessories.includes("cap") && (
+        <g>
+          <ellipse cx="60" cy="28" rx="28" ry="10" fill="#3498db" />
+          <ellipse cx="60" cy="26" rx="22" ry="7" fill="#2980b9" />
+          <rect x="75" y="22" width="18" height="5" rx="2" fill="#3498db" />
+        </g>
+      )}
+      {accessories.includes("scarf") && (
+        <g>
+          <path d="M 32,90 Q 60,98 88,90 Q 85,96 60,102 Q 35,96 32,90" fill="#e74c3c" stroke="#c0392b" strokeWidth="0.8" />
+          <path d="M 58,102 L 55,115 L 62,118 L 65,105" fill="#e74c3c" stroke="#c0392b" strokeWidth="0.8" />
+        </g>
+      )}
+      {accessories.includes("flower") && (
+        <g>
+          <circle cx="45" cy="22" r="5" fill="#ff69b4" opacity="0.9" />
+          <circle cx="55" cy="18" r="5" fill="#ff1493" opacity="0.9" />
+          <circle cx="65" cy="20" r="5" fill="#ff69b4" opacity="0.9" />
+          <circle cx="75" cy="24" r="5" fill="#ff1493" opacity="0.9" />
+          <circle cx="55" cy="25" r="3" fill="#ffd700" />
+          <circle cx="65" cy="27" r="3" fill="#ffd700" />
+        </g>
+      )}
 
       {/* Feet */}
       <ellipse cx="48" cy="108" rx="10" ry="5" fill={bodyDark} />

@@ -19,6 +19,7 @@ const Catalog = lazy(() => import("./pages/Catalog.tsx"));
 const ContentDetail = lazy(() => import("./pages/ContentDetail.tsx"));
 const ContentCreate = lazy(() => import("./pages/ContentCreate.tsx"));
 const Chat = lazy(() => import("./pages/Chat.tsx"));
+const Quiz = lazy(() => import("./pages/Quiz.tsx"));
 const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
@@ -192,6 +193,14 @@ createRoot(document.getElementById("root")!).render(
                 element={
                   <RequireAuth>
                     <Chat />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/quiz"
+                element={
+                  <RequireAuth>
+                    <Quiz />
                   </RequireAuth>
                 }
               />

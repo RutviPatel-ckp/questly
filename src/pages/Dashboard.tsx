@@ -20,7 +20,14 @@ import {
   LogOut,
   ArrowRight,
   Settings,
+  Flame,
+  Trophy,
+  Swords,
 } from "lucide-react";
+import {
+  ACHIEVEMENTS,
+  ACCESSORIES,
+} from "@/lib/quiz-data";
 
 const COLOR_THEMES: Record<string, string> = {
   Sunset: "#fb923c",
@@ -57,6 +64,14 @@ const quickActions = [
     title: "Create Content",
     description: "Upload notes, questions, or resources for your team.",
     href: "/content/create",
+    color: "text-amber-400",
+    bg: "bg-amber-500/10",
+  },
+  {
+    icon: Swords,
+    title: "Quiz Challenge",
+    description: "Challenge a friend to a head-to-head quiz and earn bonus stars.",
+    href: "/quiz",
     color: "text-amber-400",
     bg: "bg-amber-500/10",
   },
@@ -198,29 +213,41 @@ export default function Dashboard() {
           >
             <Card className="clay-card-lg border-0 h-full">
               <CardHeader>
-                <CardTitle className="text-sm">Quick Stats</CardTitle>
+                <CardTitle className="text-sm">Your Stats</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Streak */}
+                  <div className="clay-card rounded-xl p-3 flex items-center gap-3">
+                    <Flame className="h-6 w-6 text-orange-400 flex-shrink-0" />
+                    <div>
+                      <p className="text-lg font-bold text-foreground">
+                        {character?.streak || 0}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">Day Streak</p>
+                    </div>
+                  </div>
+                  {/* Stars */}
+                  <div className="clay-card rounded-xl p-3 flex items-center gap-3">
+                    <Sparkles className="h-6 w-6 text-amber-400 flex-shrink-0" />
+                    <div>
+                      <p className="text-lg font-bold text-foreground">
+                        {character?.totalStars || 0}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">Stars</p>
+                    </div>
+                  </div>
+                  {/* Companions */}
                   <div className="clay-card rounded-xl p-3">
-                    <p className="text-2xl font-bold text-foreground">
+                    <p className="text-lg font-bold text-foreground">
                       {character ? "1" : "0"}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      Companions
-                    </p>
+                    <p className="text-[11px] text-muted-foreground">Companion</p>
                   </div>
+                  {/* Lessons */}
                   <div className="clay-card rounded-xl p-3">
-                    <p className="text-2xl font-bold text-foreground">1</p>
-                    <p className="text-xs text-muted-foreground">Lessons</p>
-                  </div>
-                  <div className="clay-card rounded-xl p-3">
-                    <p className="text-2xl font-bold text-foreground">0</p>
-                    <p className="text-xs text-muted-foreground">Posts</p>
-                  </div>
-                  <div className="clay-card rounded-xl p-3">
-                    <p className="text-2xl font-bold text-foreground">0</p>
-                    <p className="text-xs text-muted-foreground">Messages</p>
+                    <p className="text-lg font-bold text-foreground">1</p>
+                    <p className="text-[11px] text-muted-foreground">Lesson</p>
                   </div>
                 </div>
               </CardContent>
@@ -265,25 +292,77 @@ export default function Dashboard() {
           </div>
         </motion.div>
 
-        {/* Recent activity placeholder */}
+        {/* Achievements shelf */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mt-10"
+          transition={{ delay: 0.5 }}
+          className="mt-8"
         >
           <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground/60 mb-4">
-            Recent Activity
+            Achievements
           </p>
-          <Card className="clay-card border-0">
-            <CardContent className="py-10 text-center">
-              <BookOpen className="mx-auto h-8 w-8 text-muted-foreground/30" />
-              <p className="mt-3 text-sm text-muted-foreground">
-                No recent activity yet. Start a lesson or browse the catalog.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="flex flex-wrap gap-3">
+            {ACHIEVEMENTS.map((ach) => {
+              const earned = (character?.achievements || []).includes(ach.id);
+              return (
+                <div
+                  key={ach.id}
+                  className={`clay-card flex items-center gap-2 rounded-xl px-3 py-2 transition-all ${
+                    earned
+                      ? ""
+                      : "opacity-30 grayscale"
+                  }`}
+                  title={ach.description}
+                >
+                  <span className="text-lg">{ach.icon}</span>
+                  <span className="text-xs font-medium text-foreground">
+                    {ach.name}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </motion.div>
+
+        {/* Accessories shelf */}
+        {character && (character.totalStars || 0) > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-6"
+          >
+            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground/60 mb-4">
+              Accessories
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {ACCESSORIES.map((acc) => {
+                const unlocked = (character.totalStars || 0) >= acc.cost;
+                const equipped = (character.accessories || []).includes(acc.id);
+                return (
+                  <div
+                    key={acc.id}
+                    className={`clay-card flex items-center gap-2 rounded-xl px-3 py-2 ${
+                      !unlocked ? "opacity-25 grayscale" : ""
+                    } ${equipped ? "ring-2 ring-purple-500/50" : ""}`}
+                    title={`${acc.name}${!unlocked ? ` (${acc.cost} stars to unlock)` : equipped ? " (equipped)" : ""}`}
+                  >
+                    <span className="text-lg">{acc.icon}</span>
+                    <span className="text-xs font-medium text-foreground">
+                      {acc.name}
+                    </span>
+                    {!unlocked && (
+                      <span className="text-[10px] text-muted-foreground">
+                        🔒 {acc.cost}⭐
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
 
         <p className="mt-10 text-center text-xs text-muted-foreground/40">
           Brainly Weird v1 · Companions & Interactive Lessons
