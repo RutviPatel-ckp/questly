@@ -32,6 +32,29 @@ const COLOR_THEMES: Record<string, string> = {
   Coral: "#fb7185",
 };
 
+const DICEBEAR_BASE = "https://api.dicebear.com/9.x/big-smile/svg";
+
+function CompanionAvatar({
+  name,
+  size,
+  className = "",
+}: {
+  name: string;
+  size: number;
+  className?: string;
+}) {
+  const seed = encodeURIComponent(name);
+  return (
+    <img
+      src={`${DICEBEAR_BASE}?seed=${seed}&size=${size}`}
+      alt={`${name}'s avatar`}
+      width={size}
+      height={size}
+      className={`rounded-full bg-white object-cover ${className}`}
+    />
+  );
+}
+
 const LESSON_TEXT = `Welcome to your first lesson! Today we're going to learn about the water cycle.
 
 The water cycle is the journey water takes as it circulates from the land to the sky and back again. Here's how it works:
@@ -296,10 +319,7 @@ export default function Lesson() {
             Dashboard
           </button>
           <div className="clay-card flex items-center gap-2 rounded-xl px-3 py-1.5">
-            <div
-              className="h-2.5 w-2.5 rounded-full"
-              style={{ backgroundColor: themeColor }}
-            />
+            <CompanionAvatar name={character.name} size={24} />
             <span className="text-sm font-medium text-foreground">
               {character.name}
             </span>
@@ -312,31 +332,24 @@ export default function Lesson() {
             animate={
               isTalking
                 ? {
-                    scale: [1, 1.06, 0.97, 1.04, 1],
-                    rotate: [0, -2, 2, -1, 0],
-                    y: [0, -4, 0, -2, 0],
+                    scale: [1, 1.08, 0.95, 1.06, 1],
+                    rotate: [0, -3, 3, -2, 0],
+                    y: [0, -6, 0, -3, 0],
                   }
-                : { scale: 1, rotate: 0, y: 0 }
+                : {
+                    scale: [1, 1.015, 1],
+                    y: [0, -4, 0],
+                  }
             }
             transition={
               isTalking
                 ? { duration: 0.5, repeat: Infinity, ease: "easeInOut" }
-                : { duration: 0.4, ease: "easeOut" }
+                : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }
             }
-            className="clay-card-lg flex h-36 w-36 items-center justify-center rounded-full"
+            className="clay-card-lg flex items-center justify-center rounded-full p-1.5"
             style={{ backgroundColor: `${themeColor}15` }}
           >
-            <div
-              className="flex h-28 w-28 items-center justify-center rounded-full"
-              style={{ backgroundColor: `${themeColor}30` }}
-            >
-              <div
-                className="flex h-20 w-20 items-center justify-center rounded-full text-4xl font-bold text-white shadow-lg"
-                style={{ backgroundColor: themeColor }}
-              >
-                {character.name[0].toUpperCase()}
-              </div>
-            </div>
+            <CompanionAvatar name={character.name} size={192} />
           </motion.div>
 
           <motion.p

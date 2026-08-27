@@ -41,6 +41,29 @@ const SUGGESTIONS = [
   "a magical pencil that knows every subject",
 ];
 
+const DICEBEAR_BASE = "https://api.dicebear.com/9.x/big-smile/svg";
+
+function CharacterAvatar({
+  name,
+  size,
+  className = "",
+}: {
+  name: string;
+  size: number;
+  className?: string;
+}) {
+  const seed = encodeURIComponent(name || "default");
+  return (
+    <img
+      src={`${DICEBEAR_BASE}?seed=${seed}&size=${size}`}
+      alt={name ? `${name}'s avatar` : "Companion avatar"}
+      width={size}
+      height={size}
+      className={`rounded-full bg-white object-cover ${className}`}
+    />
+  );
+}
+
 function CharacterPreview({
   name,
   description,
@@ -55,35 +78,28 @@ function CharacterPreview({
   const themeColor = COLOR_THEMES.find((t) => t.name === colorTheme)?.hex || "#c084fc";
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-5">
       <motion.div
         animate={
           isTalking
             ? {
-                scale: [1, 1.05, 0.98, 1.03, 1],
-                rotate: [0, -2, 2, -1, 0],
+                scale: [1, 1.08, 0.95, 1.06, 1],
+                rotate: [0, -3, 3, -2, 0],
               }
-            : { scale: 1, rotate: 0 }
+            : {
+                scale: [1, 1.02, 1],
+                y: [0, -3, 0],
+              }
         }
         transition={
           isTalking
-            ? { duration: 0.4, repeat: Infinity, ease: "easeInOut" }
-            : { duration: 0.3 }
+            ? { duration: 0.45, repeat: Infinity, ease: "easeInOut" }
+            : { duration: 3, repeat: Infinity, ease: "easeInOut" }
         }
-        className="clay-card-lg flex h-32 w-32 items-center justify-center rounded-full"
+        className="clay-card-lg flex items-center justify-center rounded-full p-1"
         style={{ backgroundColor: `${themeColor}20` }}
       >
-        <div
-          className="flex h-24 w-24 items-center justify-center rounded-full"
-          style={{ backgroundColor: `${themeColor}35` }}
-        >
-          <div
-            className="flex h-16 w-16 items-center justify-center rounded-full text-3xl font-bold text-white shadow-lg"
-            style={{ backgroundColor: themeColor }}
-          >
-            {name ? name[0].toUpperCase() : "?"}
-          </div>
-        </div>
+        <CharacterAvatar name={name} size={160} />
       </motion.div>
       {name && (
         <motion.div
@@ -93,7 +109,7 @@ function CharacterPreview({
         >
           <p className="text-lg font-bold text-foreground">{name}</p>
           {description && (
-            <p className="mt-1 max-w-[200px] text-xs text-muted-foreground">
+            <p className="mt-1 max-w-[240px] text-xs text-muted-foreground">
               {description}
             </p>
           )}
@@ -291,16 +307,10 @@ export default function CreateCharacter() {
                   {(step === 1 || step === 2) && description.trim() && (
                     <div className="flex justify-center">
                       <div className="clay-card flex items-center gap-3 rounded-2xl px-4 py-3">
-                        <div
-                          className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white"
-                          style={{
-                            backgroundColor:
-                              COLOR_THEMES.find((t) => t.name === colorTheme)
-                                ?.hex || "#c084fc",
-                          }}
-                        >
-                          {name ? name[0].toUpperCase() : "?"}
-                        </div>
+                        <CharacterAvatar
+                          name={name || "companion"}
+                          size={40}
+                        />
                         <div>
                           <p className="text-sm font-semibold text-foreground">
                             {name || "Your companion"}

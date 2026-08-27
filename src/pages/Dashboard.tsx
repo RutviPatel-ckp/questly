@@ -33,6 +33,27 @@ const COLOR_THEMES: Record<string, string> = {
   Coral: "#fb7185",
 };
 
+const DICEBEAR_BASE = "https://api.dicebear.com/9.x/big-smile/svg";
+
+function DashboardAvatar({
+  name,
+  size = 40,
+}: {
+  name: string;
+  size?: number;
+}) {
+  const seed = encodeURIComponent(name);
+  return (
+    <img
+      src={`${DICEBEAR_BASE}?seed=${seed}&size=${size}`}
+      alt={`${name}'s avatar`}
+      width={size}
+      height={size}
+      className="rounded-xl bg-white object-cover"
+    />
+  );
+}
+
 const quickActions = [
   {
     icon: Search,
@@ -143,12 +164,13 @@ export default function Dashboard() {
             <Card className="clay-card-lg border-0">
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <div
-                    className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white"
-                    style={{ backgroundColor: themeColor }}
-                  >
-                    {character ? character.name[0].toUpperCase() : "?"}
-                  </div>
+                  {character ? (
+                    <DashboardAvatar name={character.name} />
+                  ) : (
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 text-sm font-bold text-muted-foreground">
+                      ?
+                    </div>
+                  )}
                   <div>
                     <CardTitle className="text-sm">
                       {character ? character.name : "No Companion Yet"}
