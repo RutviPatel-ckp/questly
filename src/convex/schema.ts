@@ -48,6 +48,8 @@ const schema = defineSchema(
       achievements: v.optional(v.array(v.string())),
       voiceTone: v.optional(v.string()),
       pitchPreference: v.optional(v.string()),
+      currentPart: v.optional(v.number()),
+      totalPartsCompleted: v.optional(v.number()),
     }).index("by_user", ["userId"]),
 
     quizRooms: defineTable({
@@ -85,9 +87,10 @@ const schema = defineSchema(
       subject: v.string(),
       region: v.string(),
       topic: v.string(),
+      part: v.number(),
       content: v.string(),
       characterName: v.string(),
-    }).index("by_key", ["userId", "grade", "subject", "region", "topic"]),
+    }).index("by_key", ["userId", "grade", "subject", "region", "topic", "part"]),
   },
   {
     schemaValidation: false,
