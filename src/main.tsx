@@ -15,6 +15,9 @@ const AuthPage = lazy(() => import("./pages/Auth.tsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
 const CreateCharacter = lazy(() => import("./pages/CreateCharacter.tsx"));
 const Lesson = lazy(() => import("./pages/Lesson.tsx"));
+const Catalog = lazy(() => import("./pages/Catalog.tsx"));
+const ContentDetail = lazy(() => import("./pages/ContentDetail.tsx"));
+const ContentCreate = lazy(() => import("./pages/ContentCreate.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 // Simple loading fallback for route transitions
@@ -147,6 +150,30 @@ createRoot(document.getElementById("root")!).render(
                 element={
                   <RequireAuth>
                     <Lesson />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/catalog"
+                element={
+                  <RequireAuth>
+                    <Catalog />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/content/:id"
+                element={
+                  <RequireAuth>
+                    <ContentDetail />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/content/create"
+                element={
+                  <RequireAuth>
+                    <ContentCreate />
                   </RequireAuth>
                 }
               />

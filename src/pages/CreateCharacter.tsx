@@ -19,6 +19,7 @@ import {
   ArrowLeft,
   Check,
   Loader2,
+  Terminal,
 } from "lucide-react";
 
 const COLOR_THEMES = [
@@ -70,14 +71,14 @@ function CharacterPreview({
             : { duration: 0.3 }
         }
         className="clay-card-lg flex h-32 w-32 items-center justify-center rounded-full"
-        style={{ backgroundColor: `${themeColor}30` }}
+        style={{ backgroundColor: `${themeColor}20` }}
       >
         <div
           className="flex h-24 w-24 items-center justify-center rounded-full"
-          style={{ backgroundColor: `${themeColor}60` }}
+          style={{ backgroundColor: `${themeColor}35` }}
         >
           <div
-            className="flex h-16 w-16 items-center justify-center rounded-full text-3xl font-bold text-white"
+            className="flex h-16 w-16 items-center justify-center rounded-full text-3xl font-bold text-white shadow-lg"
             style={{ backgroundColor: themeColor }}
           >
             {name ? name[0].toUpperCase() : "?"}
@@ -142,10 +143,9 @@ export default function CreateCharacter() {
   const toggleTalking = () => setIsTalking((t) => !t);
 
   const steps = [
-    // Step 0: Description
     {
-      title: "What's your buddy like?",
-      description: "Describe your character in a few words. Be creative!",
+      title: "Describe your companion",
+      description: "What should your study buddy be like? A few words go a long way.",
       content: (
         <div className="space-y-4">
           <Textarea
@@ -169,10 +169,9 @@ export default function CreateCharacter() {
         </div>
       ),
     },
-    // Step 1: Name
     {
-      title: "Give your buddy a name",
-      description: "What should we call them?",
+      title: "Name your companion",
+      description: "Pick something memorable — this is the name your team will see.",
       content: (
         <div className="space-y-3">
           <Input
@@ -188,10 +187,9 @@ export default function CreateCharacter() {
         </div>
       ),
     },
-    // Step 2: Color
     {
-      title: "Pick a color",
-      description: "Choose a theme color for your buddy.",
+      title: "Choose a color",
+      description: "This sets the visual theme for your companion throughout the platform.",
       content: (
         <div className="grid grid-cols-4 gap-3">
           {COLOR_THEMES.map((theme) => (
@@ -200,7 +198,7 @@ export default function CreateCharacter() {
               onClick={() => setColorTheme(theme.name)}
               className={`group clay-btn flex flex-col items-center gap-2 rounded-2xl p-3 transition-all ${
                 colorTheme === theme.name
-                  ? `ring-2 ${theme.ring} ring-offset-2`
+                  ? `ring-2 ${theme.ring} ring-offset-2 ring-offset-background`
                   : ""
               }`}
             >
@@ -215,11 +213,10 @@ export default function CreateCharacter() {
         </div>
       ),
     },
-    // Step 3: Preview + Confirm
     {
-      title: "Meet your buddy!",
-      description: "Looking good! Ready to start learning?",
-      content: null, // preview handled separately
+      title: "Meet your companion",
+      description: "Looking good. Ready to start learning?",
+      content: null,
     },
   ];
 
@@ -231,22 +228,29 @@ export default function CreateCharacter() {
     step === 3;
 
   return (
-    <div className="min-h-screen overflow-hidden">
-      {/* Background blobs */}
+    <div className="min-h-screen overflow-hidden bg-grid">
+      {/* Background accents */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-purple-200/40 blur-3xl" />
-        <div className="absolute bottom-1/4 -left-48 h-80 w-80 rounded-full bg-orange-200/30 blur-3xl" />
+        <div className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-purple-600/8 blur-[100px]" />
       </div>
 
-      <div className="relative mx-auto max-w-lg px-6 py-8">
-        {/* Back button */}
-        <button
-          onClick={() => (step > 0 ? setStep(step - 1) : navigate("/dashboard"))}
-          className="mb-8 flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {step > 0 ? "Back" : "Dashboard"}
-        </button>
+      <div className="relative mx-auto max-w-lg px-6 py-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={() => (step > 0 ? setStep(step - 1) : navigate("/dashboard"))}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {step > 0 ? "Back" : "Dashboard"}
+          </button>
+          <div className="flex items-center gap-2">
+            <Terminal className="h-4 w-4 text-purple-400" />
+            <span className="text-sm font-medium text-muted-foreground">
+              Brainly<span className="text-purple-400"> Weird</span>
+            </span>
+          </div>
+        </div>
 
         {/* Progress dots */}
         <div className="mb-8 flex justify-center gap-2">
@@ -257,8 +261,8 @@ export default function CreateCharacter() {
                 i === step
                   ? "w-8 bg-purple-500"
                   : i < step
-                    ? "w-2 bg-purple-300"
-                    : "w-2 bg-gray-200"
+                    ? "w-2 bg-purple-400/60"
+                    : "w-2 bg-white/10"
               }`}
             />
           ))}
@@ -299,7 +303,7 @@ export default function CreateCharacter() {
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-foreground">
-                            {name || "Your buddy"}
+                            {name || "Your companion"}
                           </p>
                           <p className="text-xs text-muted-foreground line-clamp-1">
                             {description}
@@ -313,7 +317,6 @@ export default function CreateCharacter() {
                 </CardContent>
               </Card>
             ) : (
-              /* Step 3: Full preview */
               <Card className="clay-card-lg border-0">
                 <CardHeader className="text-center">
                   <CardTitle className="text-xl">
@@ -332,7 +335,7 @@ export default function CreateCharacter() {
                   />
                   <button
                     onClick={toggleTalking}
-                    className="clay-btn mx-auto flex items-center gap-2 rounded-xl bg-purple-50 px-4 py-2 text-sm font-medium text-purple-600 hover:bg-purple-100"
+                    className="clay-btn mx-auto flex items-center gap-2 rounded-xl bg-purple-500/15 px-4 py-2 text-sm font-medium text-purple-300 hover:bg-purple-500/25"
                   >
                     <Sparkles className="h-4 w-4" />
                     {isTalking ? "Stop Preview" : "Preview Animation"}
@@ -349,7 +352,7 @@ export default function CreateCharacter() {
             <Button
               onClick={() => setStep(step + 1)}
               disabled={!canProceed}
-              className="clay-btn rounded-2xl bg-purple-500 px-8 py-2.5 font-semibold text-white hover:bg-purple-600 disabled:opacity-40"
+              className="clay-btn rounded-xl bg-purple-500 px-8 py-2.5 font-semibold text-white hover:bg-purple-400 disabled:opacity-30"
             >
               Next
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -358,14 +361,14 @@ export default function CreateCharacter() {
             <Button
               onClick={handleSave}
               disabled={isSaving}
-              className="clay-btn rounded-2xl bg-gradient-to-r from-purple-500 to-orange-400 px-8 py-2.5 font-semibold text-white hover:from-purple-600 hover:to-orange-500"
+              className="clay-glow rounded-xl bg-purple-500 px-8 py-2.5 font-semibold text-white hover:bg-purple-400"
             >
               {isSaving ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Check className="mr-2 h-4 w-4" />
               )}
-              {existingCharacter ? "Update Buddy" : "Start Learning!"}
+              {existingCharacter ? "Update Companion" : "Start Learning"}
             </Button>
           )}
         </div>

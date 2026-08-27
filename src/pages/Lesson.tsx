@@ -18,6 +18,7 @@ import {
   VolumeX,
   ArrowLeft,
   Settings,
+  Terminal,
 } from "lucide-react";
 
 const COLOR_THEMES: Record<string, string> = {
@@ -62,7 +63,6 @@ export default function Lesson() {
     null
   );
 
-  // Load voices
   useEffect(() => {
     const loadVoices = () => {
       const voices = window.speechSynthesis.getVoices();
@@ -78,7 +78,6 @@ export default function Lesson() {
     };
   }, []);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       window.speechSynthesis.cancel();
@@ -108,7 +107,6 @@ export default function Lesson() {
       setIsPaused(false);
       setIsTalking(true);
 
-      // Restart progress tracking
       const totalLength = sentencesRef.current.join(" ").length;
       const currentLength = sentencesRef.current
         .slice(0, currentSentenceIndex)
@@ -130,7 +128,6 @@ export default function Lesson() {
       return;
     }
 
-    // Split text into sentences for tracking
     sentencesRef.current = LESSON_TEXT.match(/[^.!?]+[.!?]+/g) || [
       LESSON_TEXT,
     ];
@@ -143,7 +140,6 @@ export default function Lesson() {
     utterance.rate = 0.9;
     utterance.pitch = 1.1;
 
-    // Try to pick a good English voice
     const voices = window.speechSynthesis.getVoices();
     const englishVoice =
       voices.find(
@@ -186,9 +182,8 @@ export default function Lesson() {
     setIsPlaying(true);
     setIsTalking(true);
 
-    // Animate progress based on time estimate
     const estimatedDuration =
-      (totalLength / (utterance.rate * 150)) * 1000; // rough ms estimate
+      (totalLength / (utterance.rate * 150)) * 1000;
     const incrementMs = 50;
     const progressPerTick = (incrementMs / estimatedDuration) * 100;
 
@@ -232,7 +227,7 @@ export default function Lesson() {
 
   if (character === undefined) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-grid">
         <div className="animate-pulse text-muted-foreground">Loading...</div>
       </div>
     );
@@ -240,11 +235,11 @@ export default function Lesson() {
 
   if (!character) {
     return (
-      <div className="min-h-screen overflow-hidden">
+      <div className="min-h-screen overflow-hidden bg-grid">
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
-          <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-purple-200/40 blur-3xl" />
+          <div className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-purple-600/8 blur-[100px]" />
         </div>
-        <div className="relative mx-auto max-w-lg px-6 py-8">
+        <div className="relative mx-auto max-w-lg px-6 py-6">
           <button
             onClick={() => navigate("/dashboard")}
             className="mb-8 flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -254,18 +249,20 @@ export default function Lesson() {
           </button>
           <Card className="clay-card-lg border-0 p-8 text-center">
             <CardContent className="space-y-4">
-              <span className="text-5xl">👈</span>
+              <div className="clay-card mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-purple-500/15">
+                <Terminal className="h-8 w-8 text-purple-400" />
+              </div>
               <h2 className="text-xl font-bold text-foreground">
-                No character yet!
+                No companion yet
               </h2>
               <p className="text-muted-foreground">
-                Create your study buddy first, then come back for lessons.
+                Create your study companion first, then come back for lessons.
               </p>
               <Button
                 onClick={() => navigate("/create-character")}
-                className="clay-btn mt-4 rounded-2xl bg-purple-500 px-6 py-2.5 font-semibold text-white hover:bg-purple-600"
+                className="clay-glow mt-4 rounded-xl bg-purple-500 px-6 py-2.5 font-semibold text-white hover:bg-purple-400"
               >
-                Create Character
+                Create Companion
               </Button>
             </CardContent>
           </Card>
@@ -275,17 +272,17 @@ export default function Lesson() {
   }
 
   return (
-    <div className="min-h-screen overflow-hidden">
-      {/* Background blobs */}
+    <div className="min-h-screen overflow-hidden bg-grid">
+      {/* Background accents */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div
-          className="absolute -top-32 -right-32 h-96 w-96 rounded-full blur-3xl"
-          style={{ backgroundColor: `${themeColor}30` }}
+          className="absolute -top-40 left-1/3 h-[500px] w-[500px] -translate-x-1/2 rounded-full blur-[120px]"
+          style={{ backgroundColor: `${themeColor}08` }}
         />
-        <div className="absolute bottom-1/4 -left-48 h-80 w-80 rounded-full bg-blue-200/30 blur-3xl" />
+        <div className="absolute bottom-1/4 -right-40 h-[400px] w-[400px] rounded-full bg-purple-600/5 blur-[100px]" />
       </div>
 
-      <div className="relative mx-auto max-w-2xl px-6 py-8">
+      <div className="relative mx-auto max-w-2xl px-6 py-6">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <button
@@ -300,7 +297,7 @@ export default function Lesson() {
           </button>
           <div className="clay-card flex items-center gap-2 rounded-xl px-3 py-1.5">
             <div
-              className="h-3 w-3 rounded-full"
+              className="h-2.5 w-2.5 rounded-full"
               style={{ backgroundColor: themeColor }}
             />
             <span className="text-sm font-medium text-foreground">
@@ -327,11 +324,11 @@ export default function Lesson() {
                 : { duration: 0.4, ease: "easeOut" }
             }
             className="clay-card-lg flex h-36 w-36 items-center justify-center rounded-full"
-            style={{ backgroundColor: `${themeColor}20` }}
+            style={{ backgroundColor: `${themeColor}15` }}
           >
             <div
               className="flex h-28 w-28 items-center justify-center rounded-full"
-              style={{ backgroundColor: `${themeColor}40` }}
+              style={{ backgroundColor: `${themeColor}30` }}
             >
               <div
                 className="flex h-20 w-20 items-center justify-center rounded-full text-4xl font-bold text-white shadow-lg"
@@ -352,7 +349,7 @@ export default function Lesson() {
               ? `${character.name} is teaching you...`
               : isPlaying && !isPaused
                 ? `${character.name} is thinking...`
-                : `${character.name} is ready to teach!`}
+                : `${character.name} is ready to teach`}
           </motion.p>
         </div>
 
@@ -366,9 +363,12 @@ export default function Lesson() {
                   Science · 5 min read
                 </p>
               </div>
-              <div className="clay-card flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100">
+              <div
+                className="clay-card flex h-10 w-10 items-center justify-center rounded-xl"
+                style={{ backgroundColor: `${themeColor}15` }}
+              >
                 {isTalking ? (
-                  <Volume2 className="h-5 w-5 text-purple-600" />
+                  <Volume2 className="h-5 w-5" style={{ color: themeColor }} />
                 ) : (
                   <VolumeX className="h-5 w-5 text-muted-foreground" />
                 )}
@@ -406,14 +406,14 @@ export default function Lesson() {
                 disabled={!isPlaying}
                 variant="outline"
                 size="icon"
-                className="clay-btn h-12 w-12 rounded-2xl border-gray-200"
+                className="clay-btn h-12 w-12 rounded-2xl border-white/5 bg-white/[0.03]"
               >
                 <Square className="h-5 w-5" />
               </Button>
 
               <Button
                 onClick={togglePlayPause}
-                className="clay-btn flex h-16 w-16 items-center justify-center rounded-full p-0"
+                className="clay-glow flex h-16 w-16 items-center justify-center rounded-full p-0"
                 style={{ backgroundColor: themeColor }}
               >
                 {isPlaying && !isPaused ? (
@@ -427,7 +427,7 @@ export default function Lesson() {
                 onClick={() => navigate("/create-character")}
                 variant="outline"
                 size="icon"
-                className="clay-btn h-12 w-12 rounded-2xl border-gray-200"
+                className="clay-btn h-12 w-12 rounded-2xl border-white/5 bg-white/[0.03]"
               >
                 <Settings className="h-5 w-5" />
               </Button>
