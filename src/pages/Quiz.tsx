@@ -468,7 +468,7 @@ export default function Quiz() {
                                 ? "bg-rose-500/20 text-rose-300 ring-2 ring-rose-500/50"
                                 : isSelected
                                   ? "bg-amber-500/20 text-amber-300"
-                                  : "bg-white/[0.03] text-foreground hover:bg-white/[0.06]"
+                                  : "bg-amber-100/40 text-foreground hover:bg-amber-100/60"
                           }`}
                         >
                           <span className="mr-3 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs">

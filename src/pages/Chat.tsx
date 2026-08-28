@@ -275,7 +275,7 @@ export default function Chat() {
       </div>
 
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between border-b border-white/5 px-6 py-3">
+      <div className="relative z-10 flex items-center justify-between border-b border-amber-200/40 px-6 py-3 bg-card/80 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/dashboard")}
@@ -284,7 +284,7 @@ export default function Chat() {
             <ArrowLeft className="h-4 w-4" />
             <span className="hidden sm:inline">Kingdom</span>
           </button>
-          <div className="h-4 w-px bg-white/10" />
+          <div className="h-4 w-px bg-amber-200/40" />
           {character && (
             <MascotCharacter color="#94a3b8" size={32} isTalking={isGenerating} characterType="dragon" />
           )}
@@ -313,7 +313,7 @@ export default function Chat() {
               setMessages([]);
               startSession();
             }}
-            className="clay-btn rounded-2xl bg-white/[0.03] p-2 text-muted-foreground hover:text-foreground"
+            className="clay-ghost rounded-2xl p-2 text-muted-foreground hover:text-foreground"
             title="New session"
           >
             <RotateCcw className="h-4 w-4" />
@@ -388,7 +388,7 @@ export default function Chat() {
       </div>
 
       {/* Input */}
-      <div className="relative z-10 border-t border-white/5 px-6 py-4">
+      <div className="relative z-10 border-t border-amber-200/40 px-6 py-4 bg-card/80 backdrop-blur-sm">
         <form
           onSubmit={handleSubmit}
           className="mx-auto flex max-w-2xl items-center gap-3"

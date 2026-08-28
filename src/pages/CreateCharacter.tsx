@@ -161,7 +161,7 @@ export default function CreateCharacter() {
       content: (
         <div className="space-y-4">
           {characterType && (
-            <div className="flex items-center gap-3 rounded-2xl bg-white/[0.03] p-3">
+            <div className="flex items-center gap-3 rounded-2xl bg-amber-50/40 p-3">
               <MascotCharacter characterType={characterType} size={40} />
               <div>
                 <p className="text-sm font-medium text-foreground">{getCharacterType(characterType).name}</p>

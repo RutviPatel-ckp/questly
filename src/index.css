@@ -42,74 +42,45 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Questly — Fantasy Adventure Kingdom theme */
+/* Questly — Warm Forest Fantasy Theme */
 :root {
   --radius: 1.25rem;
-  --background: oklch(0.14 0.03 270);
-  --foreground: oklch(0.95 0.01 85);
-  --card: oklch(0.18 0.03 270);
-  --card-foreground: oklch(0.95 0.01 85);
-  --popover: oklch(0.20 0.03 270);
-  --popover-foreground: oklch(0.95 0.01 85);
-  --primary: oklch(0.72 0.16 80);
-  --primary-foreground: oklch(0.15 0.02 270);
-  --secondary: oklch(0.24 0.04 270);
-  --secondary-foreground: oklch(0.88 0.01 85);
-  --muted: oklch(0.22 0.025 270);
-  --muted-foreground: oklch(0.6 0.02 85);
-  --accent: oklch(0.68 0.15 275);
-  --accent-foreground: oklch(0.95 0.01 275);
-  --destructive: oklch(0.65 0.22 25);
-  --border: oklch(0.30 0.03 270);
-  --input: oklch(0.24 0.03 270);
-  --ring: oklch(0.72 0.16 80);
-  --chart-1: oklch(0.72 0.16 80);
-  --chart-2: oklch(0.68 0.15 275);
-  --chart-3: oklch(0.65 0.15 200);
-  --chart-4: oklch(0.7 0.18 335);
-  --chart-5: oklch(0.75 0.14 45);
-  --sidebar: oklch(0.16 0.03 270);
-  --sidebar-foreground: oklch(0.95 0.01 85);
-  --sidebar-primary: oklch(0.72 0.16 80);
-  --sidebar-primary-foreground: oklch(0.15 0.02 270);
-  --sidebar-accent: oklch(0.24 0.04 270);
-  --sidebar-accent-foreground: oklch(0.88 0.01 85);
-  --sidebar-border: oklch(0.30 0.03 270);
-  --sidebar-ring: oklch(0.72 0.16 80);
-}
-
-.dark {
-  --background: oklch(0.14 0.03 270);
-  --foreground: oklch(0.95 0.01 85);
-  --card: oklch(0.18 0.03 270);
-  --card-foreground: oklch(0.95 0.01 85);
-  --popover: oklch(0.20 0.03 270);
-  --popover-foreground: oklch(0.95 0.01 85);
-  --primary: oklch(0.72 0.16 80);
-  --primary-foreground: oklch(0.15 0.02 270);
-  --secondary: oklch(0.24 0.04 270);
-  --secondary-foreground: oklch(0.88 0.01 85);
-  --muted: oklch(0.22 0.025 270);
-  --muted-foreground: oklch(0.6 0.02 85);
-  --accent: oklch(0.68 0.15 275);
-  --accent-foreground: oklch(0.95 0.01 275);
-  --destructive: oklch(0.65 0.22 25);
-  --border: oklch(0.30 0.03 270);
-  --input: oklch(0.24 0.03 270);
-  --ring: oklch(0.72 0.16 80);
-  --chart-1: oklch(0.72 0.16 80);
-  --chart-2: oklch(0.68 0.15 275);
-  --chart-3: oklch(0.65 0.15 200);
-  --chart-4: oklch(0.7 0.18 335);
-  --chart-5: oklch(0.75 0.14 45);
-  --sidebar: oklch(0.16 0.03 270);
-  --sidebar-foreground: oklch(0.95 0.01 85);
-  --sidebar-primary: oklch(0.72 0.16 80);
-  --sidebar-primary-foreground: oklch(0.15 0.02 270);
-  --sidebar-accent: oklch(0.24 0.04 270);
-  --sidebar-accent-foreground: oklch(0.88 0.01 85);
-  --sidebar-border: oklch(0.30 0.03 270);
-  --sidebar-ring: oklch(0.72 0.16 80);
+  /* Warm cream/beige background like the forest images */
+  --background: oklch(0.94 0.02 85);
+  --foreground: oklch(0.22 0.03 60);
+  /* Cards: soft warm parchment */
+  --card: oklch(0.97 0.015 85);
+  --card-foreground: oklch(0.22 0.03 60);
+  --popover: oklch(0.98 0.01 85);
+  --popover-foreground: oklch(0.22 0.03 60);
+  /* Primary: warm forest gold */
+  --primary: oklch(0.68 0.14 80);
+  --primary-foreground: oklch(0.15 0.02 60);
+  /* Secondary: soft sage green */
+  --secondary: oklch(0.92 0.04 140);
+  --secondary-foreground: oklch(0.30 0.04 140);
+  --muted: oklch(0.90 0.02 85);
+  --muted-foreground: oklch(0.50 0.03 60);
+  /* Accent: teal glow (mushroom magic) */
+  --accent: oklch(0.70 0.12 190);
+  --accent-foreground: oklch(0.15 0.02 190);
+  --destructive: oklch(0.62 0.20 25);
+  --border: oklch(0.85 0.03 85);
+  --input: oklch(0.90 0.02 85);
+  --ring: oklch(0.68 0.14 80);
+  --chart-1: oklch(0.68 0.14 80);
+  --chart-2: oklch(0.70 0.12 190);
+  --chart-3: oklch(0.55 0.15 275);
+  --chart-4: oklch(0.62 0.18 140);
+  --chart-5: oklch(0.65 0.16 25);
+  --sidebar: oklch(0.96 0.02 140);
+  --sidebar-foreground: oklch(0.22 0.03 60);
+  --sidebar-primary: oklch(0.68 0.14 80);
+  --sidebar-primary-foreground: oklch(0.15 0.02 60);
+  --sidebar-accent: oklch(0.92 0.04 140);
+  --sidebar-accent-foreground: oklch(0.30 0.04 140);
+  --sidebar-border: oklch(0.85 0.03 85);
+  --sidebar-ring: oklch(0.68 0.14 80);
 }
 
 @layer base {
@@ -126,29 +97,29 @@
 }
 
 /* ===== Unified Design System ===== */
-/* Duolingo-meets-Headspace: soft clay cards, consistent 250ms transitions,
-   single primary accent (purple), generous spacing, rounded-2xl everywhere. */
+/* Warm forest claymorphism: soft parchment cards, consistent 250ms transitions,
+   gold primary accent, generous spacing, rounded-2xl everywhere. */
 
 /* --- Card Surfaces --- */
 .clay-card {
   background: var(--card);
   border-radius: var(--radius-xl);
-  border: 1px solid oklch(1 0 0 / 0.06);
+  border: 1px solid oklch(0.82 0.04 85);
   box-shadow:
-    6px 6px 14px oklch(0 0 0 / 0.35),
-    -3px -3px 10px oklch(1 0 0 / 0.03),
-    inset 0 1px 3px oklch(1 0 0 / 0.04);
+    4px 4px 12px oklch(0.55 0.04 80 / 0.15),
+    -2px -2px 8px oklch(1 0 0 / 0.6),
+    inset 0 1px 3px oklch(1 0 0 / 0.5);
   transition: box-shadow 0.25s ease, transform 0.25s ease, background 0.25s ease;
 }
 
 .clay-card-lg {
   background: var(--card);
   border-radius: calc(var(--radius-xl) + 4px);
-  border: 1px solid oklch(1 0 0 / 0.05);
+  border: 1px solid oklch(0.82 0.04 85);
   box-shadow:
-    10px 10px 20px oklch(0 0 0 / 0.4),
-    -5px -5px 14px oklch(1 0 0 / 0.03),
-    inset 0 2px 5px oklch(1 0 0 / 0.04);
+    6px 6px 16px oklch(0.55 0.04 80 / 0.18),
+    -3px -3px 10px oklch(1 0 0 / 0.6),
+    inset 0 2px 5px oklch(1 0 0 / 0.4);
   transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 
@@ -156,62 +127,62 @@
 .clay-btn {
   border-radius: var(--radius-xl);
   box-shadow:
-    3px 3px 8px oklch(0 0 0 / 0.3),
-    -1px -1px 5px oklch(1 0 0 / 0.04),
-    inset 0 1px 2px oklch(1 0 0 / 0.06);
+    2px 2px 6px oklch(0.55 0.04 80 / 0.15),
+    -1px -1px 4px oklch(1 0 0 / 0.5),
+    inset 0 1px 2px oklch(1 0 0 / 0.4);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .clay-btn:hover {
   box-shadow:
-    4px 4px 10px oklch(0 0 0 / 0.35),
-    -2px -2px 6px oklch(1 0 0 / 0.05),
-    inset 0 1px 2px oklch(1 0 0 / 0.06);
+    3px 3px 8px oklch(0.55 0.04 80 / 0.2),
+    -2px -2px 5px oklch(1 0 0 / 0.5),
+    inset 0 1px 2px oklch(1 0 0 / 0.4);
   transform: translateY(-1px);
 }
 .clay-btn:active {
   box-shadow:
-    inset 3px 3px 6px oklch(0 0 0 / 0.3),
-    inset -1px -1px 3px oklch(1 0 0 / 0.03);
+    inset 2px 2px 5px oklch(0.55 0.04 80 / 0.15),
+    inset -1px -1px 3px oklch(1 0 0 / 0.3);
   transform: scale(0.97) translateY(0);
 }
 
-/* Primary CTA button — always purple */
+/* Primary CTA button — warm gold */
 .clay-primary {
   background: var(--primary);
   color: var(--primary-foreground);
   border-radius: var(--radius-xl);
   box-shadow:
-    3px 3px 8px oklch(0 0 0 / 0.3),
-    -1px -1px 5px oklch(1 0 0 / 0.04),
-    inset 0 1px 2px oklch(1 0 0 / 0.08);
+    2px 2px 6px oklch(0.55 0.04 80 / 0.2),
+    -1px -1px 4px oklch(1 0 0 / 0.4),
+    inset 0 1px 2px oklch(1 0 0 / 0.3);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .clay-primary:hover {
-  background: oklch(0.68 0.16 80);
+  background: oklch(0.64 0.14 80);
   box-shadow:
-    4px 4px 12px oklch(0 0 0 / 0.35),
-    -2px -2px 6px oklch(1 0 0 / 0.05),
-    0 0 24px oklch(0.72 0.16 80 / 0.2),
-    inset 0 1px 2px oklch(1 0 0 / 0.08);
+    3px 3px 10px oklch(0.55 0.04 80 / 0.25),
+    -2px -2px 5px oklch(1 0 0 / 0.4),
+    0 0 20px oklch(0.68 0.14 80 / 0.2),
+    inset 0 1px 2px oklch(1 0 0 / 0.3);
   transform: translateY(-1px);
 }
 .clay-primary:active {
   transform: scale(0.97) translateY(0);
   box-shadow:
-    inset 3px 3px 6px oklch(0 0 0 / 0.3),
-    inset -1px -1px 3px oklch(1 0 0 / 0.03);
+    inset 2px 2px 5px oklch(0.55 0.04 80 / 0.2),
+    inset -1px -1px 3px oklch(1 0 0 / 0.3);
 }
 
 /* Ghost / secondary button */
 .clay-ghost {
   border-radius: var(--radius-xl);
-  border: 1px solid oklch(1 0 0 / 0.06);
-  background: oklch(1 0 0 / 0.03);
+  border: 1px solid oklch(0.82 0.04 85);
+  background: oklch(1 0 0 / 0.5);
   color: var(--muted-foreground);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .clay-ghost:hover {
-  background: oklch(1 0 0 / 0.06);
+  background: oklch(1 0 0 / 0.7);
   color: var(--foreground);
   transform: translateY(-1px);
 }
@@ -223,44 +194,41 @@
 .clay-input {
   border-radius: var(--radius-xl);
   box-shadow:
-    inset 3px 3px 6px oklch(0 0 0 / 0.25),
-    inset -1px -1px 3px oklch(1 0 0 / 0.03);
-  border: 1px solid oklch(1 0 0 / 0.06);
-  background: var(--card);
+    inset 2px 2px 5px oklch(0.55 0.04 80 / 0.1),
+    inset -1px -1px 3px oklch(1 0 0 / 0.4);
+  border: 1px solid oklch(0.82 0.04 85);
+  background: oklch(0.99 0.005 85);
+  color: var(--foreground);
   transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .clay-input:focus {
   box-shadow:
-    inset 3px 3px 6px oklch(0 0 0 / 0.25),
-    inset -1px -1px 3px oklch(1 0 0 / 0.03),
-    0 0 0 3px oklch(0.72 0.16 80 / 0.2);
-  border-color: oklch(0.72 0.16 80 / 0.4);
+    inset 2px 2px 5px oklch(0.55 0.04 80 / 0.1),
+    inset -1px -1px 3px oklch(1 0 0 / 0.4),
+    0 0 0 3px oklch(0.68 0.14 80 / 0.2);
+  border-color: oklch(0.68 0.14 80 / 0.5);
 }
 
 /* --- Glow CTA (primary with golden glow ring) --- */
 .clay-glow {
   box-shadow:
-    3px 3px 8px oklch(0 0 0 / 0.3),
-    -1px -1px 5px oklch(1 0 0 / 0.04),
-    0 0 24px oklch(0.72 0.16 80 / 0.18),
-    inset 0 1px 2px oklch(1 0 0 / 0.08);
+    2px 2px 6px oklch(0.55 0.04 80 / 0.2),
+    -1px -1px 4px oklch(1 0 0 / 0.4),
+    0 0 20px oklch(0.68 0.14 80 / 0.15),
+    inset 0 1px 2px oklch(1 0 0 / 0.3);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .clay-glow:hover {
   box-shadow:
-    4px 4px 12px oklch(0 0 0 / 0.35),
-    -2px -2px 6px oklch(1 0 0 / 0.05),
-    0 0 32px oklch(0.72 0.16 80 / 0.25),
-    inset 0 1px 2px oklch(1 0 0 / 0.08);
+    3px 3px 10px oklch(0.55 0.04 80 / 0.25),
+    -2px -2px 5px oklch(1 0 0 / 0.4),
+    0 0 28px oklch(0.68 0.14 80 / 0.25),
+    inset 0 1px 2px oklch(1 0 0 / 0.3);
   transform: translateY(-1px);
 }
 .clay-glow:active {
   transform: scale(0.97) translateY(0);
-}
-
-.clay-blob {
-  filter: url(#clay-blob);
 }
 
 /* --- Interactive tile (quick actions, achievements) --- */
@@ -269,7 +237,7 @@
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .clay-tile:hover {
-  background: oklch(1 0 0 / 0.03);
+  background: oklch(0.95 0.02 85);
   transform: translateY(-2px);
 }
 .clay-tile:active {
@@ -282,17 +250,17 @@
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: oklch(0.6 0.02 260 / 0.5);
+  color: oklch(0.50 0.03 60 / 0.6);
 }
 
 /* ===== Animated Background ===== */
-/* Fantasy kingdom aurora — gold/purple/deep-blue shifting gradients */
+/* Warm forest aurora — cream/green/teal shifting gradients */
 .bg-grid {
   position: relative;
   background:
-    radial-gradient(ellipse 80% 50% at 20% 40%, oklch(0.35 0.12 80 / 0.12), transparent 60%),
-    radial-gradient(ellipse 60% 60% at 80% 20%, oklch(0.3 0.12 275 / 0.15), transparent 55%),
-    radial-gradient(ellipse 70% 50% at 50% 80%, oklch(0.25 0.08 240 / 0.1), transparent 55%),
+    radial-gradient(ellipse 80% 50% at 20% 40%, oklch(0.88 0.06 140 / 0.25), transparent 60%),
+    radial-gradient(ellipse 60% 60% at 80% 20%, oklch(0.85 0.08 85 / 0.2), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 80%, oklch(0.82 0.06 190 / 0.15), transparent 55%),
     var(--background);
   background-size: 200% 200%, 180% 180%, 220% 220%, 100% 100%;
   animation: aurora-drift 20s ease-in-out infinite alternate;
@@ -329,47 +297,42 @@
   animation: float-up linear infinite;
 }
 
-/* Soft blurred circles */
 .floating-shape.circle {
-  background: radial-gradient(circle, var(--float-color, oklch(0.72 0.17 275 / 0.12)), transparent 70%);
+  background: radial-gradient(circle, var(--float-color, oklch(0.70 0.12 190 / 0.15)), transparent 70%);
   filter: blur(1px);
 }
 
-/* Small star shapes */
 .floating-shape.star {
   width: 6px !important;
   height: 6px !important;
-  background: var(--float-color, oklch(0.85 0.15 85 / 0.4));
+  background: var(--float-color, oklch(0.75 0.14 80 / 0.5));
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
   filter: none;
 }
 
-/* Doodle icons: pencil */
 .floating-shape.pencil {
   width: 8px !important;
   height: 16px !important;
   border-radius: 2px 2px 0 0;
-  background: var(--float-color, oklch(0.75 0.15 85 / 0.3));
+  background: var(--float-color, oklch(0.65 0.12 80 / 0.35));
   clip-path: polygon(50% 100%, 0% 30%, 20% 0%, 80% 0%, 100% 30%);
   filter: none;
 }
 
-/* Doodle icons: book */
 .floating-shape.book {
   width: 14px !important;
   height: 11px !important;
   border-radius: 1px;
-  border: 1px solid var(--float-color, oklch(0.72 0.17 275 / 0.25));
+  border: 1px solid var(--float-color, oklch(0.60 0.10 140 / 0.3));
   background: transparent;
   filter: none;
 }
 
-/* Doodle icons: lightbulb */
 .floating-shape.bulb {
   width: 10px !important;
   height: 14px !important;
   border-radius: 50% 50% 30% 30%;
-  background: var(--float-color, oklch(0.85 0.18 85 / 0.25));
+  background: var(--float-color, oklch(0.75 0.14 80 / 0.3));
   filter: none;
 }
 
@@ -378,12 +341,8 @@
     transform: translateY(110vh) translateX(0) rotate(0deg) scale(0.5);
     opacity: 0;
   }
-  5% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
+  5% { opacity: 1; }
+  90% { opacity: 1; }
   100% {
     transform: translateY(-10vh) translateX(var(--float-drift, 30px)) rotate(var(--float-rotate, 360deg)) scale(1);
     opacity: 0;
@@ -400,7 +359,7 @@
   position: absolute;
   inset: -20px;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--mascot-glow-color, oklch(0.72 0.16 80 / 0.2)), transparent 70%);
+  background: radial-gradient(circle, var(--mascot-glow-color, oklch(0.68 0.14 80 / 0.25)), transparent 70%);
   opacity: 0;
   transition: opacity 0.5s ease;
   z-index: -1;
@@ -412,29 +371,15 @@
 }
 
 @keyframes mascot-pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: scale(1.15);
-    opacity: 1;
-  }
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; }
 }
 
 /* ===== Mascot Image Animations ===== */
-.mascot-idle {
-  animation: mascot-float 4s ease-in-out infinite;
-}
-.mascot-talking {
-  animation: mascot-bounce 0.6s ease-in-out infinite, mascot-wiggle 1.2s ease-in-out infinite;
-}
-.mascot-happy {
-  animation: mascot-cheer 0.5s ease-in-out infinite;
-}
-.mascot-sad {
-  animation: mascot-droop 2s ease-in-out infinite;
-}
+.mascot-idle { animation: mascot-float 4s ease-in-out infinite; }
+.mascot-talking { animation: mascot-bounce 0.6s ease-in-out infinite, mascot-wiggle 1.2s ease-in-out infinite; }
+.mascot-happy { animation: mascot-cheer 0.5s ease-in-out infinite; }
+.mascot-sad { animation: mascot-droop 2s ease-in-out infinite; }
 
 @keyframes mascot-float {
   0%, 100% { transform: translateY(0) scale(1); }
@@ -461,37 +406,103 @@
 }
 
 /* ===== Fantasy Kingdom Accent Colors ===== */
-.accent-gold {
-  color: oklch(0.78 0.14 80);
-}
-.accent-purple {
-  color: oklch(0.68 0.15 275);
-}
-.accent-crimson {
-  color: oklch(0.65 0.18 20);
-}
-.accent-teal {
-  color: oklch(0.68 0.12 200);
-}
-.bg-accent-gold {
-  background-color: oklch(0.78 0.14 80 / 0.12);
-}
-.bg-accent-purple {
-  background-color: oklch(0.68 0.15 275 / 0.12);
-}
-.bg-accent-crimson {
-  background-color: oklch(0.65 0.18 20 / 0.12);
-}
-.bg-accent-teal {
-  background-color: oklch(0.68 0.12 200 / 0.12);
+.accent-gold { color: oklch(0.68 0.14 80); }
+.accent-teal { color: oklch(0.70 0.12 190); }
+.accent-purple { color: oklch(0.55 0.15 275); }
+.accent-forest { color: oklch(0.55 0.14 140); }
+.accent-crimson { color: oklch(0.62 0.18 25); }
+.bg-accent-gold { background-color: oklch(0.68 0.14 80 / 0.12); }
+.bg-accent-teal { background-color: oklch(0.70 0.12 190 / 0.12); }
+.bg-accent-purple { background-color: oklch(0.55 0.15 275 / 0.12); }
+.bg-accent-forest { background-color: oklch(0.55 0.14 140 / 0.12); }
+.bg-accent-crimson { background-color: oklch(0.62 0.18 25 / 0.12); }
+
+/* ===== Power Ring ===== */
+.power-ring-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ===== Shield of Mastery (Power Ring) ===== */
-.shield-mastery {
-  position: relative;
-  width: 48px;
-  height: 56px;
+.power-ring-glow {
+  position: absolute;
+  inset: -15%;
+  border-radius: 50%;
+  background: radial-gradient(circle, oklch(0.75 0.15 85 / 0.3), oklch(0.65 0.12 190 / 0.15), transparent 70%);
+  filter: blur(20px);
+  animation: ring-glow 3s ease-in-out infinite alternate;
 }
-.shield-mastery svg {
-  filter: drop-shadow(0 2px 6px oklch(0 0 0 / 0.4));
+
+/* Ornate gold filigree frame around the ring */
+.power-ring-frame {
+  position: absolute;
+  inset: -6%;
+  border-radius: 50%;
+  border: 3px solid oklch(0.65 0.12 85 / 0.5);
+  box-shadow:
+    0 0 0 2px oklch(0.75 0.14 85 / 0.3),
+    0 0 15px oklch(0.65 0.14 85 / 0.2),
+    inset 0 0 10px oklch(0.65 0.14 85 / 0.1);
+  pointer-events: none;
+}
+
+.power-ring-frame::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid oklch(0.60 0.12 85 / 0.3);
+}
+
+.power-ring-frame::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 1px solid oklch(0.60 0.12 85 / 0.2);
+}
+
+.power-ring-center-glow {
+  position: absolute;
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: radial-gradient(circle, oklch(0.90 0.12 85 / 0.6), oklch(0.85 0.10 190 / 0.2), transparent 70%);
+  filter: blur(8px);
+  animation: center-pulse 2.5s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes ring-glow {
+  0% { opacity: 0.5; transform: scale(0.95); }
+  100% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes center-pulse {
+  0% { opacity: 0.3; transform: scale(0.8); }
+  100% { opacity: 0.7; transform: scale(1.1); }
+}
+
+/* ===== Subject Theme Cards ===== */
+.subject-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.subject-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+}
+.subject-card:hover::before {
+  opacity: 1;
+}
+.subject-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px oklch(0.55 0.04 80 / 0.2);
 }

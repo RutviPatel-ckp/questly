@@ -177,13 +177,13 @@ export default function ContentDetail() {
               className={`clay-btn flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all ${
                 liked
                   ? "bg-rose-500/15 text-rose-300"
-                  : "bg-white/[0.03] text-muted-foreground hover:text-foreground"
+                  : "bg-amber-50/40 text-muted-foreground hover:text-foreground"
               }`}
             >
               <Heart className={`h-4 w-4 ${liked ? "fill-current" : ""}`} />
               {liked ? "Liked" : "Like"}
             </button>
-            <button className="clay-btn flex items-center gap-2 rounded-xl bg-white/[0.03] px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">
+            <button className="clay-btn flex items-center gap-2 rounded-xl bg-amber-50/40 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">
               <Share2 className="h-4 w-4" />
               Share
             </button>

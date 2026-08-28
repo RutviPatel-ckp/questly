@@ -150,7 +150,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                       type="submit"
                       variant="outline"
                       size="icon"
-                      className="clay-btn border-white/5 bg-white/[0.03]"
+                      className="clay-btn border-amber-200/30 bg-amber-50/40"
                       disabled={isLoading}
                     >
                       {isLoading ? (
@@ -166,7 +166,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                   <div className="mt-4">
                     <div className="relative">
                       <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-white/5" />
+                        <span className="w-full border-t border-amber-200/30" />
                       </div>
                       <div className="relative flex justify-center text-xs uppercase">
                         <span className="bg-card px-2 text-muted-foreground">
@@ -177,7 +177,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                     <Button
                       type="button"
                       variant="outline"
-                      className="clay-btn w-full mt-4 border-white/5 bg-white/[0.03] text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+                      className="clay-btn w-full mt-4 border-amber-200/30 bg-amber-50/40 text-muted-foreground hover:bg-amber-100/50 hover:text-foreground"
                       onClick={handleGuestLogin}
                       disabled={isLoading}
                     >
@@ -271,7 +271,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
             </>
           )}
 
-          <div className="py-4 px-6 text-xs text-center text-muted-foreground/50 border-t border-white/5 rounded-b-2xl">
+          <div className="py-4 px-6 text-xs text-center text-muted-foreground/50 border-t border-amber-200/30 rounded-b-2xl">
             Secured by{" "}
             <a
               href="https://freebuff.com"

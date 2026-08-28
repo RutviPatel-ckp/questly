@@ -129,7 +129,7 @@ export default function ContentCreate() {
                     className={`clay-btn flex flex-col items-center gap-2 rounded-2xl p-4 transition-all ${
                       contentType === type.id
                         ? "bg-purple-500/15 ring-2 ring-purple-500/50 ring-offset-2 ring-offset-background"
-                        : "bg-white/[0.03]"
+                        : "bg-amber-50/40"
                     }`}
                   >
                     <type.icon
@@ -200,7 +200,7 @@ export default function ContentCreate() {
                           className={`clay-btn rounded-xl px-3 py-1.5 text-xs font-medium transition-all ${
                             category === cat
                               ? "bg-purple-500 text-white"
-                              : "bg-white/[0.03] text-muted-foreground hover:text-foreground"
+                              : "bg-amber-50/40 text-muted-foreground hover:text-foreground"
                           }`}
                         >
                           {cat}
@@ -243,7 +243,7 @@ export default function ContentCreate() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="clay-btn border-white/5 bg-white/[0.03] text-muted-foreground hover:bg-white/[0.06]"
+                  className="clay-btn border-amber-200/30 bg-amber-50/40 text-muted-foreground hover:bg-amber-100/50"
                 >
                   <Upload className="mr-2 h-4 w-4" />
                   Save Draft

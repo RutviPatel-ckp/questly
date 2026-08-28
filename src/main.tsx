@@ -21,6 +21,7 @@ const ContentCreate = lazy(() => import("./pages/ContentCreate.tsx"));
 const Chat = lazy(() => import("./pages/Chat.tsx"));
 const Quiz = lazy(() => import("./pages/Quiz.tsx"));
 const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
+const SubjectRealm = lazy(() => import("./pages/SubjectRealm.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 // Simple loading fallback for route transitions
@@ -201,6 +202,14 @@ createRoot(document.getElementById("root")!).render(
                 element={
                   <RequireAuth>
                     <Quiz />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/realm/:subject"
+                element={
+                  <RequireAuth>
+                    <SubjectRealm />
                   </RequireAuth>
                 }
               />

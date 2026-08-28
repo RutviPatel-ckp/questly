@@ -279,11 +279,11 @@ export default function Lesson() {
                 </div>
                 <div className="clay-input rounded-2xl p-5"><p className="whitespace-pre-line text-sm leading-relaxed text-foreground/80">{lessonText}</p></div>
                 <div className="flex items-center justify-center gap-4">
-                  <Button onClick={stopSpeaking} disabled={!isPlaying} variant="outline" size="icon" className="clay-btn h-12 w-12 rounded-2xl border-white/5 bg-white/[0.03]"><Square className="h-5 w-5" /></Button>
+                  <Button onClick={stopSpeaking} disabled={!isPlaying} variant="outline" size="icon" className="clay-btn h-12 w-12 rounded-2xl border-amber-200/30 bg-amber-50/40"><Square className="h-5 w-5" /></Button>
                   <Button onClick={togglePlayPause} className="clay-glow flex h-16 w-16 items-center justify-center rounded-full p-0" style={{ backgroundColor: themeColor }}>
                     {isPlaying && !isPaused ? <Pause className="h-6 w-6 text-white" /> : <Play className="ml-1 h-6 w-6 text-white" />}
                   </Button>
-                  <Button onClick={() => loadLesson()} variant="outline" size="icon" className="clay-btn h-12 w-12 rounded-2xl border-white/5 bg-white/[0.03]" title="Regenerate"><RefreshCw className="h-5 w-5" /></Button>
+                  <Button onClick={() => loadLesson()} variant="outline" size="icon" className="clay-btn h-12 w-12 rounded-2xl border-amber-200/30 bg-amber-50/40" title="Regenerate"><RefreshCw className="h-5 w-5" /></Button>
                 </div>
               </CardContent></Card>
             </motion.div>
@@ -315,11 +315,11 @@ export default function Lesson() {
 
                   {phase === "ready" && (
                     <div className="flex items-center justify-center gap-4">
-                      <Button onClick={stopSpeaking} disabled={!isPlaying} variant="outline" size="icon" className="clay-btn h-12 w-12 rounded-2xl border-white/5 bg-white/[0.03]"><Square className="h-5 w-5" /></Button>
+                      <Button onClick={stopSpeaking} disabled={!isPlaying} variant="outline" size="icon" className="clay-btn h-12 w-12 rounded-2xl border-amber-200/30 bg-amber-50/40"><Square className="h-5 w-5" /></Button>
                       <Button onClick={togglePlayPause} className="clay-glow flex h-16 w-16 items-center justify-center rounded-full p-0" style={{ backgroundColor: themeColor }}>
                         {isPlaying && !isPaused ? <Pause className="h-6 w-6 text-white" /> : <Play className="ml-1 h-6 w-6 text-white" />}
                       </Button>
-                      <Button onClick={() => loadLesson()} variant="outline" size="icon" className="clay-btn h-12 w-12 rounded-2xl border-white/5 bg-white/[0.03]" title="Regenerate"><RefreshCw className="h-5 w-5" /></Button>
+                      <Button onClick={() => loadLesson()} variant="outline" size="icon" className="clay-btn h-12 w-12 rounded-2xl border-amber-200/30 bg-amber-50/40" title="Regenerate"><RefreshCw className="h-5 w-5" /></Button>
                     </div>
                   )}
 
@@ -393,7 +393,7 @@ export default function Lesson() {
                                 testSubmitted && isCorrect ? "bg-emerald-500/20 text-emerald-300 ring-2 ring-emerald-500/50"
                                 : testSubmitted && isSelected && !isCorrect ? "bg-rose-500/20 text-rose-300 ring-2 ring-rose-500/50"
                                 : isSelected ? "bg-amber-500/20 text-amber-300"
-                                : "bg-white/[0.03] text-foreground hover:bg-white/[0.06]"
+                                : "bg-amber-100/40 text-foreground hover:bg-amber-100/60"
                               }`}>
                               <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[10px]">{String.fromCharCode(65 + oi)}</span>
                               {opt}

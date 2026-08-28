@@ -96,7 +96,7 @@ export default function Landing() {
                 isAuthenticated ? "/dashboard" : "/auth?returnTo=/dashboard"
               )
             }
-            className="clay-btn rounded-xl bg-amber-500/15 px-5 py-2 text-sm font-medium text-amber-300 hover:bg-amber-500/25 hover:text-amber-200"
+            className="clay-primary rounded-xl px-5 py-2 text-sm font-medium"
           >
             {isLoading
               ? "..."
@@ -159,7 +159,7 @@ export default function Landing() {
                   isAuthenticated ? "/dashboard" : "/auth?returnTo=/dashboard"
                 )
               }
-              className="clay-btn rounded-xl border-white/5 bg-white/[0.03] px-8 py-3 text-sm font-medium text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+              className="clay-ghost rounded-xl px-8 py-3 text-sm font-medium"
               size="lg"
             >
               Enter the Kingdom
@@ -190,7 +190,7 @@ export default function Landing() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.45 + i * 0.08, duration: 0.45 }}
-                className="clay-card group p-5 transition-all hover:bg-white/[0.02]"
+                className="clay-card clay-tile group p-5"
               >
                 <div
                   className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${feature.bg}`}
@@ -215,7 +215,7 @@ export default function Landing() {
           transition={{ delay: 0.9, duration: 0.6 }}
           className="mt-24 mb-16"
         >
-          <div className="clay-card-lg mx-auto max-w-2xl px-10 py-12 text-center">
+          <div className="clay-card-lg mx-auto max-w-2xl px-10 py-12 text-center" style={{ background: "linear-gradient(135deg, oklch(0.95 0.04 85), oklch(0.92 0.06 140))" }}>
             <p className="text-xs font-medium uppercase tracking-widest text-amber-400/80">
               Your Quest Begins Now
             </p>
@@ -244,7 +244,7 @@ export default function Landing() {
         </motion.section>
 
         {/* Footer */}
-        <footer className="flex flex-col items-center gap-3 border-t border-white/5 pb-8 pt-8 sm:flex-row sm:justify-between">
+        <footer className="flex flex-col items-center gap-3 border-t border-amber-200/30 pb-8 pt-8 sm:flex-row sm:justify-between">
           <div className="flex items-center gap-2 text-sm text-muted-foreground/60">
             <Crown className="h-3.5 w-3.5" />
             Questly

@@ -188,7 +188,7 @@ export default function Catalog() {
               className={`clay-btn rounded-xl px-4 py-2 text-sm font-medium transition-all ${
                 activeCategory === cat
                   ? "bg-purple-500 text-white"
-                  : "bg-white/[0.03] text-muted-foreground hover:text-foreground hover:bg-white/[0.06]"
+                  : "bg-amber-50/40 text-muted-foreground hover:text-foreground hover:bg-amber-100/50"
               }`}
             >
               {cat}
@@ -210,7 +210,7 @@ export default function Catalog() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 + i * 0.05, duration: 0.4 }}
               onClick={() => navigate(`/content/${item.id}`)}
-              className="clay-card group p-5 text-left transition-all hover:bg-white/[0.02]"
+              className="clay-card group p-5 text-left transition-all hover:bg-amber-50/20"
             >
               <div className="flex items-start gap-4">
                 <div
@@ -240,7 +240,7 @@ export default function Catalog() {
                   <MessageSquare className="h-3 w-3" />
                   {item.comments}
                 </span>
-                <span className="ml-auto rounded-lg bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                <span className="ml-auto rounded-lg bg-amber-50/40 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                   {item.category}
                 </span>
               </div>

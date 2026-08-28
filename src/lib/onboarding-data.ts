@@ -14,7 +14,79 @@ export const SUBJECTS = [
   "History",
   "English",
   "General Knowledge",
+  "Computer Science",
 ];
+
+// ============================================================================
+// SUBJECT REALM CONFIGURATION
+// ============================================================================
+
+export interface SubjectRealm {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  bgColor: string;
+  description: string;
+  gradient: string;
+}
+
+export const SUBJECT_REALMS: Record<string, SubjectRealm> = {
+  Math: {
+    id: "math",
+    name: "Math",
+    icon: "🔢",
+    color: "oklch(0.60 0.15 275)",
+    bgColor: "oklch(0.92 0.06 275)",
+    description: "Numbers, patterns, and the language of the universe",
+    gradient: "from-purple-200 to-indigo-100",
+  },
+  Science: {
+    id: "science",
+    name: "Science",
+    icon: "🔬",
+    color: "oklch(0.55 0.14 140)",
+    bgColor: "oklch(0.92 0.06 140)",
+    description: "Explore the natural world through experiments and discovery",
+    gradient: "from-emerald-200 to-teal-100",
+  },
+  History: {
+    id: "history",
+    name: "History",
+    icon: "📜",
+    color: "oklch(0.60 0.14 60)",
+    bgColor: "oklch(0.93 0.05 60)",
+    description: "Journey through time and discover the stories of civilizations",
+    gradient: "from-amber-200 to-orange-100",
+  },
+  English: {
+    id: "english",
+    name: "English",
+    icon: "📖",
+    color: "oklch(0.58 0.16 25)",
+    bgColor: "oklch(0.93 0.05 25)",
+    description: "Master the art of words, stories, and expression",
+    gradient: "from-rose-200 to-pink-100",
+  },
+  "General Knowledge": {
+    id: "gk",
+    name: "General Knowledge",
+    icon: "🌍",
+    color: "oklch(0.60 0.12 190)",
+    bgColor: "oklch(0.92 0.05 190)",
+    description: "A grand tour of facts, cultures, and the world around you",
+    gradient: "from-cyan-200 to-sky-100",
+  },
+  "Computer Science": {
+    id: "cs",
+    name: "Computer Science",
+    icon: "💻",
+    color: "oklch(0.55 0.15 220)",
+    bgColor: "oklch(0.92 0.06 220)",
+    description: "Learn coding, algorithms, and how computers think",
+    gradient: "from-blue-200 to-violet-100",
+  },
+};
 
 export const REGIONS = [
   "Tanzania",
@@ -55,6 +127,13 @@ export const TOPICS_BY_SUBJECT: Record<string, string[]> = {
     "Creative Writing Basics",
     "Figurative Language",
     "Essay Structure",
+  ],
+  "Computer Science": [
+    "What Is a Computer?",
+    "Introduction to Coding",
+    "How the Internet Works",
+    "Data and Binary",
+    "Algorithms and Logic",
   ],
   "General Knowledge": [
     "World Geography",
