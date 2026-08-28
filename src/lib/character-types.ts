@@ -32,7 +32,7 @@ export const CHARACTER_TYPES: Record<CharacterType, CharacterTypeDef> = {
   dragon: {
     id: "dragon",
     name: "Wise Old Dragon",
-    description: "A scholarly dragon with glasses and a quill, keeper of ancient knowledge",
+    description: "A scholarly green dragon with glasses, reading books and keeping ancient knowledge",
     themeColor: "#4a9e7a",
     images: {
       idle: "/characters/dragon-idle.png",
@@ -51,7 +51,7 @@ export const CHARACTER_TYPES: Record<CharacterType, CharacterTypeDef> = {
   fairy: {
     id: "fairy",
     name: "Enchanted Fairy",
-    description: "A curious fairy with iridescent wings, master of potions and experiments",
+    description: "A curious fairy with iridescent wings and a magical globe, explorer of realms",
     themeColor: "#7c5cbf",
     images: {
       idle: "/characters/fairy-idle.png",
@@ -70,7 +70,7 @@ export const CHARACTER_TYPES: Record<CharacterType, CharacterTypeDef> = {
   knight: {
     id: "knight",
     name: "Quest Knight",
-    description: "A brave adventurer with mechanical armor, explorer of distant realms",
+    description: "A brave adventurer with a mechanical arm, mapping distant realms at his computer",
     themeColor: "#6b8fa3",
     images: {
       idle: "/characters/knight-idle.png",
@@ -89,7 +89,7 @@ export const CHARACTER_TYPES: Record<CharacterType, CharacterTypeDef> = {
   owl: {
     id: "owl",
     name: "Starlight Owl",
-    description: "A crowned owl with constellation markings, guardian of wisdom",
+    description: "A crowned owl with glowing constellation markings, surrounded by magical mushrooms",
     themeColor: "#c4883a",
     images: {
       idle: "/characters/owl-idle.png",
@@ -108,7 +108,7 @@ export const CHARACTER_TYPES: Record<CharacterType, CharacterTypeDef> = {
   griffin: {
     id: "griffin",
     name: "Royal Griffin",
-    description: "A playful baby griffin with a crown, full of mischief and wonder",
+    description: "A playful furry griffin-cat with a crown, sitting on a mossy stump in the forest",
     themeColor: "#9e8c7a",
     images: {
       idle: "/characters/griffin-idle.png",
