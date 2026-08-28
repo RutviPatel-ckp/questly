@@ -49,6 +49,7 @@ const schema = defineSchema(
       achievements: v.optional(v.array(v.string())),
       voiceTone: v.optional(v.string()),
       pitchPreference: v.optional(v.string()),
+      characterType: v.optional(v.string()),
       currentPart: v.optional(v.number()),
       totalPartsCompleted: v.optional(v.number()),
     }).index("by_user", ["userId"]),

@@ -208,7 +208,7 @@ export default function Lesson() {
             <ArrowLeft className="h-4 w-4" /> Kingdom
           </button>
           <div className="clay-card flex items-center gap-2 rounded-2xl px-3.5 py-1.5">
-            <MascotCharacter color={themeColor} size={24} />
+            <MascotCharacter color={themeColor} size={24} characterType={character?.characterType} />
             <span className="text-sm font-medium text-foreground">{character.name}</span>
           </div>
         </div>
@@ -240,7 +240,7 @@ export default function Lesson() {
         <div className="mb-8 flex flex-col items-center">
           <div className={`mascot-glow clay-card-lg flex items-center justify-center rounded-full p-1.5 ${isTalking ? "is-talking" : ""}`}
             style={{ backgroundColor: `${themeColor}15`, ["--mascot-glow-color" as string]: `${themeColor}30` }}>
-            <MascotCharacter color={themeColor} size={200} reaction={mascotReaction || (isTalking ? "talking" : "idle")} accessories={character?.accessories} />
+            <MascotCharacter color={themeColor} size={200} reaction={mascotReaction || (isTalking ? "talking" : "idle")} accessories={character?.accessories} characterType={character?.characterType} />
           </div>
           <motion.p key={isTalking ? "talking" : phase} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="mt-4 text-center text-sm text-muted-foreground">
             {isTalking ? `${character.name} is teaching while you listen...`

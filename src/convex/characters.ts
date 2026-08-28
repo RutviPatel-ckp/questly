@@ -29,6 +29,7 @@ export const saveCharacter = mutation({
     name: v.string(),
     description: v.string(),
     colorTheme: v.string(),
+    characterType: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -44,6 +45,7 @@ export const saveCharacter = mutation({
         name: args.name,
         description: args.description,
         colorTheme: args.colorTheme,
+        ...(args.characterType ? { characterType: args.characterType } : {}),
       });
       return existing._id;
     }
@@ -53,6 +55,7 @@ export const saveCharacter = mutation({
       name: args.name,
       description: args.description,
       colorTheme: args.colorTheme,
+      ...(args.characterType ? { characterType: args.characterType } : {}),
     });
   },
 });

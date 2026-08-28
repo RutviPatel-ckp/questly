@@ -286,7 +286,7 @@ export default function Chat() {
           </button>
           <div className="h-4 w-px bg-white/10" />
           {character && (
-            <MascotCharacter color="#94a3b8" size={32} isTalking={isGenerating} />
+            <MascotCharacter color="#94a3b8" size={32} isTalking={isGenerating} characterType="dragon" />
           )}
           <div>
             <p className="text-sm font-semibold text-foreground">
