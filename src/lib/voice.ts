@@ -1,9 +1,12 @@
 /**
  * Voice settings utility for character-personalized speech synthesis.
  *
- * Maps voice tone + pitch preference → speechSynthesis settings (rate, pitch, voice).
- * All characters sound like themselves, consistently across lesson narration,
- * study buddy chat, and celebratory reactions.
+ * Each character type has a distinct voice personality:
+ * - Dragon: old man voice (slow, deep, wise)
+ * - Fairy: young boy voice (slightly higher, playful)
+ * - Knight: adult male voice (normal, confident)
+ * - Owl: cartoon soft voice (gentle, slightly high)
+ * - Griffin: cartoon soft voice (playful, medium)
  */
 
 export type VoiceTone = "energetic" | "calm" | "silly" | "wise" | "sassy";
@@ -16,14 +19,30 @@ export interface VoiceSettings {
 }
 
 /**
- * Tone → speech parameter ranges.
- * Each tone defines a rate and pitch that characterizes the voice personality.
+ * Character-type-specific voice parameters.
+ * These override the generic tone system for consistent character voices.
+ */
+const CHARACTER_VOICE_PARAMS: Record<string, { rate: number; pitch: number }> = {
+  // Dragon — old man: slow, deep, wise
+  dragon: { rate: 0.82, pitch: 0.7 },
+  // Fairy — young boy: slightly faster, higher pitch, playful
+  fairy: { rate: 1.08, pitch: 1.35 },
+  // Knight — adult male: normal rate, lower pitch, confident
+  knight: { rate: 0.95, pitch: 0.85 },
+  // Owl — cartoon soft: gentle, slightly elevated pitch
+  owl: { rate: 0.9, pitch: 1.15 },
+  // Griffin — cartoon playful: medium rate, medium-high pitch
+  griffin: { rate: 1.0, pitch: 1.2 },
+};
+
+/**
+ * Tone → speech parameter ranges (fallback when character type is unknown).
  */
 const TONE_PARAMS: Record<VoiceTone, { rate: number; pitch: number }> = {
-  energetic: { rate: 1.15, pitch: 1.15 },
-  calm:      { rate: 0.88, pitch: 1.0 },
+  energetic: { rate: 1.1, pitch: 1.1 },
+  calm:      { rate: 0.88, pitch: 0.95 },
   silly:     { rate: 1.08, pitch: 1.3 },
-  wise:      { rate: 0.85, pitch: 0.85 },
+  wise:      { rate: 0.82, pitch: 0.75 },
   sassy:     { rate: 1.0,  pitch: 1.1 },
 };
 
@@ -34,7 +53,7 @@ const HIGHER_KEYWORDS = [
   "girl", "woman", "she", "her", "princess", "fairy", "bunny", "kitten",
   "puppy", "bird", "star", "sparkle", "glitter", "cute", "tiny", "little",
   "baby", "young", "child", "kid", "robot", "alien", "pixie", "sprite",
-  "pencil", "eraser", "mango", "berry", "flower", "butterfly", "unicorn",
+  "mango", "berry", "flower", "butterfly", "unicorn",
 ];
 
 /**
@@ -48,29 +67,50 @@ const LOWER_KEYWORDS = [
 ];
 
 /**
- * Voice name patterns that suggest a higher-pitched voice.
+ * Voice name patterns for selecting male voices (for knight, dragon).
  */
-const HIGH_VOICE_PATTERNS = [
-  /female/i, /samantha/i, /victoria/i, /zira/i, /hazel/i,
-  /karen/i, /moira/i, /tessa/i, /fiona/i, /google.*female/i,
-  /google.*uk.*female/i, /google.*us.*female/i,
-  /alice/i, /paulina/i, /monica/i, /pilar/i, /melina/i,
-];
-
-/**
- * Voice name patterns that suggest a lower-pitched voice.
- */
-const LOW_VOICE_PATTERNS = [
-  /male/i, /daniel/i, /david/i, /james/i, /mark/i,
+const MALE_VOICE_PATTERNS = [
+  /male/i, /daniel/i, /david/i, /james/i, /mark/i, /thomas/i, /george/i,
   /google.*male/i, /google.*uk.*male/i, /google.*us.*male/i,
-  /thomas/i, /george/i, /diego/i, /carlos/i, /nicolas/i,
-  /matthew/i, /alex/i,
+  /diego/i, /carlos/i, /nicolas/i, /matthew/i, /alex/i,
 ];
 
 /**
- * Detect pitch preference from a character description using keyword matching.
- * Used as a fallback when the Groq analysis isn't available.
+ * Voice name patterns for selecting young/boy voices (for fairy).
  */
+const BOY_VOICE_PATTERNS = [
+  /boy/i, /child/i, /young/i, /kid/i,
+  /google.*us.*female/i, /google.*uk.*female/i,
+  /samantha/i, /zira/i, /hazel/i,
+];
+
+/**
+ * Voice name patterns for cartoon/soft voices (for owl, griffin).
+ */
+const CARTOON_VOICE_PATTERNS = [
+  /google.*female/i, /google.*us.*female/i, /google.*uk.*female/i,
+  /samantha/i, /zira/i, /hazel/i, /karen/i,
+];
+
+/**
+ * Voice name patterns for old/deep voices (for dragon).
+ */
+const OLD_VOICE_PATTERNS = [
+  /male/i, /daniel/i, /david/i, /james/i, /thomas/i,
+  /google.*male/i, /google.*uk.*male/i,
+  /matthew/i,
+];
+
+/**
+ * Voice name patterns for male adult voices (for knight).
+ */
+const MALE_ADULT_PATTERNS = [
+  /male/i, /daniel/i, /david/i, /james/i, /mark/i, /thomas/i,
+  /google.*male/i, /google.*uk.*male/i, /google.*us.*male/i,
+  /diego/i, /matthew/i, /alex/i,
+];
+
+/** Detect pitch preference from description (fallback). */
 export function detectPitchFromDescription(description: string): PitchPreference {
   const lower = description.toLowerCase();
   const highScore = HIGHER_KEYWORDS.filter((kw) => lower.includes(kw)).length;
@@ -78,86 +118,101 @@ export function detectPitchFromDescription(description: string): PitchPreference
   return lowScore > highScore ? "lower" : "higher";
 }
 
-/**
- * Detect voice tone from a character description using keyword matching.
- * Fallback when Groq analysis isn't available.
- */
+/** Detect voice tone from description (fallback). */
 export function detectToneFromDescription(description: string): VoiceTone {
   const lower = description.toLowerCase();
-
-  if (/silly|funny|goofy|wacky|crazy|joke|laugh|comedy|humor|clown/i.test(lower)) {
-    return "silly";
-  }
-  if (/wise|old|ancient|sage|scholar|professor|teacher|learned|philosoph/i.test(lower)) {
-    return "wise";
-  }
-  if (/calm|gentle|peace|quiet|shy|soft|sleepy|zen|meditat|relax|serene/i.test(lower)) {
-    return "calm";
-  }
-  if (/sassy|bold|fierce|confident|witty|sass|attitude|boss|queen|diva|spicy/i.test(lower)) {
-    return "sassy";
-  }
-  // Default: energetic
+  if (/silly|funny|goofy|wacky|crazy|joke|laugh|comedy|humor|clown/i.test(lower)) return "silly";
+  if (/wise|old|ancient|sage|scholar|professor|teacher|learned|philosoph/i.test(lower)) return "wise";
+  if (/calm|gentle|peace|quiet|shy|soft|sleepy|zen|meditat|relax|serene/i.test(lower)) return "calm";
+  if (/sassy|bold|fierce|confident|witty|sass|attitude|boss|queen|diva|spicy/i.test(lower)) return "sassy";
   return "energetic";
 }
 
 /**
- * Select the best available system voice matching the pitch preference.
- * Prefers English voices, with a sensible fallback to whatever is available.
+ * Select the best available system voice for a character type.
  */
-function selectVoice(pitchPref: PitchPreference): SpeechSynthesisVoice | null {
+function selectVoiceForCharacterType(characterType: string | undefined): SpeechSynthesisVoice | null {
   if (typeof window === "undefined" || !window.speechSynthesis) return null;
 
   const voices = window.speechSynthesis.getVoices();
   if (voices.length === 0) return null;
 
-  // Filter to English voices first
   const englishVoices = voices.filter((v) => v.lang.startsWith("en"));
   const pool = englishVoices.length > 0 ? englishVoices : voices;
 
-  // Patterns to match for this pitch preference
-  const patterns = pitchPref === "higher" ? HIGH_VOICE_PATTERNS : LOW_VOICE_PATTERNS;
+  let patterns: RegExp[] = [];
 
-  // Try to find a voice matching the preferred pitch
+  switch (characterType) {
+    case "dragon":
+      patterns = OLD_VOICE_PATTERNS;
+      break;
+    case "fairy":
+      patterns = BOY_VOICE_PATTERNS;
+      break;
+    case "knight":
+      patterns = MALE_ADULT_PATTERNS;
+      break;
+    case "owl":
+    case "griffin":
+      patterns = CARTOON_VOICE_PATTERNS;
+      break;
+    default:
+      patterns = MALE_VOICE_PATTERNS;
+      break;
+  }
+
+  // Try to find a voice matching the character type
   for (const pattern of patterns) {
     const match = pool.find((v) => pattern.test(v.name));
     if (match) return match;
   }
 
-  // Fallback: prefer Google voices (they tend to be clearer)
+  // Fallback: prefer Google voices
   const googleVoice = pool.find((v) => /google/i.test(v.name));
   if (googleVoice) return googleVoice;
 
-  // Final fallback: first English voice, or first voice overall
   return pool[0] || null;
 }
 
 /**
  * Get complete voice settings for a character.
- * Combines tone-based parameters with pitch-matched voice selection.
+ * Uses character-type-specific parameters for consistent voice personality.
  *
- * @param voiceTone - The character's tone category (from Groq analysis or detection)
- * @param pitchPreference - "higher" or "lower" (from Groq analysis or detection)
- * @param description - The character's raw description (used as fallback for detection)
+ * @param voiceTone - The character's tone category (from Groq analysis)
+ * @param pitchPreference - "higher" or "lower" (from Groq analysis)
+ * @param description - The character's raw description (fallback)
+ * @param characterType - The character type ID ("dragon", "fairy", etc.)
  * @returns VoiceSettings with rate, pitch, and selected voice
  */
 export function getCharacterVoiceSettings(
   voiceTone: string | undefined,
   pitchPreference: string | undefined,
-  description: string
+  description: string,
+  characterType?: string | null,
 ): VoiceSettings {
-  // Determine tone (use stored, or detect from description)
+  // Use character-type-specific params if available
+  const charParams = characterType ? CHARACTER_VOICE_PARAMS[characterType] : null;
+
+  if (charParams) {
+    const voice = selectVoiceForCharacterType(characterType ?? undefined);
+    return {
+      rate: charParams.rate,
+      pitch: charParams.pitch,
+      voice,
+    };
+  }
+
+  // Fallback to generic tone system
   const tone: VoiceTone = voiceTone && voiceTone in TONE_PARAMS
     ? (voiceTone as VoiceTone)
     : detectToneFromDescription(description);
 
-  // Determine pitch preference (use stored, or detect from description)
   const pitch: PitchPreference = pitchPreference === "higher" || pitchPreference === "lower"
     ? pitchPreference
     : detectPitchFromDescription(description);
 
   const params = TONE_PARAMS[tone];
-  const voice = selectVoice(pitch);
+  const voice = selectVoiceForCharacterType(undefined);
 
   return {
     rate: params.rate,
@@ -168,7 +223,6 @@ export function getCharacterVoiceSettings(
 
 /**
  * Apply voice settings to a SpeechSynthesisUtterance.
- * Call this after creating the utterance and before speaking.
  */
 export function applyVoiceToUtterance(
   utterance: SpeechSynthesisUtterance,

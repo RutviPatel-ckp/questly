@@ -202,7 +202,34 @@ export const generateLesson = action({
         ? `This is ${args.partTitle} (Part ${args.part} of ${args.totalParts} on this topic). Focus ONLY on this specific sub-topic. Do NOT cover content from other parts — the student will learn those in separate lessons.`
         : "";
 
-    const prompt = `You are ${args.companionName}, a ${args.companionDescription}. Teach a ${args.grade}-level student a fun, engaging lesson about "${args.topic}" in ${args.subject}. ${scopeNote} ${regionNote} Keep your personality consistent and playful throughout. Break the lesson into short, punchy paragraphs, not a lecture. End with one simple question in your character's voice to check understanding. Do NOT use markdown formatting. Write in plain text with natural paragraph breaks. Keep the lesson focused and concise — about 200-300 words.`;
+    const prompt = `You are ${args.companionName}, a ${args.companionDescription}. Teach a ${args.grade}-level student a fun, engaging lesson about "${args.topic}" in ${args.subject}. ${scopeNote} ${regionNote} Keep your personality consistent and playful throughout. Break the lesson into short, punchy paragraphs, not a lecture. Do NOT use markdown formatting. Write in plain text with natural paragraph breaks. Keep the lesson focused and concise — about 200-300 words.
+
+IMPORTANT: After the lesson text, add exactly 3 multiple-choice quiz questions about the specific content you just taught. Format them like this:
+
+---
+---
+Q1: [question]
+A) [option]
+B) [option]
+C) [option]
+D) [option]
+Correct: [A/B/C/D]
+
+Q2: [question]
+A) [option]
+B) [option]
+C) [option]
+D) [option]
+Correct: [A/B/C/D]
+
+Q3: [question]
+A) [option]
+B) [option]
+C) [option]
+D) [option]
+Correct: [A/B/C/D]
+
+The questions MUST be directly based on facts, examples, or concepts from the lesson you just wrote. They should test whether the student was paying attention to the specific content.`;
 
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {

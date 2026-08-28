@@ -19,7 +19,6 @@ import {
   ArrowLeft,
   Loader2,
   RefreshCw,
-  AlertTriangle,
   RotateCcw,
   CheckCircle2,
   ChevronRight,
@@ -31,7 +30,7 @@ import MascotCharacter from "@/components/MascotCharacter";
 import type { MascotReaction } from "@/components/MascotCharacter";
 import Confetti from "@/components/Confetti";
 import { playCheer, playPop, playCorrect, playIncorrect } from "@/lib/sounds";
-import { FALLBACK_LESSONS, PARTS_PER_TOPIC, getPartTitle, getInlineTestQuestions } from "@/lib/onboarding-data";
+import { FALLBACK_LESSONS, PARTS_PER_TOPIC, getPartTitle, getInlineTestQuestions, type InlineTestQuestion } from "@/lib/onboarding-data";
 import { getCharacterVoiceSettings, applyVoiceToUtterance } from "@/lib/voice";
 import FloatingShapes from "@/components/FloatingShapes";
 
@@ -47,6 +46,39 @@ const COLOR_THEMES: Record<string, string> = {
 };
 
 type LessonPhase = "loading" | "ready" | "error" | "finished" | "test";
+
+/** Parse Groq-generated quiz questions from text response */
+function parseGeneratedQuestions(text: string): InlineTestQuestion[] {
+  const questions: InlineTestQuestion[] = [];
+  const qBlocks = text.split(/Q\d+:/i).filter((b) => b.trim());
+  for (const block of qBlocks) {
+    const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
+    if (lines.length < 6) continue;
+    const question = lines[0].replace(/^[.:\s]+/, "");
+    const options: string[] = [];
+    let correctIndex = 0;
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      const optionMatch = line.match(/^[A-D][).]\s*(.+)/i);
+      if (optionMatch) {
+        options.push(optionMatch[1].trim());
+        continue;
+      }
+      const correctMatch = line.match(/^Correct:\s*([A-D])/i);
+      if (correctMatch) {
+        correctIndex = "ABCD".indexOf(correctMatch[1].toUpperCase());
+      }
+    }
+    if (question && options.length === 4 && correctIndex >= 0) {
+      questions.push({
+        question,
+        options: options as [string, string, string, string],
+        correctIndex,
+      });
+    }
+  }
+  return questions;
+}
 
 export default function Lesson() {
   const navigate = useNavigate();
@@ -69,6 +101,7 @@ export default function Lesson() {
   const [coinsEarned, setCoinsEarned] = useState(0);
   const [starsFromCoins, setStarsFromCoins] = useState(0);
 
+  const [generatedQuestions, setGeneratedQuestions] = useState<InlineTestQuestion[]>([]);
   const [testAnswers, setTestAnswers] = useState<(number | null)[]>([]);
   const [testSubmitted, setTestSubmitted] = useState(false);
 
@@ -83,7 +116,10 @@ export default function Lesson() {
   const currentPart = character?.currentPart || 1;
   const totalParts = PARTS_PER_TOPIC;
   const partTitle = useMemo(() => character ? getPartTitle(character.subject || "", character.topic || "", currentPart) : "", [character, currentPart]);
-  const testQuestions = useMemo(() => character ? getInlineTestQuestions(character.topic || "", currentPart) : [], [character, currentPart]);
+  const testQuestions = useMemo(() => {
+    if (generatedQuestions.length > 0) return generatedQuestions;
+    return character ? getInlineTestQuestions(character.topic || "", currentPart) : [];
+  }, [generatedQuestions, character, currentPart]);
   const testCorrectCount = useMemo(() => {
     if (!testSubmitted) return 0;
     let c = 0;
@@ -112,7 +148,17 @@ export default function Lesson() {
         topic: character.topic, part: currentPart, totalParts, partTitle,
         companionName: character.name, companionDescription: character.description,
       });
-      setLessonText(result.content);
+      // Parse lesson text and quiz questions from the response
+      const raw = result.content;
+      const sepIdx = raw.lastIndexOf("---");
+      if (sepIdx > 100) {
+        setLessonText(raw.substring(0, sepIdx).trim());
+        const parsed = parseGeneratedQuestions(raw.substring(sepIdx + 3).trim());
+        setGeneratedQuestions(parsed.length > 0 ? parsed : []);
+      } else {
+        setLessonText(raw);
+        setGeneratedQuestions([]);
+      }
       setPhase("ready");
       setShowConfetti(true);
       setMascotReaction("happy");
@@ -122,8 +168,9 @@ export default function Lesson() {
       const fallback = FALLBACK_LESSONS[character.subject] || FALLBACK_LESSONS["General Knowledge"];
       setLessonText(fallback);
       setIsUsingFallback(true);
-      setPhase("error");
-      setErrorMessage(error instanceof Error && error.message === "TIMEOUT" ? "Timed out — showing a standard lesson" : "Couldn't generate a personalized lesson");
+      setPhase("ready");
+      setErrorMessage("");
+      setGeneratedQuestions([]);
     }
   }, [character, generateLesson, currentPart, totalParts, partTitle]);
 
@@ -147,7 +194,7 @@ export default function Lesson() {
     }
     setProgress(0); window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    applyVoiceToUtterance(utterance, getCharacterVoiceSettings(character?.voiceTone, character?.pitchPreference, character?.description || ""));
+    applyVoiceToUtterance(utterance, getCharacterVoiceSettings(character?.voiceTone, character?.pitchPreference, character?.description || "", character?.characterType));
     utterance.onend = () => { setIsPlaying(false); setIsTalking(false); setProgress(100); setPhase("finished"); if (progressIntervalRef.current) { clearInterval(progressIntervalRef.current); progressIntervalRef.current = null; } };
     utterance.onerror = () => { setIsPlaying(false); setIsTalking(false); setProgress(0); if (progressIntervalRef.current) { clearInterval(progressIntervalRef.current); progressIntervalRef.current = null; } };
     window.speechSynthesis.speak(utterance);
@@ -245,7 +292,7 @@ export default function Lesson() {
           <motion.p key={isTalking ? "talking" : phase} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="mt-4 text-center text-sm text-muted-foreground">
             {isTalking ? `${character.name} is teaching while you listen...`
               : phase === "loading" ? `${character.name} is preparing your quest...`
-              : phase === "error" ? `${character.name} had a hiccup, but has a backup ready!`
+              : phase === "error" ? `${character.name} is ready to teach!`
               : phase === "finished" ? `${character.name} completed the lesson! What's next? 🎉`
               : phase === "test" ? (testSubmitted ? (testPassed ? `${character.name} is so proud of you! 🌟` : `${character.name} says: "No worries, let's try again!" 💪`) : `Quick check — how well did you listen? 🤔`)
               : `${character.name} is ready to teach!`}
@@ -267,27 +314,6 @@ export default function Lesson() {
           )}
 
           {/* Error */}
-          {phase === "error" && (
-            <motion.div key="error" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-              <Card className="clay-card-lg border-0"><CardContent className="p-6 space-y-4">
-                <div className="clay-card rounded-2xl p-4 flex items-start gap-3">
-                  <AlertTriangle className="h-5 w-5 text-amber-400 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">{isUsingFallback ? "Oops! The personal touch hit a snag" : "Something went sideways"}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{errorMessage || "No worries — we've got a backup quest ready for you."}</p>
-                  </div>
-                </div>
-                <div className="clay-input rounded-2xl p-5"><p className="whitespace-pre-line text-sm leading-relaxed text-foreground/80">{lessonText}</p></div>
-                <div className="flex items-center justify-center gap-4">
-                  <Button onClick={stopSpeaking} disabled={!isPlaying} variant="outline" size="icon" className="clay-btn h-12 w-12 rounded-2xl border-amber-200/30 bg-amber-50/40"><Square className="h-5 w-5" /></Button>
-                  <Button onClick={togglePlayPause} className="clay-glow flex h-16 w-16 items-center justify-center rounded-full p-0" style={{ backgroundColor: themeColor }}>
-                    {isPlaying && !isPaused ? <Pause className="h-6 w-6 text-white" /> : <Play className="ml-1 h-6 w-6 text-white" />}
-                  </Button>
-                  <Button onClick={() => loadLesson()} variant="outline" size="icon" className="clay-btn h-12 w-12 rounded-2xl border-amber-200/30 bg-amber-50/40" title="Regenerate"><RefreshCw className="h-5 w-5" /></Button>
-                </div>
-              </CardContent></Card>
-            </motion.div>
-          )}
 
           {/* Lesson ready / playing / finished */}
           {(phase === "ready" || phase === "finished") && lessonText && (
