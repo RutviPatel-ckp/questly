@@ -52,6 +52,7 @@ const schema = defineSchema(
       characterType: v.optional(v.string()),
       currentPart: v.optional(v.number()),
       totalPartsCompleted: v.optional(v.number()),
+      companionUserId: v.optional(v.string()),
     }).index("by_user", ["userId"]),
 
     quizRooms: defineTable({

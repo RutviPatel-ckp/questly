@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Crown,
@@ -22,6 +23,7 @@ import {
   Sparkles,
   Shield,
   BrainCircuit,
+  Users,
 } from "lucide-react";
 import {
   ACHIEVEMENTS,
@@ -84,7 +86,22 @@ export default function Dashboard() {
   const [notifSupported, setNotifSupported] = useState(false);
   const [showStreakBanner, setShowStreakBanner] = useState(false);
   const [notifLoading, setNotifLoading] = useState(false);
-  const [rootModal, setRootModal] = useState<null | "quest" | "king" | "battle">(null);
+  const [rootModal, setRootModal] = useState<null | "quest" | "king" | "battle" | "companion">(null);
+  const [companionSearch, setCompanionSearch] = useState("");
+  const [companionResults, setCompanionResults] = useState<Array<{ userId: string; name: string; description: string; characterType: string | undefined; totalStars: number }>>([]);
+  const searchCompanionQuery = useQuery(
+    api.companions.searchCompanion,
+    companionSearch.length >= 2 ? { query: companionSearch } : "skip"
+  );
+  const setCompanion = useMutation(api.companions.setCompanion);
+  const removeCompanion = useMutation(api.companions.removeCompanion);
+  const companionData = useQuery(api.companions.getCompanion);
+
+  useEffect(() => {
+    if (searchCompanionQuery) {
+      setCompanionResults(searchCompanionQuery);
+    }
+  }, [searchCompanionQuery]);
 
   const companionMsg = useMemo(() => {
     const idx = Math.floor(Math.random() * COMPANION_MESSAGES.length);
@@ -557,6 +574,78 @@ export default function Dashboard() {
           </div>
         </motion.div>
 
+        {/* === COMPANION SEARCH === */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mt-6"
+        >
+          <div className="clay-card-lg rounded-2xl border-0 p-5"
+            style={{ background: "linear-gradient(180deg, oklch(0.96 0.015 85 / 0.95), oklch(0.94 0.03 280 / 0.4))" }}>
+            <p className="section-label mb-3 text-center">🤝 Battle Companions</p>
+
+            {/* Show current companion if set */}
+            {companionData && (
+              <div className="clay-card rounded-2xl p-3 mb-3 flex items-center gap-3">
+                <MascotCharacter characterType={companionData.characterType} size={40} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-amber-900 truncate">{companionData.name}</p>
+                  <p className="text-[10px] text-amber-700/50">{companionData.totalStars}⭐ · Battle Partner</p>
+                </div>
+                <button
+                  onClick={() => removeCompanion()}
+                  className="text-[10px] text-amber-600/50 hover:text-amber-600 transition-colors"
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+
+            {/* Search input */}
+            <div className="flex gap-2 mb-3">
+              <Input
+                value={companionSearch}
+                onChange={(e) => setCompanionSearch(e.target.value)}
+                placeholder="Search by name to find a companion..."
+                className="clay-input flex-1 rounded-2xl text-sm"
+              />
+            </div>
+
+            {/* Search results */}
+            {companionResults.length > 0 && (
+              <div className="space-y-2">
+                {companionResults.map((r) => (
+                  <button
+                    key={r.userId}
+                    onClick={() => {
+                      setCompanion({ companionUserId: r.userId });
+                      setCompanionSearch("");
+                      setCompanionResults([]);
+                    }}
+                    className="clay-card w-full flex items-center gap-3 rounded-2xl p-3 text-left hover:bg-amber-50/60 transition-all"
+                  >
+                    <MascotCharacter characterType={r.characterType} size={32} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-amber-900 truncate">{r.name}</p>
+                      <p className="text-[10px] text-amber-700/50 truncate">{r.description}</p>
+                    </div>
+                    <span className="text-[10px] text-amber-600/50">{r.totalStars}⭐</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {companionSearch.length >= 2 && companionResults.length === 0 && (
+              <p className="text-center text-[10px] text-amber-700/40 py-2">No adventurers found matching that name...</p>
+            )}
+
+            {!companionData && companionSearch.length < 2 && (
+              <p className="text-center text-[10px] text-amber-700/40">Find a friend to be your battle companion! Type their name above.</p>
+            )}
+          </div>
+        </motion.div>
+
         <p className="mt-8 text-center text-[10px] text-amber-700/30">
           Questly v1 · Every lesson is a quest ⚔️
         </p>
@@ -631,6 +720,7 @@ export default function Dashboard() {
                   {rootModal === "quest" && <><Sparkles className="mr-2 h-4 w-4" />Begin Quest</>}
                   {rootModal === "king" && <><Shield className="mr-2 h-4 w-4" />Enter the Throne Room</>}
                   {rootModal === "battle" && <><Swords className="mr-2 h-4 w-4" />Enter the Arena</>}
+                {rootModal === "companion" && <><Users className="mr-2 h-4 w-4" />Find Companion</>}
                 </Button>
                 <Button
                   onClick={() => setRootModal(null)}

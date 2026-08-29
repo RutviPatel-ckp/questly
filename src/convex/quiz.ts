@@ -173,6 +173,67 @@ export const submitAnswer = mutation({
 });
 
 // ============================================================================
+// BOT BATTLE
+// ============================================================================
+
+/**
+ * Create a bot battle room — instantly active with a simulated opponent.
+ */
+export const createBotRoom = mutation({
+  args: {
+    questionIds: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const character = await ctx.db
+      .query("characters")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+
+    const code = generateRoomCode();
+
+    // Pre-generate bot answers (65% accuracy)
+    const { QUIZ_QUESTIONS } = await import("../lib/quiz-data");
+    const botAnswers: number[] = [];
+    let botScore = 0;
+    for (const qid of args.questionIds) {
+      const q = QUIZ_QUESTIONS.find((q) => q.id === qid);
+      if (q && Math.random() < 0.65) {
+        botAnswers.push(q.correctIndex);
+        botScore++;
+      } else {
+        const wrongOptions = [0, 1, 2, 3].filter(
+          (i) => i !== (q?.correctIndex ?? 0)
+        );
+        botAnswers.push(
+          wrongOptions[Math.floor(Math.random() * wrongOptions.length)]
+        );
+      }
+    }
+
+    await ctx.db.insert("quizRooms", {
+      roomCode: code,
+      hostUserId: userId,
+      hostName: character?.name || "Player 1",
+      guestUserId: "bot",
+      guestName: "\ud83e\udd16 Training Bot",
+      status: "active",
+      currentQuestion: 0,
+      hostAnswers: [],
+      guestAnswers: botAnswers,
+      hostScore: 0,
+      guestScore: botScore,
+      questions: args.questionIds,
+      createdAt: Date.now(),
+    });
+
+    return code;
+  },
+});
+
+// ============================================================================
 // STREAK & STARS
 // ============================================================================
 

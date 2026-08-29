@@ -68,6 +68,8 @@ export default function Quiz() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
   const [countdown, setCountdown] = useState(3);
+  const [starAwarded, setStarAwarded] = useState(false);
+  const [isBotRoom, setIsBotRoom] = useState(false);
 
   const themeColor = character
     ? COLOR_THEMES[character.colorTheme] || "#fbbf24"
@@ -122,6 +124,23 @@ export default function Quiz() {
       setIsHost(true);
     } catch (e) {
       console.error("Failed to create room:", e);
+    }
+  };
+
+  const createBotRoom = useMutation(api.quiz.createBotRoom);
+
+  const handleStartBotBattle = async () => {
+    const q = pickQuestions(QUESTIONS_PER_QUIZ);
+    try {
+      const code = await createBotRoom({ questionIds: q.map((q) => q.id) });
+      setRoomCode(code);
+      setIsHost(true);
+      setIsBotRoom(true);
+      // Bot rooms start immediately, skip waiting phase
+      setPhase("countdown");
+      setCountdown(3);
+    } catch (e) {
+      console.error("Failed to create bot room:", e);
     }
   };
 
@@ -187,6 +206,12 @@ export default function Quiz() {
       setMascotReaction("happy");
       playFanfare();
       setTimeout(() => setMascotReaction("idle"), 3000);
+      // Award star for winning
+      if (iWon && !starAwarded) {
+        setStarAwarded(true);
+        addStars({ amount: 1 }).catch(() => {});
+        awardAchievement({ achievementId: "beat_a_friend" }).catch(() => {});
+      }
     }
   }, [phase]);
 
@@ -276,12 +301,33 @@ export default function Quiz() {
                     <p className="text-xs text-muted-foreground mb-4">
                       Generate a battle code and share it with your opponent.
                     </p>
+                  <Button
+                    onClick={handleCreateRoom}
+                    className="clay-primary w-full rounded-2xl py-2.5 font-semibold"
+                  >
+                    Create Battle Room
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="clay-card-lg border-0">
+                  <CardHeader>
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <span className="text-lg">\ud83e\udd16</span>
+                      Train with Bot
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xs text-muted-foreground mb-4">
+                      Practice against a training bot to sharpen your skills!
+                    </p>
                     <Button
-                      onClick={handleCreateRoom}
+                      onClick={handleStartBotBattle}
                       className="clay-primary w-full rounded-2xl py-2.5 font-semibold"
                     >
-                      Create Battle Room
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                      Start Bot Battle
+                      <Zap className="ml-2 h-4 w-4" />
                     </Button>
                   </CardContent>
                 </Card>
@@ -289,7 +335,7 @@ export default function Quiz() {
                 <Card className="clay-card-lg border-0">
                   <CardHeader>
                     <CardTitle className="text-sm flex items-center gap-2">
-                      <Zap className="h-4 w-4 text-amber-400" />
+                      <Users className="h-4 w-4 text-amber-400" />
                       Accept a Challenge
                     </CardTitle>
                   </CardHeader>
