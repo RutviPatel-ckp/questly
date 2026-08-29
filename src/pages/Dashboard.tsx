@@ -143,7 +143,7 @@ export default function Dashboard() {
     return progress;
   }, [totalLessonsCompleted]);
 
-  const ringProgress = Math.min(100, (totalStars / 30) * 100);
+  const ringProgress = Math.min(100, (coins / 3) * 100);
 
   // Current arena tier
   const currentArena = ARENA_TIERS.reduce((best, tier) =>
@@ -269,6 +269,9 @@ export default function Dashboard() {
                   {/* Power Ring */}
                   <div className="flex flex-col items-center">
                     <PowerRing progress={ringProgress} size={180} subjectProgress={subjectProgress} />
+                    <p className="mt-1 text-[11px] font-bold text-amber-800 text-center">
+                      {coins} 🪙 collected
+                    </p>
                     <p className="mt-2 text-[11px] text-amber-700/60 text-center">
                       {currentArena.icon} {currentArena.name}
                     </p>

@@ -194,7 +194,7 @@ export default function PowerRing({
           fontSize={size * 0.05}
           fontFamily="system-ui"
         >
-          Ring Power
+          Coins to Star
         </text>
       </svg>
     </div>
