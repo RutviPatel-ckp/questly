@@ -32,18 +32,8 @@ import Confetti from "@/components/Confetti";
 import { playCheer, playPop, playCorrect, playIncorrect } from "@/lib/sounds";
 import { FALLBACK_LESSONS, PARTS_PER_TOPIC, getPartTitle, getInlineTestQuestions, type InlineTestQuestion } from "@/lib/onboarding-data";
 import { getCharacterVoiceSettings, applyVoiceToUtterance } from "@/lib/voice";
+import { getCharacterType } from "@/lib/character-types";
 import FloatingShapes from "@/components/FloatingShapes";
-
-const COLOR_THEMES: Record<string, string> = {
-  Sunset: "#fb923c",
-  Ocean: "#38bdf8",
-  Forest: "#34d399",
-  Lavender: "#c084fc",
-  Berry: "#f472b6",
-  Honey: "#fbbf24",
-  Mint: "#2dd4bf",
-  Coral: "#fb7185",
-};
 
 type LessonPhase = "loading" | "ready" | "error" | "finished" | "test";
 
@@ -54,7 +44,7 @@ function parseGeneratedQuestions(text: string): InlineTestQuestion[] {
   for (const block of qBlocks) {
     const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
     if (lines.length < 6) continue;
-    const question = lines[0].replace(/^[.:\s]+/, "");
+    const question = lines[0].replace(/^[.:]+/, "");
     const options: string[] = [];
     let correctIndex = 0;
     for (let i = 1; i < lines.length; i++) {
@@ -108,18 +98,33 @@ export default function Lesson() {
   const isPausedRef = useRef(false);
   const lessonTextRef = useRef("");
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const hasLoadedRef = useRef(false);
 
   useEffect(() => { isPausedRef.current = isPaused; }, [isPaused]);
   useEffect(() => { lessonTextRef.current = lessonText; }, [lessonText]);
 
-  const themeColor = character ? COLOR_THEMES[character.colorTheme] || "#fbbf24" : "#fbbf24";
+  // Use characterType for theme color, not old COLOR_THEMES lookup
+  const charDef = getCharacterType(character?.characterType);
+  const themeColor = charDef.themeColor;
   const currentPart = character?.currentPart || 1;
   const totalParts = PARTS_PER_TOPIC;
   const partTitle = useMemo(() => character ? getPartTitle(character.subject || "", character.topic || "", currentPart) : "", [character, currentPart]);
+
   const testQuestions = useMemo(() => {
     if (generatedQuestions.length > 0) return generatedQuestions;
     return character ? getInlineTestQuestions(character.topic || "", currentPart) : [];
   }, [generatedQuestions, character, currentPart]);
+
+  // FIX: Compute test results using ref + local calculation instead of stale state
+  const computeTestResults = useCallback(() => {
+    let correct = 0;
+    testQuestions.forEach((q, i) => {
+      if (testAnswers[i] === q.correctIndex) correct++;
+    });
+    const passed = correct >= Math.ceil(testQuestions.length * 0.5);
+    return { correct, passed, total: testQuestions.length };
+  }, [testQuestions, testAnswers]);
+
   const testCorrectCount = useMemo(() => {
     if (!testSubmitted) return 0;
     let c = 0;
@@ -132,6 +137,7 @@ export default function Lesson() {
     if (character && character !== null && !character.grade) navigate("/onboarding");
   }, [character, navigate]);
 
+  // FIX: Only load lesson once on mount, not on every character update
   const loadLesson = useCallback(async () => {
     if (!character?.grade || !character?.subject || !character?.region || !character?.topic) return;
     setPhase("loading");
@@ -142,6 +148,7 @@ export default function Lesson() {
     setTestSubmitted(false);
     setCoinsEarned(0);
     setStarsFromCoins(0);
+    setGeneratedQuestions([]);
     try {
       const result = await generateLesson({
         grade: character.grade, subject: character.subject, region: character.region,
@@ -160,10 +167,6 @@ export default function Lesson() {
         setGeneratedQuestions([]);
       }
       setPhase("ready");
-      setShowConfetti(true);
-      setMascotReaction("happy");
-      playCheer();
-      setTimeout(() => setMascotReaction("idle"), 3000);
     } catch (error) {
       const fallback = FALLBACK_LESSONS[character.subject] || FALLBACK_LESSONS["General Knowledge"];
       setLessonText(fallback);
@@ -172,9 +175,26 @@ export default function Lesson() {
       setErrorMessage("");
       setGeneratedQuestions([]);
     }
-  }, [character, generateLesson, currentPart, totalParts, partTitle]);
+  }, [character?.grade, character?.subject, character?.region, character?.topic, character?.name, character?.description, currentPart, totalParts, partTitle, generateLesson]);
 
-  useEffect(() => { if (character?.grade) loadLesson(); }, [character?.grade, loadLesson]);
+  // Only load once when character is ready
+  useEffect(() => {
+    if (character?.grade && !hasLoadedRef.current) {
+      hasLoadedRef.current = true;
+      loadLesson();
+    }
+  }, [character?.grade, loadLesson]);
+
+  // Reload when part changes (after advancing)
+  const prevPartRef = useRef(currentPart);
+  useEffect(() => {
+    if (prevPartRef.current !== currentPart && currentPart > 1) {
+      prevPartRef.current = currentPart;
+      hasLoadedRef.current = false;
+      loadLesson();
+    }
+  }, [currentPart, loadLesson]);
+
   useEffect(() => () => { window.speechSynthesis.cancel(); if (progressIntervalRef.current) clearInterval(progressIntervalRef.current); }, []);
 
   const stopSpeaking = useCallback(() => {
@@ -211,14 +231,33 @@ export default function Lesson() {
 
   const togglePlayPause = useCallback(() => { playPop(); if (!isPlaying) speak(); else if (isPaused) speak(); else pauseSpeaking(); }, [isPlaying, isPaused, speak, pauseSpeaking]);
 
-  const handleRepeatLesson = useCallback(() => { playPop(); setPhase("loading"); setTestAnswers([]); setTestSubmitted(false); loadLesson(); }, [loadLesson]);
-  const handleStartTest = useCallback(() => { playPop(); setPhase("test"); setTestAnswers(testQuestions.map(() => null)); setTestSubmitted(false); }, [testQuestions]);
+  const handleRepeatLesson = useCallback(() => { playPop(); setPhase("loading"); setTestAnswers([]); setTestSubmitted(false); setCoinsEarned(0); setStarsFromCoins(0); setGeneratedQuestions([]); loadLesson(); }, [loadLesson]);
+
+  const handleStartTest = useCallback(() => {
+    playPop();
+    setPhase("test");
+    setTestAnswers(testQuestions.map(() => null));
+    setTestSubmitted(false);
+    setCoinsEarned(0);
+    setStarsFromCoins(0);
+  }, [testQuestions]);
+
   const handleTestAnswer = useCallback((qi: number, ai: number) => { if (testSubmitted) return; playPop(); setTestAnswers(p => { const n = [...p]; n[qi] = ai; return n; }); }, [testSubmitted]);
+
+  // FIX: Use computeTestResults() instead of stale testCorrectCount
   const handleSubmitTest = useCallback(async () => {
     if (testAnswers.some(a => a === null)) return;
-    playPop(); setTestSubmitted(true);
-    if (testCorrectCount >= Math.ceil(testQuestions.length * 0.5)) {
-      playCorrect(); setMascotReaction("happy"); setShowConfetti(true);
+    playPop();
+    setTestSubmitted(true);
+
+    // Compute results locally to avoid stale closure
+    const { correct, passed } = computeTestResults();
+
+    if (passed) {
+      playCorrect();
+      setMascotReaction("happy");
+      setShowConfetti(true);
+
       // Award 1 coin for completing the chapter
       try {
         const result = await addCoins({ amount: 1 });
@@ -227,12 +266,41 @@ export default function Lesson() {
           if (result.starsAdded > 0) setStarsFromCoins(result.starsAdded);
         }
       } catch (e) { console.error("Failed to award coin:", e); }
+
       setTimeout(() => setMascotReaction("idle"), 3000);
+
+      // Advance to next part
       try { await advancePart(); } catch (e) { console.error("Failed to advance:", e); }
-    } else { playIncorrect(); setMascotReaction("sad"); setTimeout(() => setMascotReaction("idle"), 2000); }
-  }, [testAnswers, testCorrectCount, testQuestions, advancePart, addCoins]);
+    } else {
+      playIncorrect();
+      setMascotReaction("sad");
+      setTimeout(() => setMascotReaction("idle"), 2000);
+    }
+  }, [testAnswers, computeTestResults, advancePart, addCoins]);
+
   const handleBackToLesson = useCallback(() => { playPop(); setPhase("ready"); setTestAnswers([]); setTestSubmitted(false); }, []);
-  const handleGoToNextPart = useCallback(() => { playPop(); setPhase("loading"); setTestAnswers([]); setTestSubmitted(false); loadLesson(); }, [loadLesson]);
+
+  const handleGoToNextPart = useCallback(() => {
+    playPop();
+    setPhase("loading");
+    setTestAnswers([]);
+    setTestSubmitted(false);
+    setCoinsEarned(0);
+    setStarsFromCoins(0);
+    setGeneratedQuestions([]);
+    hasLoadedRef.current = false;
+    loadLesson();
+  }, [loadLesson]);
+
+  // Back to realm
+  const handleBackToRealm = useCallback(() => {
+    stopSpeaking();
+    if (character?.subject) {
+      navigate(`/realm/${encodeURIComponent(character.subject)}`);
+    } else {
+      navigate("/dashboard");
+    }
+  }, [stopSpeaking, navigate, character?.subject]);
 
   if (character === undefined || character === null || !character.grade) {
     return <div className="flex min-h-screen items-center justify-center bg-grid"><div className="animate-pulse text-muted-foreground">Loading...</div></div>;
@@ -250,13 +318,20 @@ export default function Lesson() {
 
       <div className="relative mx-auto max-w-2xl px-6 py-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <button onClick={() => { stopSpeaking(); navigate("/dashboard"); }} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-all duration-250">
-            <ArrowLeft className="h-4 w-4" /> Kingdom
+        <div className="mb-6 flex items-center justify-between">
+          <button onClick={handleBackToRealm} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-all duration-250">
+            <ArrowLeft className="h-4 w-4" /> {character.subject || "Kingdom"}
           </button>
-          <div className="clay-card flex items-center gap-2 rounded-2xl px-3.5 py-1.5">
-            <MascotCharacter color={themeColor} size={24} characterType={character?.characterType} />
-            <span className="text-sm font-medium text-foreground">{character.name}</span>
+          <div className="flex items-center gap-3">
+            {/* Coin counter in header */}
+            <div className="clay-card flex items-center gap-1.5 rounded-2xl px-3 py-1.5">
+              <span className="text-sm">🪙</span>
+              <span className="text-sm font-bold text-amber-900">{character.coins || 0}</span>
+            </div>
+            <div className="clay-card flex items-center gap-2 rounded-2xl px-3.5 py-1.5">
+              <MascotCharacter color={themeColor} size={24} characterType={character?.characterType} />
+              <span className="text-sm font-medium text-foreground">{character.name}</span>
+            </div>
           </div>
         </div>
 
@@ -273,8 +348,8 @@ export default function Lesson() {
             <div className="flex justify-between mt-1.5">
               {Array.from({ length: totalParts }).map((_, i) => (
                 <div key={i} className="flex items-center gap-1">
-                  <div className={`h-4 w-4 rounded-full flex items-center justify-center text-[8px] font-bold ${i + 1 < currentPart ? "text-white" : i + 1 === currentPart ? "text-white ring-2 ring-offset-1" : "bg-white/10 text-muted-foreground"}`}
-                    style={i + 1 <= currentPart ? { backgroundColor: themeColor } : undefined}>
+                  <div className={`h-4 w-4 rounded-full flex items-center justify-center text-[8px] font-bold ${i + 1 < currentPart ? "text-white" : i + 1 === currentPart ? "text-white ring-2 ring-offset-1" : "text-muted-foreground"}`}
+                    style={i + 1 < currentPart ? { backgroundColor: themeColor } : i + 1 === currentPart ? { backgroundColor: themeColor } : { backgroundColor: "oklch(0.90 0.03 85)" }}>
                     {i + 1 < currentPart ? "✓" : i + 1}
                   </div>
                 </div>
@@ -313,11 +388,9 @@ export default function Lesson() {
             </motion.div>
           )}
 
-          {/* Error */}
-
           {/* Lesson ready / playing / finished */}
           {(phase === "ready" || phase === "finished") && lessonText && (
-            <motion.div key="lesson" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+            <motion.div key={`lesson-${currentPart}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
               <Card className="clay-card-lg border-0">
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -345,7 +418,7 @@ export default function Lesson() {
                       <Button onClick={togglePlayPause} className="clay-glow flex h-16 w-16 items-center justify-center rounded-full p-0" style={{ backgroundColor: themeColor }}>
                         {isPlaying && !isPaused ? <Pause className="h-6 w-6 text-white" /> : <Play className="ml-1 h-6 w-6 text-white" />}
                       </Button>
-                      <Button onClick={() => loadLesson()} variant="outline" size="icon" className="clay-btn h-12 w-12 rounded-2xl border-amber-200/30 bg-amber-50/40" title="Regenerate"><RefreshCw className="h-5 w-5" /></Button>
+                      <Button onClick={() => { hasLoadedRef.current = false; loadLesson(); }} variant="outline" size="icon" className="clay-btn h-12 w-12 rounded-2xl border-amber-200/30 bg-amber-50/40" title="Regenerate"><RefreshCw className="h-5 w-5" /></Button>
                     </div>
                   )}
 
@@ -362,16 +435,16 @@ export default function Lesson() {
                             <RotateCcw className="h-6 w-6" style={{ color: themeColor }} />
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-foreground group-hover:text-amber-300 transition-colors">Repeat This Chapter</p>
+                            <p className="text-sm font-semibold text-foreground group-hover:text-amber-700 transition-colors">Repeat This Chapter</p>
                             <p className="text-xs text-muted-foreground mt-0.5">Listen again from the start</p>
                           </div>
                         </button>
                         <button onClick={handleStartTest} className="clay-card clay-tile group flex flex-col items-center gap-3 rounded-2xl p-5 text-center">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/15">
-                            <Zap className="h-6 w-6 text-amber-400" />
+                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ backgroundColor: `${themeColor}15` }}>
+                            <Zap className="h-6 w-6" style={{ color: themeColor }} />
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-foreground group-hover:text-amber-300 transition-colors">Quick Trial ✨</p>
+                            <p className="text-sm font-semibold text-foreground group-hover:text-amber-700 transition-colors">Quick Trial ✨</p>
                             <p className="text-xs text-muted-foreground mt-0.5">Test what you learned (earn 1 🪙)</p>
                           </div>
                         </button>
@@ -416,12 +489,12 @@ export default function Lesson() {
                           return (
                             <button key={oi} onClick={() => handleTestAnswer(qi, oi)} disabled={testSubmitted}
                               className={`clay-btn w-full rounded-2xl p-3 text-left text-sm font-medium transition-all duration-250 ${
-                                testSubmitted && isCorrect ? "bg-emerald-500/20 text-emerald-300 ring-2 ring-emerald-500/50"
-                                : testSubmitted && isSelected && !isCorrect ? "bg-rose-500/20 text-rose-300 ring-2 ring-rose-500/50"
-                                : isSelected ? "bg-amber-500/20 text-amber-300"
-                                : "bg-amber-100/40 text-foreground hover:bg-amber-100/60"
+                                testSubmitted && isCorrect ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400"
+                                : testSubmitted && isSelected && !isCorrect ? "bg-rose-100 text-rose-800 ring-2 ring-rose-400"
+                                : isSelected ? "bg-amber-100 text-amber-900 ring-2 ring-amber-400"
+                                : "bg-amber-50/40 text-foreground hover:bg-amber-100/60"
                               }`}>
-                              <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[10px]">{String.fromCharCode(65 + oi)}</span>
+                              <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/60 text-[10px]">{String.fromCharCode(65 + oi)}</span>
                               {opt}
                             </button>
                           );
@@ -440,11 +513,11 @@ export default function Lesson() {
                         <p className="text-2xl font-bold" style={{ color: themeColor }}>{testCorrectCount}/{testQuestions.length}</p>
                         <p className="text-sm text-muted-foreground mt-1">{testPassed ? "🎉 Amazing work! You passed!" : "💪 Almost there! Give it another shot!"}</p>
                         {coinsEarned > 0 && (
-                          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="mt-3 inline-flex items-center gap-2 rounded-2xl bg-amber-500/15 px-4 py-2">
+                          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="mt-3 inline-flex items-center gap-2 rounded-2xl px-4 py-2" style={{ backgroundColor: `${themeColor}15` }}>
                             <span className="text-lg">🪙</span>
-                            <span className="text-sm font-bold text-amber-300">+1 Coin earned!</span>
+                            <span className="text-sm font-bold" style={{ color: themeColor }}>+1 Coin earned!</span>
                             {starsFromCoins > 0 && (
-                              <span className="text-sm text-purple-300">→ +{starsFromCoins} Star{starsFromCoins > 1 ? "s" : ""}! ⭐</span>
+                              <span className="text-sm text-amber-700">→ +{starsFromCoins} Star{starsFromCoins > 1 ? "s" : ""}! ⭐</span>
                             )}
                           </motion.div>
                         )}
@@ -452,9 +525,13 @@ export default function Lesson() {
                       <div className="flex gap-3">
                         {!testPassed ? (
                           <Button onClick={handleRepeatLesson} className="clay-primary flex-1 rounded-2xl py-2.5 font-semibold"><RotateCcw className="mr-2 h-4 w-4" /> Review & Retry</Button>
-                        ) : (
+                        ) : currentPart < totalParts ? (
                           <Button onClick={handleGoToNextPart} className="clay-primary flex-1 rounded-2xl py-2.5 font-semibold">
-                            {currentPart < totalParts ? "Next Chapter" : "Back to Kingdom"} <ChevronRight className="ml-2 h-4 w-4" />
+                            Next Chapter <ChevronRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        ) : (
+                          <Button onClick={handleBackToRealm} className="clay-primary flex-1 rounded-2xl py-2.5 font-semibold">
+                            Back to {character.subject || "Kingdom"} <ChevronRight className="ml-2 h-4 w-4" />
                           </Button>
                         )}
                       </div>

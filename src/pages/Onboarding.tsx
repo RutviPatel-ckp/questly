@@ -200,7 +200,7 @@ export default function Onboarding() {
                 <SelectTrigger className="clay-input h-12 rounded-2xl text-base">
                   <SelectValue placeholder={currentStep.placeholder} />
                 </SelectTrigger>
-                <SelectContent className="bg-card border-white/10 rounded-2xl">
+                <SelectContent className="bg-card border-amber-200/30 rounded-2xl">
                   {currentStep.options.map((opt) => (
                     <SelectItem key={opt} value={opt} className="text-sm rounded-xl">
                       {opt}

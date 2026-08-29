@@ -241,7 +241,7 @@ export default function CreateCharacter() {
             <div
               key={i}
               className={`h-2 rounded-full transition-all duration-300 ${
-                i === step ? "w-8 bg-amber-500" : i < step ? "w-2 bg-amber-400/60" : "w-2 bg-white/10"
+                i === step ? "w-8 bg-amber-500" : i < step ? "w-2 bg-amber-400/60" : "w-2 bg-amber-200/40"
               }`}
             />
           ))}
