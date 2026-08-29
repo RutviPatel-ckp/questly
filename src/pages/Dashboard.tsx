@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/hooks/use-auth";
@@ -18,6 +18,10 @@ import {
   Lock,
   Trophy,
   ChevronRight,
+  X,
+  Sparkles,
+  Shield,
+  BrainCircuit,
 } from "lucide-react";
 import {
   ACHIEVEMENTS,
@@ -80,6 +84,7 @@ export default function Dashboard() {
   const [notifSupported, setNotifSupported] = useState(false);
   const [showStreakBanner, setShowStreakBanner] = useState(false);
   const [notifLoading, setNotifLoading] = useState(false);
+  const [rootModal, setRootModal] = useState<null | "quest" | "king" | "battle">(null);
 
   const companionMsg = useMemo(() => {
     const idx = Math.floor(Math.random() * COMPANION_MESSAGES.length);
@@ -434,7 +439,7 @@ export default function Dashboard() {
                 <p className="section-label mb-3 text-center">🌿 Roots of Knowledge</p>
                 <div className="grid gap-3 sm:grid-cols-3">
                   <button
-                    onClick={() => navigate("/lesson")}
+                    onClick={() => setRootModal("quest")}
                     className="clay-card clay-tile group flex flex-col items-center gap-2 p-4 text-center"
                   >
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100/60">
@@ -444,7 +449,7 @@ export default function Dashboard() {
                     <p className="text-[10px] text-amber-700/50">Resume your lesson</p>
                   </button>
                   <button
-                    onClick={() => navigate("/chat")}
+                    onClick={() => setRootModal("king")}
                     className="clay-card clay-tile group flex flex-col items-center gap-2 p-4 text-center"
                   >
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-100/60">
@@ -454,7 +459,7 @@ export default function Dashboard() {
                     <p className="text-[10px] text-amber-700/50">Royal tutor awaits</p>
                   </button>
                   <button
-                    onClick={() => navigate("/quiz")}
+                    onClick={() => setRootModal("battle")}
                     className="clay-card clay-tile group flex flex-col items-center gap-2 p-4 text-center"
                   >
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100/60">
@@ -556,6 +561,89 @@ export default function Dashboard() {
           Questly v1 · Every lesson is a quest ⚔️
         </p>
       </div>
+
+      {/* === FEATURE DESCRIPTION OVERLAY === */}
+      <AnimatePresence>
+        {rootModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+            onClick={() => setRootModal(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="clay-card-lg rounded-3xl p-8 max-w-sm w-full relative"
+              onClick={(e) => e.stopPropagation()}>
+              {/* Close button */}
+              <button
+                onClick={() => setRootModal(null)}
+                className="absolute top-4 right-4 h-8 w-8 rounded-full bg-amber-100/60 flex items-center justify-center hover:bg-amber-200/60 transition-colors">
+                <X className="h-4 w-4 text-amber-700" />
+              </button>
+
+              {/* Icon */}
+              <div className="flex justify-center mb-4">
+                <div className={`flex h-16 w-16 items-center justify-center rounded-2xl ${
+                  rootModal === "quest" ? "bg-amber-100/80" :
+                  rootModal === "king" ? "bg-purple-100/80" :
+                  "bg-rose-100/80"
+                }`}>
+                  {rootModal === "quest" && <BookOpen className="h-8 w-8 text-amber-600" />}
+                  {rootModal === "king" && <BrainCircuit className="h-8 w-8 text-purple-500" />}
+                  {rootModal === "battle" && <Swords className="h-8 w-8 text-rose-500" />}
+                </div>
+              </div>
+
+              {/* Content */}
+              <h3 className="text-lg font-bold text-amber-900 text-center">
+                {rootModal === "quest" && "Continue Your Quest"}
+                {rootModal === "king" && "The Wise Old King"}
+                {rootModal === "battle" && "Quiz Battle"}
+              </h3>
+
+              <p className="mt-3 text-sm text-amber-700/70 text-center leading-relaxed">
+                {rootModal === "quest" && (
+                  <>Dive back into your lessons! Each chapter teaches you something new, and after every lesson, a short quiz tests what you learned. Complete chapters to earn coins and level up your kingdom!</>
+                )}
+                {rootModal === "king" && (
+                  <>Your royal tutor awaits! The Wise Old King never gives you the answer directly — instead, he asks guiding questions and offers hints, helping you discover the solution yourself. The fewer hints you need, the more you prove your wisdom!</>
+                )}
+                {rootModal === "battle" && (
+                  <>Face off against a fellow adventurer or battle the training bot! Answer general knowledge questions head-to-head. The winner earns a Star, and both players sharpen their minds in the heat of combat!</>
+                )}
+              </p>
+
+              <div className="mt-6 space-y-2">
+                <Button
+                  onClick={() => {
+                    setRootModal(null);
+                    if (rootModal === "quest") navigate("/lesson");
+                    if (rootModal === "king") navigate("/chat");
+                    if (rootModal === "battle") navigate("/quiz");
+                  }}
+                  className="clay-primary w-full rounded-2xl py-2.5 font-semibold"
+                >
+                  {rootModal === "quest" && <><Sparkles className="mr-2 h-4 w-4" />Begin Quest</>}
+                  {rootModal === "king" && <><Shield className="mr-2 h-4 w-4" />Enter the Throne Room</>}
+                  {rootModal === "battle" && <><Swords className="mr-2 h-4 w-4" />Enter the Arena</>}
+                </Button>
+                <Button
+                  onClick={() => setRootModal(null)}
+                  variant="ghost"
+                  className="w-full rounded-2xl py-2 text-sm text-amber-700/60 hover:text-amber-900"
+                >
+                  Not yet
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
