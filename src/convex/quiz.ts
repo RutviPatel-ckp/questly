@@ -21,6 +21,7 @@ function generateRoomCode(): string {
 export const createRoom = mutation({
   args: {
     questionIds: v.array(v.string()),
+    battleTopic: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -46,6 +47,7 @@ export const createRoom = mutation({
       hostScore: 0,
       guestScore: 0,
       questions: args.questionIds,
+      battleTopic: args.battleTopic,
       createdAt: Date.now(),
     });
 
@@ -182,6 +184,7 @@ export const submitAnswer = mutation({
 export const createBotRoom = mutation({
   args: {
     questionIds: v.array(v.string()),
+    battleTopic: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -226,6 +229,7 @@ export const createBotRoom = mutation({
       hostScore: 0,
       guestScore: botScore,
       questions: args.questionIds,
+      battleTopic: args.battleTopic,
       createdAt: Date.now(),
     });
 

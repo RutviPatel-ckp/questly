@@ -72,6 +72,7 @@ const schema = defineSchema(
       hostScore: v.number(),
       guestScore: v.number(),
       questions: v.array(v.string()),
+      battleTopic: v.optional(v.string()),
       createdAt: v.number(),
     }).index("by_code", ["roomCode"]),
 

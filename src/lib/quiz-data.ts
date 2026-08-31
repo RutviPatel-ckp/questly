@@ -152,8 +152,47 @@ export function scoreAnswers(
 }
 
 // ============================================================================
-// KINGDOM RANKS
+// BATTLE TOPICS
 // ============================================================================
+
+export interface BattleTopic {
+  id: string;
+  name: string;
+  emoji: string;
+  color: string;
+  subject: string;
+}
+
+export const BATTLE_TOPICS: BattleTopic[] = [
+  { id: "science", name: "Science", emoji: "🔬", color: "#34d399", subject: "Science" },
+  { id: "math", name: "Mathematics", emoji: "🔢", color: "#60a5fa", subject: "Math" },
+  { id: "history", name: "History", emoji: "📜", color: "#fbbf24", subject: "History" },
+  { id: "english", name: "English", emoji: "📚", color: "#c084fc", subject: "English" },
+  { id: "cs", name: "Computer Science", emoji: "💻", color: "#38bdf8", subject: "Programming" },
+  { id: "gk", name: "General Knowledge", emoji: "🌍", color: "#fb7185", subject: "General Knowledge" },
+];
+
+/**
+ * Pick 3 questions from a specific subject for battle.
+ */
+export function pickQuestionsByTopic(topicId: string, count = 3): QuizQuestion[] {
+  const topic = BATTLE_TOPICS.find((t) => t.id === topicId);
+  if (!topic) return pickQuestions(count);
+  const matching = QUIZ_QUESTIONS.filter((q) => q.subject === topic.subject);
+  if (matching.length < count) {
+    // Fall back to mixing in questions from other subjects
+    const others = QUIZ_QUESTIONS.filter((q) => q.subject !== topic.subject);
+    const combined = [...matching, ...others];
+    const shuffled = [...combined].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
+  }
+  const shuffled = [...matching].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
+
+// ============================================================================
+// KINGDOM RANKS
+// ====================================================================================
 
 export interface Rank {
   id: string;
